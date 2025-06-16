@@ -1,0 +1,368 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+*{
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #011126;
+  font-family: 'Inter', sans-serif;
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+
+.body{
+    background-color: #011126 ;
+}
+.navbar {
+    background: linear-gradient(to right, #122C6F, #8215ca,#122C6F ) ;
+    margin-top: 30px ;
+    margin-right: 100px;
+    margin-left: 100px;
+    border-radius: 15px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) ;
+    position: fixed;
+}
+.LoginSignup_Button{
+    background-color: #50DA00;
+    color: black;
+    border: none;
+    border-radius: 15px;
+    padding: 8px 13px;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: bolder;
+    font-family: "Inter", sans-serif;
+    transition: 0.3s background-color;
+}
+
+.navbar-brand{
+    color: white;
+}
+
+.LoginSignup_Button:hover{
+    background-color: #5eff00;
+}
+
+.navbar-toggler{
+    border: none;
+    font-size: 1.45rem;
+    color: white;
+}
+
+.navbar-toggler:focus, .btn-close:focus{
+    box-shadow: none;
+    outline: none   ;
+}
+
+.nav-link{
+    color: #011126;
+    font-family: "Inter",sans-serif;
+    font-weight: bolder;
+    position: relative;
+}
+
+@media (min-width:991px){
+    .nav-link::before{
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 3px;
+        background-color: #50DA00;
+        visibility: hidden;
+        transition: 0.3s ease-in-out;
+        
+    }
+
+    .nav-link{
+        color: white;
+    }
+
+    .nav-link:hover::before,.nav-link.active::before{
+        width: 100%;
+        visibility: visible;
+        
+    }
+
+    .nav-link:hover{
+        color: black;
+    }
+}   
+
+.advertise-board{
+    font-family: "Inter", sans-serif;
+    align-items: center;
+    background: url(/images/Advi-Back.png);
+    background-repeat: no-repeat;
+    text-align: right;
+
+    margin-top: 150px;
+    margin-right: 200px;
+    margin-left: 200px;
+
+    position: absolute;
+    width: auto;
+    height: 500px;
+
+    color: white;
+    padding: 30px 30px 30px 30px;
+
+    position: sticky;
+}
+
+
+.advertise-board h1{
+    font-weight: bolder;
+    font-size: 100px;
+    
+}
+
+.advertise-board p{
+    font-weight: bolder;
+    text-align: right;
+    position: absolute;
+    right: 10px;
+    
+    
+}
+.advertise-board h2{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+
+}
+
+.Advertise-btn {
+    position: absolute;
+    text-decoration: none;
+    bottom: 30px;
+    right: 30px;
+
+    background: linear-gradient(to right, #122C6F, #8215ca,#122C6F );
+    color: white;
+    border-color: #8215ca;
+    border-style: solid;
+    border-width: 2px;
+    padding: 16px 50px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bolder;
+    font-family: "Inter", sans-serif;
+
+
+}
+
+.Advi-model{
+    position: absolute;
+    left: 290px;
+    bottom: 0px;
+    height: 490px;
+}
+
+.intro-Workout{
+    font-family: "Inter", sans-serif;
+    align-items: center;
+    color: white;
+
+    margin-top: 150px;
+    margin-right: 230px;
+    margin-left: 230px;
+
+    position: absolute;
+    width: auto;
+    height: 400px;
+
+    text-align: right;
+
+    position: sticky;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 100px 230px;
+  gap: 30px;
+}
+
+.section-image img {
+  width: 400px;
+  height: auto;
+  border-radius: 10px;
+}
+
+
+.section-text {
+  flex: 1;
+  color: white;
+  text-align: right;
+
+}
+
+.section-text h1 {
+  font-size: 50px;
+  font-weight: bolder;
+}
+
+.section-text p ,h3{
+  margin-top: 20px;
+  font-size: 20px;
+  margin-right:30px ;
+}
+
+.Advi-Small-img{
+    height: 400px;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    
+    margin-right: 100px;
+}
+
+.Explore-Btn{
+    position: absolute;
+    text-decoration: none;
+    bottom: 10px;
+    right: 30px;
+
+   background: linear-gradient(to right, #122C6F, #8215ca,#122C6F );
+    color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) ;
+    border-radius: 17px;
+    border-width: 2px;
+    padding: 16px 50px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bolder;
+    font-family: "Inter", sans-serif;
+
+}
+
+
+.intro-Community{
+    font-family: "Inter", sans-serif;
+    align-items: center;
+    color: white;
+
+    margin-top: 150px;
+    margin-right: 230px;
+    margin-left: 230px;
+
+    position: absolute;
+    width: auto;
+    height: 400px;
+
+    position: sticky;
+
+}
+
+.intro-Community h1{
+    font-weight: bolder;
+    font-size: 50px;
+
+}
+
+.intro-Community p{
+    
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 100px 230px;
+  gap: 30px;
+}
+
+.section-image img {
+  width: 400px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.section-text-left {
+  flex: 1;
+  color: white;
+  text-align: left;
+
+
+}
+
+.section-text-left h1 {
+  font-size: 50px;
+  font-weight: bolder;
+}
+
+.section-text-left p,h3 {
+  margin-top: 20px;
+  font-size: 20px;
+  margin-left:30px;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+
+.Explore-Btn-left{
+    position: absolute;
+    text-decoration: none;
+    bottom: 10px;
+    left: 30px;
+
+    background: linear-gradient(to right, #122C6F, #8215ca,#122C6F );
+    color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) ;
+    border-radius: 17px;
+    border-width: 2px;
+    padding: 16px 50px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bolder;
+    font-family: "Inter", sans-serif;
+
+}
+
+.Advi-Small-img-right{
+    height: 400px;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    
+    margin-left: 100px;
+}
+
+.footer{
+    height: 600px;
+    bottom: 0;
+
+    margin-right: 230px;
+    margin-left: 230px;
+
+    color: white;
+}
+
+.ContactUs{
+    height: 200px;
+    width: auto;
+
+    margin-top: 150px;
+    background-color: #2D323E;
+
+    border-radius: 15px;
+    padding-top: 65px;
+    
+}
