@@ -3,7 +3,7 @@ import '../style/common.css';
 import Navbar from '@/components/intro-nav'; // or use relative path if needed
 import Image from 'next/image';
 
-export default function LoginPage() {
+export default function introPage() {
   return (
     <>
     <html lang="en">

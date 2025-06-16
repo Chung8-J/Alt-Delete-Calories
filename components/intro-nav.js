@@ -40,7 +40,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <Link href="/login" className="LoginSignup_Button">Login/SignUp</Link>
+        <Link href="/Login" className="LoginSignup_Button">Login/SignUp</Link>
 
         <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
           <span className="navbar-toggler-icon"></span>
