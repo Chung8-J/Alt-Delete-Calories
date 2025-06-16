@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     if (!name || !password) {
-       window.alert('⚠️ Please enter both username and password.');
+       window.alert('⚠️ Please enter both username and password without blank.');
       return;
     }
 
@@ -32,6 +32,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         //setMessage('✅ Login successful!');
+
+        // base on name direct to admin or user
         router.push('/home');
        
       } else {
@@ -69,12 +71,11 @@ export default function LoginPage() {
             Login
       </a>
 
-
       <p style={{ color: 'red' }}>{message}</p>
 
       <br />
       <Link href="/Signup">Sign Up</Link><br />
-      <a href="#">Forget password</a>
+      <a href="/forgetpassword">Forget password</a>
     </div>
   );
 }
