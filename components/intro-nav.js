@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Link from 'next/link';
 
+import '../style/common.css';
+
 export default function Navbar() {
   useEffect(() => {
     import('bootstrap/dist/js/bootstrap.bundle.min.js');

@@ -3,6 +3,8 @@ import '../style/common.css';
 import Navbar from '@/components/intro-nav'; // or use relative path if needed
 import Image from 'next/image';
 
+// can become component
+
 export default function introPage() {
   return (
     <>

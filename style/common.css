@@ -63,12 +63,13 @@ html, body {
     outline: none   ;
 }
 
-.nav-link{
-    color: #011126;
-    font-family: "Inter",sans-serif;
-    font-weight: bolder;
-    position: relative;
+.navbar .nav-item .nav-link {
+  color: white ; /* ⬅️ Always white by default */
+  font-family: "Inter", sans-serif!important;
+  font-weight: bolder!important;
+  position: relative!important;
 }
+
 
 @media (min-width:991px){
     .nav-link::before{
@@ -96,7 +97,7 @@ html, body {
     }
 
     .nav-link:hover{
-        color: black;
+        color: black !important;
     }
 }   
 
