@@ -40,27 +40,59 @@ export default async function handler(req, res) {
 
         return res.status(200).json({ message: '✅ Member added' });
       }
+    if (action === 'login') {
+      let result;
+      let role = 'user';
+      let user;
 
-      if (action === 'login') {
-        const result = await pool.query(
-          'SELECT * FROM member WHERE member_name = $1',
+      console.log("🔐 Login attempt for:", data.member_name);
+
+      // Try logging in as a member
+      result = await pool.query(
+        'SELECT * FROM member WHERE member_name = $1',
+        [data.member_name]
+      );
+
+      if (result.rows.length > 0) {
+        user = result.rows[0];
+        console.log("✅ Found in member:", user.member_name);
+      } else {
+        // Try logging in as a coach (admin)
+        result = await pool.query(
+          'SELECT * FROM coach WHERE coach_name = $1',
           [data.member_name]
         );
-
-        if (result.rows.length === 0) {
-          return res.status(401).json({ error: 'Invalid credentials' });
+        if (result.rows.length > 0) {
+          user = result.rows[0];
+          role = 'admin';
+          console.log("✅ Found in coach:", user.coach_name);
+        } else {
+          console.log("❌ User not found");
+          return res.status(401).json({ error: 'Invalid credentials (user not found)' });
         }
-
-        const isMatch = await bcrypt.compare(data.password, result.rows[0].password);
-
-        if (!isMatch) {
-          return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        return res
-          .status(200)
-          .json({ message: 'Login successful', user: result.rows[0] });
       }
+
+      //console.log("🔍 Input password:", data.password);
+      //console.log("🔐 Stored hash:", user.password);
+
+      const isMatch = await bcrypt.compare(data.password, user.password);
+      console.log("🧪 Password match result:", isMatch);
+
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Password incorrect Please try again!' });
+      }
+
+      // Attach role and return
+      user.role = role;
+      return res.status(200).json({
+        message: 'Login successful',
+        user,
+        role,
+      });
+    }
+
+
+
     }
 
     if (table === 'product' && action === 'create') {

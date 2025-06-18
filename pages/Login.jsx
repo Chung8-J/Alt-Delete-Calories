@@ -9,35 +9,34 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
   const router = useRouter();
 
-
   const handleLogin = async () => {
     if (!name || !password) {
-       window.alert('⚠️ Please enter both username and password without blank.');
+      window.alert('⚠️ Please enter both username and password without blank.');
       return;
     }
 
     try {
-        const response = await fetch('/api/Db_connection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            table: 'member',
-            action: 'login',
-            data: { member_name: name, password },
-        }),
-        });
-
-
+     const response = await fetch('/api/Db_connection', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    table: 'member', // <-- Add this line
+    action: 'login',
+    data: { member_name: name, password },
+  }),
+});
       const result = await response.json();
 
       if (response.ok) {
-        //setMessage('✅ Login successful!');
+        localStorage.setItem('user', JSON.stringify(result.user));
 
-        // base on name direct to admin or user
-        router.push('/home');
-       
+        if (result.role === 'admin') {
+          router.push('/adminhome'); // Redirect to admin dashboard
+        } else {
+          router.push('/userhome'); // Redirect to user dashboard
+        }
       } else {
-        window.alert('❌ ' + result.error);
+        alert(result.error || 'Invalid credentials');
       }
     } catch (err) {
       window.alert('❌ Failed to connect to server.');
@@ -68,7 +67,7 @@ export default function LoginPage() {
       /><br /><br />
 
       <a href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
-            Login
+        Login
       </a>
 
       <p style={{ color: 'red' }}>{message}</p>
