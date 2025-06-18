@@ -2,41 +2,29 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function AdminHome() {
+export default function AdminDashboard() {
   const [admin, setAdmin] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser || !storedUser.coach_name) {
-      router.push('/login'); // redirect to login if not an admin
-    } else {
+
+    if (storedUser && storedUser.role === 'admin') {
       setAdmin(storedUser);
+    } else {
+      router.push('/Login'); 
     }
   }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
 
   if (!admin) return <p>Loading...</p>;
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h1>Welcome, Coach {admin.coach_name} 👋</h1>
-      <p>You have successfully logged in as an administrator.</p>
-
+    <div>
+      <h1>Welcome Admin, {admin.coach_name || admin.name}!</h1>
       <button
-        onClick={handleLogout}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#d9534f',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
+        onClick={() => {
+          localStorage.removeItem('user');
+          router.push('/Login');
         }}
       >
         Logout

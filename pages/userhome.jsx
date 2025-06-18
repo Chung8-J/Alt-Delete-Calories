@@ -1,5 +1,6 @@
+'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function UserDashboard() {
   const [user, setUser] = useState(null);
@@ -7,25 +8,27 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.member_name) {
+
+    if (storedUser && storedUser.role === 'user') {
       setUser(storedUser);
     } else {
-      // Redirect if not logged in or not a user
-      router.push('/login');
+      router.push('/Login');
     }
   }, [router]);
 
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Welcome, {user.member_name}!</h1>
-      <p>You are logged in as a regular user.</p>
-      {/* Add your user-specific features here */}
-      <button onClick={() => {
-        localStorage.removeItem('user');
-        router.push('/login');
-      }}>Logout</button>
+    <div>
+      <h1>Welcome, {user.member_name || user.name}!</h1>
+      <button
+        onClick={() => {
+          localStorage.removeItem('user');
+          router.push('/Login');
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 }

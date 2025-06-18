@@ -28,7 +28,10 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('user', JSON.stringify(result.user));
+        localStorage.setItem('user', JSON.stringify({
+          name: result.user.member_name,
+          role: result.role
+        }));
 
         if (result.role === 'admin') {
           router.push('/adminhome'); // Redirect to admin dashboard
