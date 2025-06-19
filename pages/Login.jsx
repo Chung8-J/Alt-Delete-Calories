@@ -30,8 +30,10 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify({
           name: result.user.member_name,
-          role: result.role
+          role: result.role,
+          member_ic: result.user.member_ic
         }));
+
 
         if (result.role === 'admin') {
           router.push('/adminhome'); // Redirect to admin dashboard

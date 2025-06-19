@@ -61,8 +61,7 @@ export default function SignupPage() {
         window.alert('✅ Signup successful!');
         router.push('/Login');  
 
-        
-
+      
       } else {
         window.alert('❌ ' + result.error);
       }
