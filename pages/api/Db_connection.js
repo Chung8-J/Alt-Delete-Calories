@@ -7,19 +7,40 @@ const pool = new Pool({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
-
-  const { table, action, data } = req.body;
+  const { table, action, data } = req.body || {}; // prevent destructuring error for GET
 
   try {
-    if (table === 'member') {
-      if (action === 'create') {
-        // Check for required fields
+    // ✅ 1. GET Profile
+    if (req.method === 'GET') {
+      const { member_ic, role } = req.query;
+
+      if (!member_ic || !role) {
+        return res.status(400).json({ error: 'Missing member_ic or role' });
+      }
+
+      const tableName = role === 'admin' ? 'coach' : 'member';
+
+      const result = await pool.query(
+        `SELECT * FROM ${tableName} WHERE ${tableName}_ic = $1`,
+        [member_ic]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: `${role === 'admin' ? 'Coach' : 'Member'} not found` });
+      }
+
+      return res.status(200).json(result.rows[0]);
+    }
+
+    // ✅ 2. POST - Register, Login, Update
+    if (req.method === 'POST') {
+
+      // ➕ Member Registration
+      if (table === 'member' && action === 'create') {
         if (!data.password || !data.member_name || !data.member_ic || !data.d_birth || !data.email) {
           return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        // Check if member_name already exists
         const checkResult = await pool.query(
           'SELECT * FROM member WHERE member_name = $1',
           [data.member_name]
@@ -28,10 +49,8 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: '❌ Username already taken' });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
-        // Insert new member
         await pool.query(
           `INSERT INTO member (member_ic, member_name, password, d_birth, email)
            VALUES ($1, $2, $3, $4, $5)`,
@@ -40,60 +59,98 @@ export default async function handler(req, res) {
 
         return res.status(200).json({ message: '✅ Member added' });
       }
-   if (action === 'login') {
-  // 1. Try member table
-  const userResult = await pool.query(
-    'SELECT * FROM member WHERE member_name = $1',
-    [data.member_name]
-  );
 
-  if (userResult.rows.length > 0) {
-    const user = userResult.rows[0];
-    const match = await bcrypt.compare(data.password, user.password);
-    if (match) {
-      return res.status(200).json({
-        user,
-        role: 'user'
-      });
-    }
+      // 🔐 Login (member or coach)
+      if (action === 'login') {
+        const userResult = await pool.query(
+          'SELECT * FROM member WHERE member_name = $1',
+          [data.member_name]
+        );
+
+        if (userResult.rows.length > 0) {
+          const user = userResult.rows[0];
+          const match = await bcrypt.compare(data.password, user.password);
+          if (match) {
+            return res.status(200).json({
+              user,
+              role: 'user'
+            });
+          }
+        }
+
+        const coachResult = await pool.query(
+          'SELECT * FROM coach WHERE coach_name = $1',
+          [data.member_name]
+        );
+
+        if (coachResult.rows.length > 0) {
+          const coach = coachResult.rows[0];
+          const match = await bcrypt.compare(data.password, coach.password);
+          if (match) {
+            return res.status(200).json({
+              user: {
+                member_name: coach.coach_name,
+                member_ic: coach.coach_ic
+              },
+              role: 'admin'
+            });
+          }
+        }
+
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // ✏️ Update Profile (member or coach)
+     if (action === 'update_profile') {
+        const { role, member_ic, updates } = data;
+
+        if (!role || !member_ic || !updates) {
+          return res.status(400).json({ error: 'Missing update data' });
+        }
+
+        const tableName = role === 'admin' ? 'coach' : 'member';
+        const idColumn = role === 'admin' ? 'coach_ic' : 'member_ic';
+
+        const keys = Object.keys(updates);
+        const values = Object.values(updates);
+
+        if (keys.length === 0) {
+          return res.status(400).json({ error: 'No fields to update' });
+        }
+
+        const setClause = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
+
+        const query = `
+          UPDATE ${tableName}
+          SET ${setClause}
+          WHERE ${idColumn} = $${keys.length + 1}
+        `;
+
+  try {
+    await pool.query(query, [...values, member_ic]);
+    return res.status(200).json({ message: '✅ Profile updated' });
+  } catch (err) {
+    console.error('❌ Update query failed:', err);
+    return res.status(500).json({ error: 'Failed to update profile' });
   }
-
-  // 2. Try coach table if not found in member
-  const coachResult = await pool.query(
-    'SELECT * FROM coach WHERE coach_name = $1',
-    [data.member_name]
-  );
-
-  if (coachResult.rows.length > 0) {
-    const coach = coachResult.rows[0];
-    const match = await bcrypt.compare(data.password, coach.password);
-    if (match) {
-      return res.status(200).json({
-        user: { member_name: coach.coach_name }, // Use same format for frontend
-        role: 'admin'
-      });
-    }
-  }
-
-  // 3. If not found or password mismatch
-  return res.status(401).json({ error: 'Invalid credentials' });
 }
 
 
+      // 🛒 Create Product (extra case)
+      if (table === 'product' && action === 'create') {
+        await pool.query('INSERT INTO product (name, price) VALUES ($1, $2)', [
+          data.name,
+          data.price,
+        ]);
+        return res.status(200).json({ message: 'Product added' });
+      }
 
+      return res.status(400).json({ error: 'Invalid POST request' });
     }
 
-    if (table === 'product' && action === 'create') {
-      await pool.query('INSERT INTO product (name, price) VALUES ($1, $2)', [
-        data.name,
-        data.price,
-      ]);
-      return res.status(200).json({ message: 'Product added' });
-    }
-
-    return res.status(400).json({ error: 'Invalid request' });
+    res.status(405).end(); // Method not allowed
   } catch (err) {
-    console.error(err);
+    console.error('❌ API error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 }

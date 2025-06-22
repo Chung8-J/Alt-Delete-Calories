@@ -26,7 +26,7 @@ export default function UserDashboard() {
     <a href="#">Library</a> <br /><br />
     <a href="#">Customize plan</a> <br /><br />
     <a href="#">Calories Calculator</a> <br /><br />
-    <a href="#">profile</a> <br /><br />
+    <a href="/userprofile">profile</a> <br /><br />
 
 
 
@@ -34,6 +34,7 @@ export default function UserDashboard() {
         onClick={() => {
           localStorage.removeItem('user');
           router.push('/Login');
+          
         }}
       >
         Logout
