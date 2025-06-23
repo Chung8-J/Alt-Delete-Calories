@@ -23,10 +23,11 @@ export default function UserDashboard() {
       <h1>Welcome, {user.member_name || user.name} This is dashboard page!</h1>
 
     <a href="/community">Community</a> <br /><br />
-    <a href="#">Library</a> <br /><br />
+    <a href="/member_exercise">Exercise Library</a> <br /><br />
+    <a href="#">Food Library</a> <br /><br />
     <a href="#">Customize plan</a> <br /><br />
     <a href="#">Calories Calculator</a> <br /><br />
-    <a href="/userprofile">profile</a> <br /><br />
+    <a href="/userprofile">Profile</a> <br /><br />
 
 
 
