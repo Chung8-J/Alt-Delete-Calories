@@ -104,8 +104,8 @@ export default function CommunityPage() {
               alt="Post"
               style={{
                 width: '100%',
-                maxHeight: '400px', // or whatever limit you want
-                height: 'auto',      // let image control the height
+                maxHeight: '400px',
+                height: 'auto',      
                 objectFit: 'contain',
                 borderRadius: '4px'
               }}
