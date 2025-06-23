@@ -136,7 +136,8 @@ export default function ExerciseLibrary({ role }) {
               {role === 'admin' && (
                 <div className="flex gap-2 mt-3">
                   <button
-                    onClick={() => router.push(`/edit-exercise/${ex.exercise_id}`)}
+                    onClick={() => router.push('/edit_exercise/' + ex.exercise_id)}
+
                     className="px-3 py-1 text-sm rounded bg-yellow-400 hover:bg-yellow-500 text-white"
                   >
                     Edit

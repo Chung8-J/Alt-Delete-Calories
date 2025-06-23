@@ -1,16 +1,19 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router'; // ✅ Pages Router!
 import { useEffect, useState } from 'react';
 
-export default function EditExercise({ params }) {
+export default function EditExercise() {
   const router = useRouter();
-  const { id } = params;
+  const { id } = router.query; // ✅ Get ID from URL
 
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
+  // ✅ Only fetch when id is defined
   useEffect(() => {
+    if (!id) return;
+
     fetch(`/api/Fetch_exercise_by_id?id=${id}`)
       .then(res => res.json())
       .then(data => {
@@ -106,19 +109,19 @@ export default function EditExercise({ params }) {
         />
 
         <select
-            name="exercise_genre"
-            value={exercise.exercise_genre}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            >
-            <option value="">-- Select Genre --</option>
-            <option value="Cardio">Dumbell Exercise</option>
-            <option value="Strength">Barbell Exercise</option>
-            <option value="Flexibility">With Machine</option>
-            <option value="Balance">Without Equipment</option>
-            <option value="Endurance">Cardio</option>
-            <option value="Endurance">Stretch</option>
-            <option value="Endurance">Yoga</option>
+          name="exercise_genre"
+          value={exercise.exercise_genre}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="">-- Select Genre --</option>
+          <option value="Cardio">Dumbell Exercise</option>
+          <option value="Strength">Barbell Exercise</option>
+          <option value="Flexibility">With Machine</option>
+          <option value="Balance">Without Equipment</option>
+          <option value="Endurance">Cardio</option>
+          <option value="Endurance">Stretch</option>
+          <option value="Endurance">Yoga</option>
         </select>
 
         <button
