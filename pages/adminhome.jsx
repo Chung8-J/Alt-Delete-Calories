@@ -21,8 +21,8 @@ export default function AdminDashboard() {
   return (
     <div>
       <h1>Welcome Admin, {admin.coach_name || admin.name}!</h1>
-      <a href="/coach_exerciselib">Manage Food Library</a> <br /><br />
-      <a href="/coach_foodlib">Manage Exercise Library </a> <br /><br />
+      <a href="/coach_foodlib">Manage Food Library</a> <br /><br />
+      <a href="/coach_exerciselib">Manage Exercise Library </a> <br /><br />
       <a href="/manage_member">Manage Members </a> <br /><br />
       <a href="/community">Community</a> <br /><br />
       <a href="#">Calories Calculator</a> <br /><br />

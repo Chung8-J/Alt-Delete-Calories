@@ -1,11 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ExerciseLibrary from '@/components/ExerciseLibrary';
+import FoodLibrary from '@/components/FoodLibrary';
 
-export default function CoachExercisesPage() {
-  const router = useRouter();
+export default function CoachFoodsPage() {
   const [role, setRole] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -18,5 +18,5 @@ export default function CoachExercisesPage() {
 
   if (!role) return null;
 
-  return <ExerciseLibrary role={role} />;
+  return <FoodLibrary role={role} />;
 }

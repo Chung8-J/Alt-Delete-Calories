@@ -24,7 +24,7 @@ export default function UserDashboard() {
 
     <a href="/community">Community</a> <br /><br />
     <a href="/member_exercise">Exercise Library</a> <br /><br />
-    <a href="#">Food Library</a> <br /><br />
+    <a href="member_food">Food Library</a> <br /><br />
     <a href="#">Customize plan</a> <br /><br />
     <a href="#">Calories Calculator</a> <br /><br />
     <a href="/userprofile">Profile</a> <br /><br />
