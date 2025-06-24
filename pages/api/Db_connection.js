@@ -101,39 +101,46 @@ export default async function handler(req, res) {
       }
 
       // ✏️ Update Profile (member or coach)
-     if (action === 'update_profile') {
-        const { role, member_ic, updates } = data;
+        if (action === 'update_profile') {
+          try {
+            const { role, member_ic, updates } = data;
 
-        if (!role || !member_ic || !updates) {
-          return res.status(400).json({ error: 'Missing update data' });
+            if (!role || !member_ic || !updates) {
+              return res.status(400).json({ error: 'Missing update data' });
+            }
+
+            const tableName = role === 'admin' ? 'coach' : 'member';
+            const idColumn = role === 'admin' ? 'coach_ic' : 'member_ic';
+
+            const validColumns = ['height', 'weight', 'goal_weight', 'bmr', 'tdee', 'email', 'gender', 'age']; // add more if needed
+
+            const keys = Object.keys(updates).filter(key => validColumns.includes(key));
+            const values = keys.map(key => updates[key]);
+
+
+            if (keys.length === 0) {
+              return res.status(400).json({ error: 'No fields to update' });
+            }
+
+            const setClause = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
+
+            const query = `
+              UPDATE ${tableName}
+              SET ${setClause}
+              WHERE ${idColumn} = $${keys.length + 1}
+            `;
+
+            await pool.query(query, [...values, member_ic]);
+
+            return res.status(200).json({ message: '✅ Profile updated' });
+          } catch (err) {
+            console.error('❌ Update query failed:', err);
+            return res.status(500).json({
+              error: 'Failed to update profile',
+              details: err.message
+            });
+          }
         }
-
-        const tableName = role === 'admin' ? 'coach' : 'member';
-        const idColumn = role === 'admin' ? 'coach_ic' : 'member_ic';
-
-        const keys = Object.keys(updates);
-        const values = Object.values(updates);
-
-        if (keys.length === 0) {
-          return res.status(400).json({ error: 'No fields to update' });
-        }
-
-        const setClause = keys.map((key, index) => `${key} = $${index + 1}`).join(', ');
-
-        const query = `
-          UPDATE ${tableName}
-          SET ${setClause}
-          WHERE ${idColumn} = $${keys.length + 1}
-        `;
-
-  try {
-    await pool.query(query, [...values, member_ic]);
-    return res.status(200).json({ message: '✅ Profile updated' });
-  } catch (err) {
-    console.error('❌ Update query failed:', err);
-    return res.status(500).json({ error: 'Failed to update profile' });
-  }
-}
 
 
       // 🛒 Create Product (extra case)
