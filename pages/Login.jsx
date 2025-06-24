@@ -16,29 +16,31 @@ export default function LoginPage() {
     }
 
     try {
-     const response = await fetch('/api/Db_connection', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    table: 'member', // <-- Add this line
-    action: 'login',
-    data: { member_name: name, password },
-  }),
-});
+      const response = await fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'member',
+          action: 'login',
+          data: { member_name: name, password },
+        }),
+      });
+
       const result = await response.json();
 
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify({
           name: result.user.member_name,
           role: result.role,
-          member_ic: result.user.member_ic
+          member_ic: result.user.member_ic,
+          age: result.user.age,
+          gender: result.user.gender
         }));
 
-
         if (result.role === 'admin') {
-          router.push('/adminhome'); // Redirect to admin dashboard
+          router.push('/adminhome');
         } else {
-          router.push('/userhome'); // Redirect to user dashboard
+          router.push('/userhome');
         }
       } else {
         alert(result.error || 'Invalid credentials');

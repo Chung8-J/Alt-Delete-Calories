@@ -72,11 +72,6 @@ export default function UserProfile() {
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem('user');
-    router.push('/login');
-  }
-
   if (!profile) return <p>Loading profile...</p>;
 
   return (
@@ -86,6 +81,8 @@ export default function UserProfile() {
         <tbody>
           {[
             ['Name', 'member_name'],
+            ['Gender', 'gender'],
+            ['Age', 'age'],
             ['Email', 'email'],
             ['Date of Birth', 'd_birth'],
             ['Height (cm)', 'height'],
@@ -99,13 +96,24 @@ export default function UserProfile() {
               <td style={{ padding: '8px', fontWeight: 'bold' }}>{label}</td>
               <td style={{ padding: '8px' }}>
                 {editing ? (
-                  <input
-                    type={key === 'd_birth' ? 'date' : 'text'}
-                    name={key}
-                    value={formData[key] || ''}
-                    onChange={handleChange}
-                    style={{ width: '100%' }}
-                  />
+                  key === 'gender' ? (
+                    <select name="gender" value={formData.gender || ''} onChange={handleChange} style={{ width: '100%' }}>
+                      <option value="">-- Select Gender --</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  ) : key === 'd_birth' ? (
+                    <input type="date" name={key} value={formData[key] || ''} onChange={handleChange} style={{ width: '100%' }} />
+                  ) : (
+                    <input
+                      type="text"
+                      name={key}
+                      value={formData[key] || ''}
+                      onChange={handleChange}
+                      style={{ width: '100%' }}
+                    />
+                  )
                 ) : (
                   profile[key] || '-'
                 )}
@@ -126,15 +134,15 @@ export default function UserProfile() {
         ) : (
           <button onClick={() => setEditing(true)}>✏️ Edit Profile</button>
         )}
-            <button style={{ float: 'right', color: 'red' }}
-                onClick={() => {
-                localStorage.removeItem('user');
-                router.push('/Login');
-                
-                }}
-            >
-                Logout
-            </button>
+        <button
+          style={{ float: 'right', color: 'red' }}
+          onClick={() => {
+            localStorage.removeItem('user');
+            router.push('/Login');
+          }}
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

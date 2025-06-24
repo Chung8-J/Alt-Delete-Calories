@@ -69,14 +69,14 @@ function generateFitnessPrompt(user, exerciseList, foodList) {
     📤 **Output JSON Format**:
     {
     "workout": [
-        { "exercise_name": "Squats", "duration_sec": 300 },
+        { "exercise_id": "2", "exercise_name": "Squats", "duration_seconds": 300 , "estimated_calories": "45"},
         ...
     ],
     "meals": [
         {
         "meal": "Lunch",
         "foods": [
-            { "name": "Grilled Chicken Breast", "calories": 220 },
+            { "food_code": "1", "food_name": "Grilled Chicken Breast", "serving_size": 100, "calories": 220 },
             ...
         ]
         },
