@@ -6,69 +6,131 @@ import CreatePost from '@/components/createpost';
 export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const SUPABASE_IMAGE_BASE =
     'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/communitypost/public/';
 
+  useEffect(() => {
+    const u = JSON.parse(localStorage.getItem('user'));
+    setCurrentUser(u);
+    fetchPosts();
+  }, []);
+
   const fetchPosts = async () => {
-    try {
-      const res = await fetch('/api/Fetch_post');
-      const data = await res.json();
-      if (res.ok) {
-        // posts are already sorted in backend, but just in case:
-        const sorted = data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setPosts(sorted);
-      }
-    } catch (err) {
-      console.error('Error fetching posts:', err);
+    const res = await fetch('/api/Fetch_post');
+    const data = await res.json();
+    if (res.ok) {
+      setPosts(data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
     }
   };
 
   const timeAgo = (utcDateStr) => {
-    const now = new Date();
-    const nowUTC = new Date(now.getTime() + now.getTimezoneOffset() * 60000); // Convert to UTC
-    const createdAtUTC = new Date(utcDateStr); // already in UTC
-
-    const secondsAgo = Math.floor((nowUTC - createdAtUTC) / 1000);
-
+    const secondsAgo = Math.floor((new Date() - new Date(utcDateStr)) / 1000);
     const units = [
-      { name: 'year', seconds: 31536000 },
-      { name: 'month', seconds: 2592000 },
-      { name: 'day', seconds: 86400 },
-      { name: 'hour', seconds: 3600 },
-      { name: 'minute', seconds: 60 },
-      { name: 'second', seconds: 1 },
+      ['year', 31536000],
+      ['month', 2592000],
+      ['day', 86400],
+      ['hour', 3600],
+      ['minute', 60],
+      ['second', 1],
     ];
-
-    for (let unit of units) {
-      const count = Math.floor(secondsAgo / unit.seconds);
-      if (count > 0) {
-        return `${count} ${unit.name}${count !== 1 ? 's' : ''} ago`;
-      }
+    for (let [name, sec] of units) {
+      const c = Math.floor(secondsAgo / sec);
+      if (c > 0) return `${c} ${name}${c !== 1 ? 's' : ''} ago`;
     }
-
     return 'just now';
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   const handlePostCreated = () => {
     fetchPosts();
     setShowCreate(false);
   };
+function CommentSection({ postId, currentUser }) {
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+
+  const fetchComments = async () => {
+    const res = await fetch(`/api/comments?post_id=${postId}`);
+    if (res.ok) {
+      setComments(await res.json());
+    }
+  };
+
+  const submitComment = async () => {
+    if (!newComment.trim()) return;
+
+    const res = await fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        post_id: postId,
+        member_ic: currentUser.member_ic,
+        content: newComment
+      }),
+    });
+
+    if (res.ok) {
+      setNewComment('');
+      fetchComments();
+    } else {
+      alert('❌ Failed to add comment');
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [postId]);
+
+  return (
+    <div style={{ marginTop: '12px' }}>
+      <strong>💬 Comments</strong>
+      <div style={{ marginTop: '6px' }}>
+        {comments.map((c) => (
+          <div key={c.comment_id} style={{ marginBottom: '8px' }}>
+            <strong>{c.member_name}</strong> ·{' '}
+            <small>{timeAgo(c.created_at)}</small>
+
+            <p style={{ margin: '4px 0' }}>{c.content}</p>
+          </div>
+        ))}
+      </div>
+
+      {currentUser && (
+        <>
+         <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            style={{
+              width: '100%',
+              height: '30px',
+              margin: '10px 10px 10px -px',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+              resize: 'none',
+              outline: 'none',
+              fontFamily: 'inherit',
+            }}
+          />
+
+          <button onClick={submitComment} style={{ marginTop: '3px' }}>
+            Submit Comment
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+
 
   return (
     <div style={{ padding: '20px' }}>
       <h2>📢 Community Posts</h2>
-      <a href="/userhome">back</a> <br /><br />
-      <button
-        onClick={() => setShowCreate(!showCreate)}
-        style={{ marginBottom: '20px' }}
-      >
+      <a href="/userhome">Back</a><br /><br />
+
+      <button onClick={() => setShowCreate(!showCreate)} style={{ marginBottom: '20px' }}>
         {showCreate ? 'Hide Create Post' : '➕ Create New Post'}
       </button>
 
@@ -77,41 +139,33 @@ export default function CommunityPage() {
       {posts.length === 0 && <p>No posts yet.</p>}
 
       {posts.map((post) => (
-        <div
-          key={post.postid}
-          style={{
+        <div key={post.postid} style={{
             border: post.poster_role === 'coach' ? '2px solid red' : '1px solid #ddd',
             borderRadius: '8px',
             padding: '12px',
             marginBottom: '20px',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-          }}
-        >
+            boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+          }}>
           <p style={{ marginBottom: '6px' }}>
-            <strong>
-              {post.poster_name || post.member_ic || post.coach_ic}
-            </strong>{' '}
-            • {timeAgo(post.created_at)}
+            <strong>{post.poster_name}</strong> • {timeAgo(post.created_at)}
             {post.poster_role === 'coach' && (
-              <span style={{ color: 'red', marginLeft: '10px' }}>
-                🎓 Coach Post
-              </span>
+              <span style={{ color: 'red', marginLeft: '10px' }}>🎓 Coach Post</span>
             )}
           </p>
 
-            <img
-              src={SUPABASE_IMAGE_BASE + post.image}
-              alt="Post"
-              style={{
-                width: '100%',
-                maxHeight: '400px',
-                height: 'auto',      
-                objectFit: 'contain',
-                borderRadius: '4px'
-              }}
-            />
-
+          <img
+            src={SUPABASE_IMAGE_BASE + post.image}
+            alt="Post"
+            style={{
+              width: '100%',
+              maxHeight: '400px',
+              objectFit: 'contain',
+              borderRadius: '4px'
+            }}
+          />
           <p style={{ marginTop: '10px' }}>{post.description}</p>
+
+          <CommentSection postId={post.postid} currentUser={currentUser} />
         </div>
       ))}
     </div>
