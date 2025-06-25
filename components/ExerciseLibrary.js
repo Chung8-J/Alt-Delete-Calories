@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Navbar from './navbar';
 
 export default function ExerciseLibrary({ role }) {
   const [exercises, setExercises] = useState([]);
@@ -8,6 +9,8 @@ export default function ExerciseLibrary({ role }) {
   const [search, setSearch] = useState('');
   const [genreFilter, setGenreFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
   const router = useRouter();
 
   useEffect(() => {
@@ -26,26 +29,17 @@ export default function ExerciseLibrary({ role }) {
         ex.exercise_name.toLowerCase().includes(search.toLowerCase()) ||
         ex.description.toLowerCase().includes(search.toLowerCase())
       )
-      .filter(ex => genreFilter ? ex.exercise_genre === genreFilter : true)
-      .filter(ex => areaFilter.length > 0 ? areaFilter.includes(ex.targeted_area) : true);
+      .filter(ex => (genreFilter ? ex.exercise_genre === genreFilter : true))
+      .filter(ex => (areaFilter.length > 0 ? areaFilter.includes(ex.targeted_area) : true));
 
     setFiltered(filteredData);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [search, genreFilter, areaFilter, exercises]);
 
   const uniqueGenres = [...new Set(exercises.map(ex => ex.exercise_genre))];
-  const uniqueAreas = [...new Set(exercises.map(ex => ex.targeted_area))];
 
-  const toggleArea = (area) => {
-    setAreaFilter(prev =>
-      prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]
-    );
-  };
 
-  const clearFilters = () => {
-    setSearch('');
-    setGenreFilter('');
-    setAreaFilter([]);
-  };
+
 
   const handleDelete = async (id) => {
     const confirm = window.confirm('Are you sure you want to delete this exercise?');
@@ -66,10 +60,15 @@ export default function ExerciseLibrary({ role }) {
     }
   };
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const pageData = filtered.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Exercise Library</h1>
 
+      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
@@ -91,34 +90,13 @@ export default function ExerciseLibrary({ role }) {
         </select>
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-4">
-        {uniqueAreas.map((area, i) => (
-          <button
-            key={i}
-            onClick={() => toggleArea(area)}
-            className={`px-3 py-1 rounded border ${
-              areaFilter.includes(area) ? 'bg-blue-500 text-white' : 'bg-gray-100'
-            }`}
-          >
-            {area}
-          </button>
-        ))}
 
-        {(search || genreFilter || areaFilter.length > 0) && (
-          <button
-            onClick={clearFilters}
-            className="px-4 py-1 border border-red-500 text-red-600 rounded ml-auto"
-          >
-            Clear Filters
-          </button>
-        )}
-      </div>
-
-      {filtered.length === 0 ? (
+      {/* Exercise Grid */}
+      {pageData.length === 0 ? (
         <p>No exercises found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map(ex => (
+          {pageData.map(ex => (
             <div key={ex.exercise_id} className="bg-white rounded-xl shadow p-4">
               {ex.example_pic && (
                 <img
@@ -133,11 +111,13 @@ export default function ExerciseLibrary({ role }) {
               <p className="text-sm"><strong>Target Area:</strong> {ex.targeted_area}</p>
               <p className="text-sm"><strong>Genre:</strong> {ex.exercise_genre}</p>
 
+              
+
               {role === 'admin' && (
                 <div className="flex gap-2 mt-3">
+                  <hr />
                   <button
-                    onClick={() => router.push('/edit_exercise/' + ex.exercise_id)}
-
+                    onClick={() => router.push(`edit_exercise/${ex.exercise_id}`)}
                     className="px-3 py-1 text-sm rounded bg-yellow-400 hover:bg-yellow-500 text-white"
                   >
                     Edit
@@ -147,11 +127,45 @@ export default function ExerciseLibrary({ role }) {
                     className="px-3 py-1 text-sm rounded bg-red-500 hover:bg-red-600 text-white"
                   >
                     Delete
-                  </button>
-                  </div>
-              )} <hr />
+                    
+                  </button><hr />
+                </div>
+              )} 
             </div>
           ))}
+        </div>
+      )}
+      
+
+      {/* Pagination Controls */}
+      {filtered.length > itemsPerPage && (
+        <div className="flex justify-between items-center mt-6">
+          <button
+            onClick={() => {
+              setCurrentPage(p => Math.max(1, p - 1));
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-gray-300 text-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            >
+            Previous
+            </button>
+
+            <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+            onClick={() => {
+              setCurrentPage(p => p + 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            disabled={currentPage >= totalPages}
+            className={`px-4 py-2 rounded ${currentPage >= totalPages ? 'bg-gray-300 text-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            >
+            Next
+          </button>
+
         </div>
       )}
     </div>
