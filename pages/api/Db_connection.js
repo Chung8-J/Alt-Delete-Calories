@@ -289,10 +289,56 @@ if (table === 'member' && action === 'create') {
         return res.status(200).json({ message: 'Product added' });
       }
 
+
+        if (table === 'preset_workout_plan' && action === 'get_user_plans') {
+          const { member_ic } = data;
+          const plans = await pool.query(
+            `SELECT p_workoutplan_id, plan_name FROM preset_workout_plan WHERE member_ic = $1 ORDER BY p_workoutplan_id`,
+            [member_ic]
+          );
+          return res.status(200).json(plans.rows);
+        }
+
+        // ✅ Fetch exercises in one workout plan
+        if (table === 'preset_workout_exercise' && action === 'get_plan_exercises') {
+          const { plan_id } = data;
+          const exercises = await pool.query(`
+            SELECT e.exercise_name, pe.duration_seconds, pe.estimated_calories
+            FROM preset_workout_exercise pe
+            JOIN exercise e ON pe.exercise_id = e.exercise_id
+            WHERE p_workoutplan_id = $1
+          `, [plan_id]);
+          return res.status(200).json(exercises.rows);
+        }
+
+        // ✅ Fetch all food plans for user
+        if (table === 'diet_plan' && action === 'get_user_plans') {
+          const { member_ic } = data;
+          const plans = await pool.query(
+            `SELECT d_plan_id, plan_name, total_calories FROM diet_plan WHERE member_ic = $1 ORDER BY d_plan_id`,
+            [member_ic]
+          );
+          return res.status(200).json(plans.rows);
+        }
+
+        // ✅ Fetch meals in a diet plan
+        if (table === 'diet_plan_meal' && action === 'get_plan_meals') {
+          const { plan_id } = data;
+          const meals = await pool.query(`
+            SELECT d.meal_type, f.food_name, d.serving_size, d.calories
+            FROM diet_plan_meal d
+            JOIN food f ON d.food_code = f.food_code
+            WHERE d_plan_id = $1
+          `, [plan_id]);
+          return res.status(200).json(meals.rows);
+        }
+
+
+        //This is end
+
       return res.status(400).json({ error: 'Invalid POST request' });
     }
-
-    res.status(405).end(); // Method not allowed
+    res.status(405).end(); 
   } catch (err) {
     console.error('❌ API error:', err);
     res.status(500).json({ error: 'Server error' });

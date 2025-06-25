@@ -311,7 +311,7 @@ export default function UserDashboard() {
       <a href="/community">Community</a><br /><br />
       <a href="/member_exercise">Exercise Library</a><br /><br />
       <a href="/member_food">Food Library</a><br /><br />
-      <a href="#">Customize Plan</a><br /><br />
+      <a href="/customizeplan">Customize Plan</a><br /><br />
       <a href="/caloriescalculator">Calories Calculator</a><br /><br />
       <a href="/userprofile">Profile</a><br /><br />
       <button onClick={() => {
