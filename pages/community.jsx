@@ -46,89 +46,111 @@ export default function CommunityPage() {
     fetchPosts();
     setShowCreate(false);
   };
-function CommentSection({ postId, currentUser }) {
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
 
-  const fetchComments = async () => {
-    const res = await fetch(`/api/comments?post_id=${postId}`);
-    if (res.ok) {
-      setComments(await res.json());
+  const handleDeletePost = async (postid) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+      const res = await fetch('/api/Fetch_post', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postid })
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert('✅ Post deleted');
+        fetchPosts(); // refresh
+      } else {
+        alert('❌ Failed to delete: ' + result.error);
+      }
+    } catch (err) {
+      console.error('❌ Error deleting post:', err);
+      alert('❌ Error deleting post');
     }
   };
 
-  const submitComment = async () => {
-    if (!newComment.trim()) return;
+  const CommentSection = ({ postId, currentUser }) => {
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
 
-    const res = await fetch('/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        post_id: postId,
-        member_ic: currentUser.member_ic,
-        content: newComment
-      }),
-    });
+    const fetchComments = async () => {
+      const res = await fetch(`/api/comments?post_id=${postId}`);
+      if (res.ok) {
+        setComments(await res.json());
+      }
+    };
 
-    if (res.ok) {
-      setNewComment('');
+    const submitComment = async () => {
+      if (!newComment.trim()) return;
+
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: postId,
+          member_ic: currentUser.member_ic,
+          content: newComment
+        }),
+      });
+
+      if (res.ok) {
+        setNewComment('');
+        fetchComments();
+      } else {
+        alert('❌ Failed to add comment');
+      }
+    };
+
+    useEffect(() => {
       fetchComments();
-    } else {
-      alert('❌ Failed to add comment');
-    }
-  };
+    }, [postId]);
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
+    return (
+      <div style={{ marginTop: '12px' }}>
+        <strong>💬 Comments</strong>
+        <div style={{ marginTop: '6px' }}>
+          {comments.map((c) => (
+            <div key={c.comment_id} style={{ marginBottom: '8px' }}>
+              <strong>{c.member_name}</strong> ·{' '}
+              <small>{timeAgo(c.created_at)}</small>
+              <p style={{ margin: '4px 0' }}>{c.content}</p>
+            </div>
+          ))}
+        </div>
 
-  return (
-    <div style={{ marginTop: '12px' }}>
-      <strong>💬 Comments</strong>
-      <div style={{ marginTop: '6px' }}>
-        {comments.map((c) => (
-          <div key={c.comment_id} style={{ marginBottom: '8px' }}>
-            <strong>{c.member_name}</strong> ·{' '}
-            <small>{timeAgo(c.created_at)}</small>
-
-            <p style={{ margin: '4px 0' }}>{c.content}</p>
-          </div>
-        ))}
+        {currentUser && (
+          <>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              style={{
+                width: '100%',
+                height: '30px',
+                margin: '10px 0',
+                borderRadius: '8px',
+                border: '1px solid #ccc',
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+            <button onClick={submitComment} style={{ marginTop: '3px' }}>
+              Submit Comment
+            </button>
+          </>
+        )}
       </div>
-
-      {currentUser && (
-        <>
-         <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-            style={{
-              width: '100%',
-              height: '30px',
-              margin: '10px 10px 10px -px',
-              borderRadius: '8px',
-              border: '1px solid #ccc',
-              resize: 'none',
-              outline: 'none',
-              fontFamily: 'inherit',
-            }}
-          />
-
-          <button onClick={submitComment} style={{ marginTop: '3px' }}>
-            Submit Comment
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
-
-
+    );
+  };
 
   return (
     <div style={{ padding: '20px' }}>
       <h2>📢 Community Posts</h2>
-      <a href="/userhome">Back</a><br /><br />
+
+      <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
 
       <button onClick={() => setShowCreate(!showCreate)} style={{ marginBottom: '20px' }}>
         {showCreate ? 'Hide Create Post' : '➕ Create New Post'}
@@ -140,12 +162,12 @@ function CommentSection({ postId, currentUser }) {
 
       {posts.map((post) => (
         <div key={post.postid} style={{
-            border: post.poster_role === 'coach' ? '2px solid red' : '1px solid #ddd',
-            borderRadius: '8px',
-            padding: '12px',
-            marginBottom: '20px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-          }}>
+          border: post.poster_role === 'coach' ? '2px solid red' : '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '12px',
+          marginBottom: '20px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+        }}>
           <p style={{ marginBottom: '6px' }}>
             <strong>{post.poster_name}</strong> • {timeAgo(post.created_at)}
             {post.poster_role === 'coach' && (
@@ -166,6 +188,23 @@ function CommentSection({ postId, currentUser }) {
           <p style={{ marginTop: '10px' }}>{post.description}</p>
 
           <CommentSection postId={post.postid} currentUser={currentUser} />
+
+          {currentUser?.role === 'admin' && (
+            <button
+              onClick={() => handleDeletePost(post.postid)}
+              style={{
+                backgroundColor: 'red',
+                color: 'white',
+                padding: '5px 10px',
+                border: 'none',
+                borderRadius: '5px',
+                marginTop: '10px',
+                cursor: 'pointer'
+              }}
+            >
+              🗑️ Delete Post
+            </button>
+          )}
         </div>
       ))}
     </div>
