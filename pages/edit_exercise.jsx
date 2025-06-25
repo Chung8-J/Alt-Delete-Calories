@@ -45,7 +45,7 @@ export default function EditExercise() {
 
       if (res.ok) {
         alert('✅ Exercise updated successfully!');
-        router.push('/coach/exercises');
+        router.push('/coach_exerciselib');
       } else {
         setMessage(result.error || 'Update failed.');
       }
@@ -59,7 +59,7 @@ export default function EditExercise() {
   if (!exercise) return <p>No exercise found.</p>;
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="edit_exercise">
       <h1 className="text-2xl font-bold mb-4">Edit Exercise</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">

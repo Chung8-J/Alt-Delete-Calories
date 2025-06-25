@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 const bodyParts = [
   "Wrists", "Upper Chest", "Shoulders", "Triceps", "Upper Back", "Spine", "Chest", "Hip Flexors",
   "Lower Back", "Hamstrings", "Traps", "Core", "Glutes", "Quads", "Relaxation", "Balance"

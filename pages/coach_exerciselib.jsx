@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ExerciseLibrary from '@/components/ExerciseLibrary';
 
+
 export default function CoachExercisesPage() {
   const router = useRouter();
   const [role, setRole] = useState('');
