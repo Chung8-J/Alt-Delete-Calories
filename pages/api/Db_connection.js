@@ -338,7 +338,7 @@ if (table === 'member' && action === 'create') {
         if (table === 'preset_workout_plan' && action === 'get_user_plans') {
           const { member_ic } = data;
           const plans = await pool.query(
-            `SELECT p_workoutplan_id, plan_name FROM preset_workout_plan WHERE member_ic = $1 ORDER BY p_workoutplan_id`,
+            `SELECT p_workoutplan_id, plan_name, description FROM preset_workout_plan WHERE member_ic = $1 ORDER BY p_workoutplan_id`,
             [member_ic]
           );
           return res.status(200).json(plans.rows);
@@ -379,6 +379,18 @@ if (table === 'member' && action === 'create') {
           return res.status(200).json(meals.rows);
         }
 
+        // ✅ DELETE plan
+        if (action === 'delete_plan') {
+          const { plan_id } = data;
+          if (table === 'p_workoutplan') {
+            await pool.query('DELETE FROM preset_workout_exercise WHERE p_workoutplan_id = $1', [plan_id]);
+            await pool.query('DELETE FROM preset_workout_plan WHERE p_workoutplan_id = $1', [plan_id]);
+          } else if (table === 'diet_plan') {
+            await pool.query('DELETE FROM diet_plan_meal WHERE d_plan_id = $1', [plan_id]);
+            await pool.query('DELETE FROM diet_plan WHERE d_plan_id = $1', [plan_id]);
+          }
+          return res.status(200).json({ success: true });
+        }
 
         //This is end
 

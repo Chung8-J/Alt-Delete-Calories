@@ -12,6 +12,7 @@ export default function CustomizePlan() {
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanItems, setSelectedPlanItems] = useState([]);
   const [showAddPlan, setShowAddPlan] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
 
   useEffect(() => {
@@ -83,7 +84,12 @@ export default function CustomizePlan() {
   }, [user]);
 
 const selectPlan = async (planId) => {
+    const planObj = (section === 'exercise' ? exercisePlans : foodPlans).find(
+    plan => plan[section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id'] === planId
+  );
   setSelectedPlanId(planId);
+  setSelectedPlan(planObj); // <-- new
+
 
   const table = section === 'exercise' ? 'preset_workout_exercise' : 'diet_plan_meal';
   const action = section === 'exercise' ? 'get_plan_exercises' : 'get_plan_meals';
@@ -173,37 +179,129 @@ const selectPlan = async (planId) => {
       </div>
 
       <div style={{ flex: 2, marginLeft: 20 }}>
-        <h3>Details</h3>
-        {!selectedPlanId ? (
-          <p>📌 Please choose a plan to view its contents.</p>
-        ) : selectedPlanItems.length > 0 ? (
-          <div>
-            {section === 'exercise' ? (
-              <ul>
-                {selectedPlanItems.map((ex, idx) => (
-                  <li key={idx}>
-                    <strong>{ex.exercise_name}</strong><br />
-                    {ex.reps != null && ex.set != null ? (
-                      <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                    ) : (
-                      <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <ul>
-                {selectedPlanItems.map((meal, idx) => (
-                  <li key={idx}>
-                    <strong>{meal.meal_type}</strong>: {meal.food_name} – {meal.serving_size}g, {meal.calories} kcal
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ) : (
-          <p>⚠️ This plan has no items yet.</p>
-        )}
+      <h3>Details</h3>
+      {!selectedPlanId ? (
+        <p>📌 Please choose a plan to view its contents.</p>
+      ) : (
+        <div>
+          <h4>📝 Plan Name: {selectedPlan?.plan_name || 'Unnamed Plan'}</h4>
+          {selectedPlan?.description && <p>📄 Description: {selectedPlan.description}</p>}
+
+          {selectedPlanItems.length > 0 ? (
+            <div>
+              {section === 'exercise' ? (
+                <ul>
+                  {selectedPlanItems.map((ex, idx) => (
+                    <li key={idx}>
+                      <strong>{ex.exercise_name}</strong><br />
+                      {ex.reps != null && ex.set != null ? (
+                        <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                      ) : (
+                        <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul>
+                  {selectedPlanItems.map((meal, idx) => (
+                    <li key={idx}>
+                      <strong>{meal.meal_type}</strong>: {meal.food_name} – {meal.serving_size}g, {meal.calories} kcal
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <p>⚠️ This plan has no items yet.</p>
+          )}
+
+
+
+
+        
+          <div style={{ marginTop: 10 }}>
+          <button
+            style={{
+              padding: '6px 12px',
+              marginRight: 10,
+              backgroundColor: '#ffe58f',
+              border: '1px solid #d4b106',
+              borderRadius: 4,
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              setShowAddPlan(true);
+              setSelectedPlanId(null); // hide current selection
+              // pass selectedPlan as default to AddExercise later (optional)
+            }}
+          >
+            ✏️ Edit Plan
+          </button>
+
+          <button
+            style={{
+              padding: '6px 12px',
+              backgroundColor: '#ffccc7',
+              border: '1px solid #cf1322',
+              borderRadius: 4,
+              cursor: 'pointer'
+            }}
+            onClick={async () => {
+              const confirmed = confirm('Are you sure you want to delete this plan?');
+              if (!confirmed) return;
+
+              const planKey = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
+
+              try {
+                const res = await fetch('/api/Db_connection', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    table: section === 'exercise' ? 'p_workoutplan' : 'diet_plan',
+                    action: 'delete_plan',
+                    data: { plan_id: selectedPlan[planKey] }
+                  })
+                });
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                  alert('🗑️ Plan deleted successfully.');
+                  setSelectedPlanId(null);
+                  setSelectedPlan(null);
+                  setSelectedPlanItems([]);
+
+                  // Refresh plan list
+                  const refreshRes = await fetch('/api/Db_connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      table: section === 'exercise' ? 'preset_workout_plan' : 'diet_plan',
+                      action: 'get_user_plans',
+                      data: { member_ic: user.member_ic }
+                    })
+                  });
+                  const newData = await refreshRes.json();
+                  if (section === 'exercise') setExercisePlans(newData);
+                  else setFoodPlans(newData);
+                } else {
+                  alert('❌ Failed to delete plan.');
+                  console.error(result);
+                }
+              } catch (err) {
+                console.error('❌ Delete error:', err);
+              }
+            }}
+          >
+            🗑️ Delete Plan
+          </button>
+        </div>
+
+        </div>
+
+        
+      )}
+
 
       </div>
 
