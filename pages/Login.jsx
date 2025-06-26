@@ -76,11 +76,20 @@ export default function LoginPage() {
       <a href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
         Login
       </a>
+      <button
+          onClick={() => {
+            localStorage.removeItem('user');
+            router.push('/intro');
+          }}
+        >
+          Back
+      </button>
 
       <p style={{ color: 'red' }}>{message}</p>
 
       <br />
       <Link href="/Signup">Sign Up</Link><br />
+       
       <a href="/forgetpassword">Forget password</a>
     </div>
   );

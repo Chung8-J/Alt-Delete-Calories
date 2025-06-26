@@ -3,7 +3,7 @@ import EditMember from '../edit_member'; // ✅ relative import
 
 export default function EditMemberPage() {
   const router = useRouter();
-  const { ic } = router.query;
+  const { member_ic } = router.query;
 
-  return <EditMember member_ic={ic} />;
+  return <EditMember member_ic={member_ic} />;
 }

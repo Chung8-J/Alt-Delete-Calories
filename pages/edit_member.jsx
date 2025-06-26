@@ -6,6 +6,7 @@ export default function EditMemberPage() {
   const router = useRouter();
   const { member_ic } = router.query;
 
+  const [originalIc, setOriginalIc] = useState('');
   const [member, setMember] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -20,6 +21,7 @@ export default function EditMemberPage() {
           const age = calculateAge(data.d_birth);
           const { bmr, tdee } = calculateBmrTdee(data.weight, data.height, age, data.gender, data.active_level);
           setMember({ ...data, age, bmr, tdee });
+          setOriginalIc(data.member_ic); // 👈 Save original IC for WHERE clause
         } else {
           setMember(data);
         }
@@ -34,7 +36,7 @@ export default function EditMemberPage() {
   };
 
   const calculateBmrTdee = (weight, height, age, gender, active_level) => {
-    const bmr = gender === 'Male'
+    const bmr = gender === 'male'
       ? 10 * weight + 6.25 * height - 5 * age + 5
       : 10 * weight + 6.25 * height - 5 * age - 161;
 
@@ -70,7 +72,10 @@ export default function EditMemberPage() {
       const res = await fetch('/api/Edit_member', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(member),
+        body: JSON.stringify({
+          ...member,
+          original_ic: originalIc // 👈 Include original IC separately
+        }),
       });
       const result = await res.json();
       if (res.ok) {
@@ -89,7 +94,7 @@ export default function EditMemberPage() {
       const res = await fetch('/api/Edit_member_password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ member_ic, password: newPassword })
+        body: JSON.stringify({ member_ic: originalIc, password: newPassword })
       });
       const result = await res.json();
       if (res.ok) {
@@ -111,6 +116,11 @@ export default function EditMemberPage() {
       <h1 className="text-2xl font-bold mb-4">Edit Member</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block font-semibold">IC Number:</label>
+          <input type="text" name="member_ic" value={member.member_ic} onChange={handleChange} className="w-full border p-2 rounded" />
+        </div>
+
         <div>
           <label className="block font-semibold">Name:</label>
           <input type="text" name="member_name" value={member.member_name} onChange={handleChange} className="w-full border p-2 rounded" />
@@ -144,8 +154,8 @@ export default function EditMemberPage() {
         <div>
           <label className="block font-semibold">Gender:</label>
           <select name="gender" value={member.gender} onChange={handleChange} className="w-full border p-2 rounded">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
           </select>
         </div>
 
@@ -165,7 +175,17 @@ export default function EditMemberPage() {
         </p>
 
         <div className="flex gap-4 mt-4">
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button> <br /><br />
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowModal(false);
+              router.push('/manage_member');
+            }}
+            className="px-4 py-2 border border-gray-400 rounded"
+          >
+            Cancel
+          </button>
           <button type="button" onClick={() => setShowModal(true)} className="bg-yellow-500 text-white px-4 py-2 rounded">Change Password</button>
         </div>
       </form>

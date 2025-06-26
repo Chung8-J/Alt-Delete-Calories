@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Layout from '../components/Layout';
 
 export default function FoodLibrary({ role }) {
   const [foods, setFoods] = useState([]);
@@ -81,142 +82,146 @@ const handlePrev = () => {
 
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Food Library</h1>
+    <div className=''>
+      <Layout>
+      <div className="p-6 max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Food Library</h1>
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search food..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border p-2 rounded flex-1"
-        />
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <input
+            type="text"
+            placeholder="Search food..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="border p-2 rounded flex-1"
+          />
 
-        <select
-          value={genreFilter}
-          onChange={e => setGenreFilter(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="">All Genres</option>
-          {uniqueGenres.map((g, i) => (
-            <option key={i} value={g}>{g}</option>
-          ))}
-        </select>
-
-        {(search || genreFilter) && (
-          <button
-            onClick={clearFilters}
-            className="px-3 py-1 border border-red-500 text-red-600 rounded"
+          <select
+            value={genreFilter}
+            onChange={e => setGenreFilter(e.target.value)}
+            className="border p-2 rounded"
           >
-            Clear Filters
-          </button>
-        )}
-      </div>
+            <option value="">All Genres</option>
+            {uniqueGenres.map((g, i) => (
+              <option key={i} value={g}>{g}</option>
+            ))}
+          </select>
 
-      {/* Food Cards */}
-      {currentFoods.length === 0 ? (
-        <p>No food items found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentFoods.map(food => (
-            <div key={food.food_code} className="bg-white p-4 rounded-xl shadow">
-              {food.food_pic && (
-                <img
-                  src={food.food_pic}
-                  alt={food.food_name}
-                  className="w-full h-40 object-cover rounded mb-3"
-                />
-              )}
-              <h2 className="text-xl font-semibold">{food.food_name}</h2>
-
-              {/* Role-Based Content */}
-              {role === 'admin' ? (
-                <>
-                  <p className="text-sm text-gray-600 mb-2">{food.description}</p>
-                  <p className="text-sm"><strong>Genre:</strong> {food.food_genre}</p>
-                  <p className="text-sm"><strong>Calories:</strong> {food.calories} kcal</p>
-                  <p className="text-sm">
-                    <strong>Per 100g:</strong><br />
-                    {food.carbohydrate_per_100g}g carbs<br />
-                    {food.protein_per_100g}g protein<br />
-                    {food.fat_per_100g}g fat
-                  </p>
-                  <hr />
-
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={() => router.push(`edit_food/${food.food_code}`)}
-                      className="bg-yellow-400 text-white text-sm px-3 py-1 rounded hover:bg-yellow-500"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(food.food_code)}
-                      className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div><hr />
-                </>
-              ) : (
-                <>
-                  {expanded === food.food_code ? (
-                    <>
-                      <p className="text-sm text-gray-600 mb-2">{food.description}</p>
-                      <p className="text-sm"><strong>Genre:</strong> {food.food_genre}</p>
-                      <p className="text-sm"><strong>Calories:</strong> {food.calories} kcal</p>
-                      <p className="text-sm">
-                        <strong>Per 100g:</strong><br />
-                        {food.carbohydrate_per_100g}g carbs<br />
-                        {food.protein_per_100g}g protein<br />
-                        {food.fat_per_100g}g fat
-                      </p>
-                      <button
-                        onClick={() => setExpanded(null)}
-                        className="mt-2 px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm"
-                      >
-                        Hide Details
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => setExpanded(food.food_code)}
-                      className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-                    >
-                      View More Details
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
-          ))}
+          {(search || genreFilter) && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-1 border border-red-500 text-red-600 rounded"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
-      )}
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center mt-6 gap-4">
-        <button
-          onClick={handlePrev}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
-        >
-          ◀ Previous
-        </button>
+        {/* Food Cards */}
+        {currentFoods.length === 0 ? (
+          <p>No food items found.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentFoods.map(food => (
+              <div key={food.food_code} className="bg-white p-4 rounded-xl shadow">
+                {food.food_pic && (
+                  <img
+                    src={food.food_pic}
+                    alt={food.food_name}
+                    className="w-full h-40 object-cover rounded mb-3"
+                  />
+                )}
+                <h2 className="text-xl font-semibold">{food.food_name}</h2>
 
-        <span className="px-4 py-2 font-medium">
-          Page {currentPage} of {totalPages}
-        </span>
+                {/* Role-Based Content */}
+                {role === 'admin' ? (
+                  <>
+                    <p className="text-sm text-gray-600 mb-2">{food.description}</p>
+                    <p className="text-sm"><strong>Genre:</strong> {food.food_genre}</p>
+                    <p className="text-sm"><strong>Calories:</strong> {food.calories} kcal</p>
+                    <p className="text-sm">
+                      <strong>Per 100g:</strong><br />
+                      {food.carbohydrate_per_100g}g carbs<br />
+                      {food.protein_per_100g}g protein<br />
+                      {food.fat_per_100g}g fat
+                    </p>
+                    <hr />
 
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
-        >
-          Next ▶
-        </button>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={() => router.push(`edit_food/${food.food_code}`)}
+                        className="bg-yellow-400 text-white text-sm px-3 py-1 rounded hover:bg-yellow-500"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(food.food_code)}
+                        className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div><hr />
+                  </>
+                ) : (
+                  <>
+                    {expanded === food.food_code ? (
+                      <>
+                        <p className="text-sm text-gray-600 mb-2">{food.description}</p>
+                        <p className="text-sm"><strong>Genre:</strong> {food.food_genre}</p>
+                        <p className="text-sm"><strong>Calories:</strong> {food.calories} kcal</p>
+                        <p className="text-sm">
+                          <strong>Per 100g:</strong><br />
+                          {food.carbohydrate_per_100g}g carbs<br />
+                          {food.protein_per_100g}g protein<br />
+                          {food.fat_per_100g}g fat
+                        </p>
+                        <button
+                          onClick={() => setExpanded(null)}
+                          className="mt-2 px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm"
+                        >
+                          Hide Details
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setExpanded(food.food_code)}
+                        className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                      >
+                        View More Details
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-6 gap-4">
+          <button
+            onClick={handlePrev}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+          >
+            ◀ Previous
+          </button>
+
+          <span className="px-4 py-2 font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+          >
+            Next ▶
+          </button>
+        </div>
       </div>
+      </Layout>
     </div>
   );
 }
