@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '../components/Layout';
+import Navbar from './navbar';
 
 export default function ExerciseLibrary({ role }) {
   const [exercises, setExercises] = useState([]);
@@ -66,7 +66,6 @@ export default function ExerciseLibrary({ role }) {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Layout>
       <h1 className="text-3xl font-bold mb-6">Exercise Library</h1>
 
       {/* Filters */}
@@ -169,7 +168,6 @@ export default function ExerciseLibrary({ role }) {
 
         </div>
       )}
-      </Layout>
     </div>
   );
 }

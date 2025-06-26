@@ -10,7 +10,7 @@ export default function UserFoodsPage() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || user.role !== 'user') {
-      router.push('/Login');
+      router.push('/login');
     } else {
       setRole('user');
     }

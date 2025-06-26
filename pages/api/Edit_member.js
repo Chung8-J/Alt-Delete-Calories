@@ -9,7 +9,6 @@ const pool = new Pool({
 export default async function handler(req, res) {
   if (req.method === 'PUT') {
     const {
-      original_ic,
       member_ic,
       member_name,
       email,
@@ -24,19 +23,17 @@ export default async function handler(req, res) {
     try {
       const result = await pool.query(
         `UPDATE member 
-         SET member_ic = $1,
-             member_name = $2,
-             email = $3,
-             d_birth = $4,
-             height = $5,
-             weight = $6,
-             goal_weight = $7,
-             gender = $8,
-             active_level = $9
-         WHERE member_ic = $10
+         SET member_name = $1,
+             email = $2,
+             d_birth = $3,
+             height = $4,
+             weight = $5,
+             goal_weight = $6,
+             gender = $7,
+             active_level = $8
+         WHERE member_ic = $9
          RETURNING *`,
         [
-          member_ic,
           member_name,
           email,
           d_birth,
@@ -45,7 +42,7 @@ export default async function handler(req, res) {
           goal_weight,
           gender,
           active_level,
-          original_ic // this ensures update is performed on the correct record
+          member_ic,
         ]
       );
 

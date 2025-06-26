@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from '../components/Layout';
 
 export default function ManageMembers() {
   const [members, setMembers] = useState([]);
@@ -51,7 +50,6 @@ export default function ManageMembers() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Layout>
       <h1 className="text-3xl font-bold mb-6">Manage Members</h1>
 
       {currentMembers.length === 0 ? (
@@ -73,7 +71,7 @@ export default function ManageMembers() {
                   Edit
                 </button>
                 <button
-                    onClick={handleDelete}
+                    onClick={() => router.push(`/edit_member?member_ic=${member.member_ic}`)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 >
                     Delete
@@ -103,7 +101,6 @@ export default function ManageMembers() {
           </div>
         </>
       )}
-      </Layout>
     </div>
   );
 }

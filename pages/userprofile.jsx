@@ -99,8 +99,9 @@ export default function UserProfile() {
                   key === 'gender' ? (
                     <select name="gender" value={formData.gender || ''} onChange={handleChange} style={{ width: '100%' }}>
                       <option value="">-- Select Gender --</option>
-                      <option value="Male">male</option>
-                      <option value="Female">female</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
                     </select>
                   ) : key === 'd_birth' ? (
                     <input type="date" name={key} value={formData[key] || ''} onChange={handleChange} style={{ width: '100%' }} />

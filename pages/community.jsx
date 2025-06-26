@@ -1,7 +1,7 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import CreatePost from '@/components/createpost';
-import Layout from '../components/Layout';
 
 export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
@@ -148,7 +148,6 @@ export default function CommunityPage() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <Layout>
       <h2>📢 Community Posts</h2>
 
       <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
@@ -208,7 +207,6 @@ export default function CommunityPage() {
           )}
         </div>
       ))}
-    </Layout>
     </div>
   );
 }
