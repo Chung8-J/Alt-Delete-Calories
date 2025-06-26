@@ -223,49 +223,141 @@ export default function CustomizePlan() {
           <p>📌 Please choose a plan to view its contents.</p>
         ) : isEditing ? (
           <div>
-            <input
-              type="text"
-              value={editData.plan_name}
-              onChange={(e) => setEditData(prev => ({ ...prev, plan_name: e.target.value }))}
-              placeholder="Plan Name"
-            />
-            <textarea
-              value={editData.description}
-              onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Description"
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '545px' }}>
+              <label style={{ fontWeight: 'bold' }}>📝 Plan Name:</label>
+              <input
+                type="text"
+                value={editData.plan_name}
+                onChange={(e) => setEditData(prev => ({ ...prev, plan_name: e.target.value }))}
+                placeholder="Enter plan name"
+                style={{
+                  padding: '8px',
+                  fontSize: '14px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px'
+                }}
+              />
 
+              <label style={{ fontWeight: 'bold' }}>📄 Description:</label>
+              <textarea
+                value={editData.description}
+                onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Enter description"
+                rows={4}
+                style={{
+                  padding: '8px',
+                  fontSize: '14px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  resize: 'none'
+                }}
+              />
+            </div>
+            <h4 style={{ marginTop: '10px' }}>🏋️‍♀️ Exercises:</h4>
             {editData.exercises.map((ex, idx) => (
-              <div key={idx}>
-                <label>{ex.exercise_name}</label><br />
+              <div
+                key={idx}
+                style={{
+                  marginBottom: '16px',
+                  padding: '12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: '#f9f9f9',
+
+                  maxWidth: '520px',      // ✅ limit width
+                width: '100%'
+                
+                }}
+              >
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>
+                  {ex.exercise_name}
+                </label>
+
                 {ex.reps && ex.set ? (
-                  <>
-                    <input
-                      type="number"
-                      value={ex.reps}
-                      onChange={e => updateExerciseField(idx, 'reps', e.target.value)}
-                      placeholder="Reps"
-                    />
-                    <input
-                      type="number"
-                      value={ex.set}
-                      onChange={e => updateExerciseField(idx, 'set', e.target.value)}
-                      placeholder="Set"
-                    />
-                  </>
+                  <div style={{ display: 'flex', gap: '30px', maxWidth: '500px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '13px' }}>Reps:</label>
+                      <input
+                        type="number"
+                        value={ex.reps}
+                        onChange={e => updateExerciseField(idx, 'reps', e.target.value)}
+                        placeholder="Reps"
+                        style={{
+                          width: '100%',
+                          padding: '4px',
+                          fontSize: '14px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          length:'80px'
+                        }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '13px' }}>Sets:</label>
+                      <input
+                        type="number"
+                        value={ex.set}
+                        onChange={e => updateExerciseField(idx, 'set', e.target.value)}
+                        placeholder="Sets"
+                        style={{
+                          width: '100%',
+                          padding: '4px',
+                          fontSize: '14px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px'
+                        }}
+                      />
+                    </div>
+                  </div>
                 ) : (
-                  <input
-                    type="number"
-                    value={ex.duration_seconds}
-                    onChange={e => updateExerciseField(idx, 'duration_seconds', e.target.value)}
-                    placeholder="Duration (seconds)"
-                  />
+                  <div style={{ maxWidth: '500px' }}>
+                    <label style={{ fontSize: '13px' }}>Duration (seconds):</label>
+                    <input
+                      type="number"
+                      value={ex.duration_seconds}
+                      onChange={e => updateExerciseField(idx, 'duration_seconds', e.target.value)}
+                      placeholder="Duration (seconds)"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px'
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             ))}
 
-            <button onClick={saveEdit}>💾 Save</button>
-            <button onClick={() => setIsEditing(false)}>❌ Cancel</button>
+          <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+            <button
+              onClick={saveEdit}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              💾 Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
           </div>
         ) : (
           <div>
