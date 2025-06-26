@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AddExercise from '@/components/Addexercise'; // adjust path if needed
 
 export default function CustomizePlan() {
   const router = useRouter();
@@ -10,6 +11,8 @@ export default function CustomizePlan() {
   const [foodPlans, setFoodPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanItems, setSelectedPlanItems] = useState([]);
+  const [showAddPlan, setShowAddPlan] = useState(false);
+
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('user'));
@@ -19,6 +22,15 @@ export default function CustomizePlan() {
     }
     setUser(stored);
   }, [router]);
+
+  function formatDuration(seconds) {
+    if (!seconds || isNaN(seconds)) return '0s';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  }
+
+
 
   useEffect(() => {
     if (!user) return;
@@ -139,19 +151,43 @@ const selectPlan = async (planId) => {
               </li>
             ))}
           </ul>
+
+          {section === 'exercise' && (
+            <button
+              style={{
+                marginTop: 10,
+                padding: '8px',
+                width: '100%',
+                backgroundColor: '#cce5ff',
+                border: '1px solid #99cfff',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+              onClick={() => setShowAddPlan(prev => !prev)}
+            >
+              {showAddPlan ? '➖ Hide Add Plan' : '➕ Add Plan'}
+            </button>
+          )}
+
         </div>
       </div>
 
       <div style={{ flex: 2, marginLeft: 20 }}>
         <h3>Details</h3>
-        {!selectedPlanId && <p>Select a plan to view its contents.</p>}
-        {selectedPlanItems.length > 0 && (
+        {!selectedPlanId ? (
+          <p>📌 Please choose a plan to view its contents.</p>
+        ) : selectedPlanItems.length > 0 ? (
           <div>
             {section === 'exercise' ? (
               <ul>
                 {selectedPlanItems.map((ex, idx) => (
                   <li key={idx}>
-                    {ex.exercise_name} – {ex.duration_seconds}s, {ex.estimated_calories} kcal
+                    <strong>{ex.exercise_name}</strong><br />
+                    {ex.reps != null && ex.set != null ? (
+                      <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                    ) : (
+                      <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -165,8 +201,63 @@ const selectPlan = async (planId) => {
               </ul>
             )}
           </div>
+        ) : (
+          <p>⚠️ This plan has no items yet.</p>
         )}
+
       </div>
+
+      {showAddPlan && section === 'exercise' && (
+        <div style={{ marginTop: 30 }}>
+          <AddExercise
+            onSave={async (planData) => {
+              try {
+                const res = await fetch('/api/Db_connection', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    table: 'p_workoutplan',
+                    action: 'save_plan',
+                    data: {
+                      member_ic: user.member_ic,
+                      plan_name: planData.plan_name,
+                      description: planData.description,
+                      exercises: planData.exercises
+                    }
+                  })
+                });
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                  alert('✅ Plan saved!');
+                  setShowAddPlan(false); // auto-hide
+                  setSelectedPlanId(null); // reset selection
+                  // refresh plan list
+                  const updatedPlans = await fetch('/api/Db_connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      table: 'preset_workout_plan',
+                      action: 'get_user_plans',
+                      data: { member_ic: user.member_ic }
+                    })
+                  });
+                  const newData = await updatedPlans.json();
+                  if (Array.isArray(newData)) setExercisePlans(newData);
+                } else {
+                  console.error('❌ Save failed:', result);
+                  alert('❌ Failed to save plan.');
+                }
+              } catch (err) {
+                console.error('❌ Error saving:', err);
+              }
+            }}
+          />
+        </div>
+      )}
+
     </div>
+
+    
   );
 }

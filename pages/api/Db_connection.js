@@ -177,7 +177,7 @@ if (table === 'member' && action === 'create') {
           }
         }
         
-       if (action === 'save_plan') {
+     if (action === 'save_plan') {
           const { plan_name, description, member_ic, exercises } = data;
 
           const planRes = await pool.query(
@@ -187,15 +187,60 @@ if (table === 'member' && action === 'create') {
           );
           const planId = planRes.rows[0].p_workoutplan_id;
 
-          const stmt = `INSERT INTO preset_workout_exercise
-            (p_workoutplan_id, exercise_id, duration_seconds, estimated_calories)
-            VALUES ($1, $2, $3, $4)`;
+          const stmt = `
+            INSERT INTO preset_workout_exercise
+              (p_workoutplan_id, exercise_id, duration_seconds, estimated_calories, reps, set)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `;
+
           for (const ex of exercises) {
-            await pool.query(stmt, [planId, ex.exercise_id, ex.duration_seconds, ex.estimated_calories]);
+            const exercise_id = parseInt(ex.exercise_id);
+            const duration_seconds = ex.duration_seconds ? parseInt(ex.duration_seconds) : null;
+            const reps = ex.reps ? parseInt(ex.reps) : null;
+            const set = ex.set ? parseInt(ex.set) : null;
+
+            // ⛏️ 1. Get calories_per_sec from exercise table
+            const calRes = await pool.query(
+              'SELECT calories_per_sec FROM exercise WHERE exercise_id = $1 LIMIT 1',
+              [exercise_id]
+            );
+            const calPerSec = calRes.rows[0]?.calories_per_sec;
+
+            if (!calPerSec) {
+              return res.status(400).json({ error: `Calories info not found for exercise_id ${exercise_id}` });
+            }
+
+            // 🧠 2. Decide duration and estimate calories
+            let duration = null;
+            let estimatedCalories = null;
+
+            if (duration_seconds) {
+              duration = duration_seconds;
+              estimatedCalories = Math.round(duration * calPerSec);
+            } else if (reps && set) {
+              duration = reps * set * 5;
+              estimatedCalories = Math.round(duration * calPerSec);
+            } else {
+              return res.status(400).json({
+                error: `⛔ Please enter either duration_seconds or reps and set for exercise_id ${exercise_id}`
+              });
+            }
+
+            await pool.query(stmt, [
+              planId,
+              exercise_id,
+              duration,
+              estimatedCalories,
+              reps ?? null,
+              set ?? null
+            ]);
           }
+
 
           return res.status(200).json({ success: true, planId });
         }
+
+
 
         if (table === 'diet_plan' && action === 'save_plan') {
           const { member_ic, plan_name, total_calories, meals } = data;
@@ -303,10 +348,11 @@ if (table === 'member' && action === 'create') {
         if (table === 'preset_workout_exercise' && action === 'get_plan_exercises') {
           const { plan_id } = data;
           const exercises = await pool.query(`
-            SELECT e.exercise_name, pe.duration_seconds, pe.estimated_calories
-            FROM preset_workout_exercise pe
-            JOIN exercise e ON pe.exercise_id = e.exercise_id
-            WHERE p_workoutplan_id = $1
+          SELECT e.exercise_name, pe.duration_seconds, pe.estimated_calories, pe.reps, pe.set
+          FROM preset_workout_exercise pe
+          JOIN exercise e ON pe.exercise_id = e.exercise_id
+          WHERE p_workoutplan_id = $1
+
           `, [plan_id]);
           return res.status(200).json(exercises.rows);
         }

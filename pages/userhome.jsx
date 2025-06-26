@@ -31,6 +31,15 @@ export default function UserDashboard() {
   const [dbExercises, setDbExercises] = useState([]);
   const router = useRouter();
 
+
+  function formatDuration(seconds) {
+  if (!seconds || isNaN(seconds)) return '0s';
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+}
+
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (!storedUser || storedUser.role !== 'user') {
@@ -148,14 +157,17 @@ export default function UserDashboard() {
   if (!plan?.workout?.length) return alert('❌ No workout exercises found.');
 
   // === 1. Save Workout Plan ===
-  const matched = plan.workout.map(item => {
-    if (!item.exercise_id || !item.duration_seconds || !item.estimated_calories) return null;
-    return {
-      exercise_id: parseInt(item.exercise_id),
-      duration_seconds: Math.round(item.duration_seconds),
-      estimated_calories: Math.round(parseFloat(item.estimated_calories))
-    };
-  }).filter(Boolean);
+    const matched = plan.workout.map(item => {
+      if (!item.exercise_id || !item.duration_seconds || !item.estimated_calories) return null;
+      return {
+        exercise_id: parseInt(item.exercise_id),
+        duration_seconds: Math.round(item.duration_seconds),
+        estimated_calories: Math.round(parseFloat(item.estimated_calories)),
+        reps: item.reps ? parseInt(item.reps) : null,
+        set: item.set ? parseInt(item.set) : null
+      };
+    }).filter(Boolean);
+
 
   const workoutRes = await fetch('/api/Db_connection', {
     method: 'POST',
@@ -259,7 +271,9 @@ export default function UserDashboard() {
                 {plan.workout.map((ex, idx) => (
                   <li key={idx} style={{ marginBottom: '10px' }}>
                     <strong>{ex.exercise_name}</strong><br />
-                    Duration: {ex.duration_seconds}s, Calories: {Math.round(ex.estimated_calories)}
+                    {ex.reps != null && ex.set != null
+                      ? `Reps: ${ex.reps}, Sets: ${ex.set}, Calories: ${Math.round(ex.estimated_calories)}`
+                      : `Duration: ${formatDuration(ex.duration_seconds)}, Calories: ${Math.round(ex.estimated_calories)}`}
                   </li>
                 ))}
               </ul>

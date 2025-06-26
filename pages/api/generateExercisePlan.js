@@ -52,7 +52,7 @@ function generateFitnessPrompt(user, exerciseList, foodList) {
         - Be close to ${Math.abs(dailyDiff)} kcal
         - **But not exceed 1000 kcal** (to ensure safety and sustainability)
 
-    2. Recommend 3 meals and 1–2 snacks using the food list.
+    2. Recommend 3 meals and 1-2 snacks using the food list.
     - Total food intake ≈ ${dailyCalories} kcal.
     - Ensure diversity, nutrition balance, and realism.
 
@@ -69,7 +69,7 @@ function generateFitnessPrompt(user, exerciseList, foodList) {
     📤 **Output JSON Format**:
     {
     "workout": [
-        { "exercise_id": "2", "exercise_name": "Squats", "duration_seconds": 300 , "estimated_calories": "45"},
+        { "exercise_id": "2", "exercise_name": "Squats", "duration_seconds": 300 , "estimated_calories": "45", "reps": "12", "set": "2"},
         ...
     ],
     "meals": [
@@ -81,7 +81,7 @@ function generateFitnessPrompt(user, exerciseList, foodList) {
         ]
         },
         ...
-    ],
+    ],  
     "summary": "To ${goalWeight > currentWeight ? 'gain' : 'lose'} ${Math.abs(goalWeight - currentWeight)}kg in 30 days, maintain a daily ${dailyDiff > 0 ? 'surplus' : 'deficit'} of ${Math.abs(dailyDiff)} kcal. Burn around ${Math.min(Math.abs(dailyDiff), 1000)} kcal from exercise and eat ${dailyCalories} kcal of food."
     }
     `;

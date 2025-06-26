@@ -1,4 +1,4 @@
-// pages/api/exercises.js
+// pages/api/Fetch_exercise.js
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -21,3 +21,4 @@ export default async function handler(req, res) {
   }
 }
 
+  
