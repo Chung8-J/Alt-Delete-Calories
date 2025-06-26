@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function CoachHome() {
-  
   const [admin, setAdmin] = useState(null);
   const router = useRouter();
 
@@ -21,14 +20,10 @@ export default function CoachHome() {
   if (!admin) return <p>Loading...</p>;
 
   return (
-    <div>
-      <Layout>
-      <main className="pt-20 px-6">
+    <Layout user={admin}>
+      <main className="">
         <h1>Welcome Admin, {admin?.coach_name || admin?.name}!</h1>
       </main>
-      </Layout>
-    </div>
+    </Layout>
   );
-
 }
-

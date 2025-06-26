@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       const { member_ic, role } = req.query;
 
       if (!member_ic || !role) {
-        return res.status(400).json({ error: 'Missing member_ic or role' });
+        return res.status(400).json({ error: 'Missing NoIC or role' });
       }
 
       const tableName = role === 'admin' ? 'coach' : 'member';
