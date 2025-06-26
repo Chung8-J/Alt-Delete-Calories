@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AddExercise from '@/components/Addexercise'; // adjust path if needed
+import AddExercise from '@/components/Addexercise';
 
 export default function CustomizePlan() {
   const router = useRouter();
@@ -13,7 +13,8 @@ export default function CustomizePlan() {
   const [selectedPlanItems, setSelectedPlanItems] = useState([]);
   const [showAddPlan, setShowAddPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('user'));
@@ -24,109 +25,143 @@ export default function CustomizePlan() {
     setUser(stored);
   }, [router]);
 
-  function formatDuration(seconds) {
+  const formatDuration = (seconds) => {
     if (!seconds || isNaN(seconds)) return '0s';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-  }
+  };
 
+  const fetchPlans = async () => {
+    try {
+      const exRes = await fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'preset_workout_plan',
+          action: 'get_user_plans',
+          data: { member_ic: user.member_ic },
+        }),
+      });
 
+      const fdRes = await fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'diet_plan',
+          action: 'get_user_plans',
+          data: { member_ic: user.member_ic },
+        }),
+      });
+
+      if (exRes.ok) {
+        const exData = await exRes.json();
+        setExercisePlans(Array.isArray(exData) ? exData : []);
+      }
+
+      if (fdRes.ok) {
+        const fdData = await fdRes.json();
+        setFoodPlans(Array.isArray(fdData) ? fdData : []);
+      }
+    } catch (err) {
+      console.error('❌ Fetch failed:', err);
+    }
+  };
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchPlans = async () => {
-      try {
-        // 🔁 Exercise plans
-        const exRes = await fetch('/api/Db_connection', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            table: 'preset_workout_plan',
-            action: 'get_user_plans',
-            data: { member_ic: user.member_ic },
-          }),
-        });
-
-        if (exRes.ok) {
-          const exData = await exRes.json();
-          setExercisePlans(Array.isArray(exData) ? exData : []);
-        } else {
-          const text = await exRes.text();
-          console.error('Exercise plan fetch error:', text);
-        }
-
-        // 🍽️ Food plans
-        const fdRes = await fetch('/api/Db_connection', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            table: 'diet_plan',
-            action: 'get_user_plans',
-            data: { member_ic: user.member_ic },
-          }),
-        });
-
-        if (fdRes.ok) {
-          const fdData = await fdRes.json();
-          setFoodPlans(Array.isArray(fdData) ? fdData : []);
-        } else {
-          const text = await fdRes.text();
-          console.error('Food plan fetch error:', text);
-        }
-      } catch (err) {
-        console.error('❌ Fetch failed:', err);
-      }
-    };
-
-    fetchPlans();
+    if (user) fetchPlans();
   }, [user]);
 
-const selectPlan = async (planId) => {
-    const planObj = (section === 'exercise' ? exercisePlans : foodPlans).find(
-    plan => plan[section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id'] === planId
-  );
-  setSelectedPlanId(planId);
-  setSelectedPlan(planObj); // <-- new
+  const selectPlan = async (planId) => {
+    const planList = section === 'exercise' ? exercisePlans : foodPlans;
+    const key = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
+    const planObj = planList.find(plan => plan[key] === planId);
 
+    setSelectedPlanId(planId);
+    setSelectedPlan(planObj);
+    setIsEditing(false);
 
-  const table = section === 'exercise' ? 'preset_workout_exercise' : 'diet_plan_meal';
-  const action = section === 'exercise' ? 'get_plan_exercises' : 'get_plan_meals';
+    const table = section === 'exercise' ? 'preset_workout_exercise' : 'diet_plan_meal';
+    const action = section === 'exercise' ? 'get_plan_exercises' : 'get_plan_meals';
 
-  try {
-    const res = await fetch('/api/Db_connection', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        table,
-        action,
-        data: { plan_id: planId }
-      })
-    });
+    try {
+      const res = await fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ table, action, data: { plan_id: planId } }),
+      });
 
-    const text = await res.text(); // Read body safely once
-    if (!res.ok) {
-      console.error('❌ Error response from server:', text);
-      return;
+      const text = await res.text();
+      if (!res.ok) return console.error('❌ Error:', text);
+
+      const data = JSON.parse(text);
+      setSelectedPlanItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('❌ Fetch failed:', err);
     }
+  };
 
-    if (!text) {
-      console.warn('⚠️ Empty response body.');
-      return;
-    }
-
-    const data = JSON.parse(text); // Parse manually now
-    setSelectedPlanItems(Array.isArray(data) ? data : []);
-  } catch (err) {
-    console.error('❌ Fetch failed:', err);
-  }
+  const startEditing = () => {
+  setEditData({
+    plan_name: selectedPlan.plan_name,
+    description: selectedPlan.description,
+    exercises: selectedPlanItems.map(ex => ({
+      exercise_id: ex.exercise_id, // ✅ Must be passed
+      exercise_name: ex.exercise_name,
+      duration_seconds: ex.duration_seconds || '',
+      reps: ex.reps || '',
+      set: ex.set || '',
+      mode: ex.duration_seconds ? 'duration' : 'reps_sets'
+    }))
+  });
+  setIsEditing(true);
 };
 
 
+  const saveEdit = async () => {
+    try {
+      const res = await fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'p_workoutplan',
+          action: 'update_plan',
+          data: {
+            plan_id: selectedPlanId,
+            plan_name: editData.plan_name,
+            description: editData.description,
+            exercises: editData.exercises
+          }
+        })
+      });
+
+      const result = await res.json();
+
+      console.log('🔍 update_plan response:', result);  //
+      if (res.ok && result.success) {
+        alert('✅ Plan updated!');
+        setIsEditing(false);
+        setSelectedPlanId(null);
+        await fetchPlans();
+      } else {
+        alert('❌ Update failed.');
+      }
+    } catch (err) {
+      console.error('❌ Update error:', err);
+    }
+  };
+
+  const updateExerciseField = (idx, key, value) => {
+    setEditData(prev => {
+      const updated = [...prev.exercises];
+      updated[idx] = { ...updated[idx], [key]: value };
+      return { ...prev, exercises: updated };
+    });
+  };
 
   return (
     <div style={{ display: 'flex', padding: 20 }}>
+      {/* Sidebar */}
       <div style={{ flex: 1 }}>
         <h2>📋 Customize Plan</h2>
         <button onClick={() => { setSection('exercise'); setSelectedPlanId(null); }}>Exercise Plan</button>
@@ -135,27 +170,27 @@ const selectPlan = async (planId) => {
         <div style={{ marginTop: 20, maxWidth: 200 }}>
           <h4>{section === 'exercise' ? 'Your Exercise Plans' : 'Your Food Plans'}</h4>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {(section === 'exercise' ? exercisePlans : foodPlans).map(plan => (
-              <li key={plan[section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id']}>
-                <button
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    textAlign: 'left',
-                    background:
-                      plan[section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id'] === selectedPlanId
-                        ? '#e0eaff'
-                        : 'transparent',
-                    border: 'none',
-                    padding: '8px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => selectPlan(plan[section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id'])}
-                >
-                  {plan.plan_name}
-                </button>
-              </li>
-            ))}
+            {(section === 'exercise' ? exercisePlans : foodPlans).map(plan => {
+              const key = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
+              return (
+                <li key={plan[key]}>
+                  <button
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      background: plan[key] === selectedPlanId ? '#e0eaff' : 'transparent',
+                      border: 'none',
+                      padding: '8px',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => selectPlan(plan[key])}
+                  >
+                    {plan.plan_name}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
 
           {section === 'exercise' && (
@@ -169,142 +204,126 @@ const selectPlan = async (planId) => {
                 borderRadius: '4px',
                 cursor: 'pointer'
               }}
-              onClick={() => setShowAddPlan(prev => !prev)}
+              onClick={() => {
+                setShowAddPlan(true);
+                setIsEditing(false);
+                setSelectedPlanId(null);
+              }}
             >
               {showAddPlan ? '➖ Hide Add Plan' : '➕ Add Plan'}
             </button>
           )}
-
         </div>
       </div>
 
+      {/* Main Content */}
       <div style={{ flex: 2, marginLeft: 20 }}>
-      <h3>Details</h3>
-      {!selectedPlanId ? (
-        <p>📌 Please choose a plan to view its contents.</p>
-      ) : (
-        <div>
-          <h4>📝 Plan Name: {selectedPlan?.plan_name || 'Unnamed Plan'}</h4>
-          {selectedPlan?.description && <p>📄 Description: {selectedPlan.description}</p>}
+        <h3>Details</h3>
+        {!selectedPlanId ? (
+          <p>📌 Please choose a plan to view its contents.</p>
+        ) : isEditing ? (
+          <div>
+            <input
+              type="text"
+              value={editData.plan_name}
+              onChange={(e) => setEditData(prev => ({ ...prev, plan_name: e.target.value }))}
+              placeholder="Plan Name"
+            />
+            <textarea
+              value={editData.description}
+              onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Description"
+            />
 
-          {selectedPlanItems.length > 0 ? (
-            <div>
-              {section === 'exercise' ? (
-                <ul>
-                  {selectedPlanItems.map((ex, idx) => (
-                    <li key={idx}>
-                      <strong>{ex.exercise_name}</strong><br />
-                      {ex.reps != null && ex.set != null ? (
-                        <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                      ) : (
-                        <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul>
-                  {selectedPlanItems.map((meal, idx) => (
-                    <li key={idx}>
-                      <strong>{meal.meal_type}</strong>: {meal.food_name} – {meal.serving_size}g, {meal.calories} kcal
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : (
-            <p>⚠️ This plan has no items yet.</p>
-          )}
+            {editData.exercises.map((ex, idx) => (
+              <div key={idx}>
+                <label>{ex.exercise_name}</label><br />
+                {ex.reps && ex.set ? (
+                  <>
+                    <input
+                      type="number"
+                      value={ex.reps}
+                      onChange={e => updateExerciseField(idx, 'reps', e.target.value)}
+                      placeholder="Reps"
+                    />
+                    <input
+                      type="number"
+                      value={ex.set}
+                      onChange={e => updateExerciseField(idx, 'set', e.target.value)}
+                      placeholder="Set"
+                    />
+                  </>
+                ) : (
+                  <input
+                    type="number"
+                    value={ex.duration_seconds}
+                    onChange={e => updateExerciseField(idx, 'duration_seconds', e.target.value)}
+                    placeholder="Duration (seconds)"
+                  />
+                )}
+              </div>
+            ))}
 
+            <button onClick={saveEdit}>💾 Save</button>
+            <button onClick={() => setIsEditing(false)}>❌ Cancel</button>
+          </div>
+        ) : (
+          <div>
+            <h4>📝 Plan Name: {selectedPlan?.plan_name || 'Unnamed Plan'}</h4>
+            {selectedPlan?.description && <p>📄 Description: {selectedPlan.description}</p>}
+            {selectedPlanItems.length > 0 ? (
+              <ul>
+                {selectedPlanItems.map((ex, idx) => (
+                  <li key={idx}>
+                    <strong>{ex.exercise_name}</strong><br />
+                    {ex.reps != null && ex.set != null ? (
+                      <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                    ) : (
+                      <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>⚠️ This plan has no items yet.</p>
+            )}
+            <div style={{ marginTop: 10 }}>
+              <button onClick={startEditing} style={{ marginRight: 10 }}>✏️ Edit Plan</button>
+              <button
+                style={{ backgroundColor: '#ffcccc', border: '1px solid #cc0000', borderRadius: 4, padding: '5px 10px' }}
+                onClick={async () => {
+                  if (!confirm('Are you sure you want to delete this plan?')) return;
 
-
-
-        
-          <div style={{ marginTop: 10 }}>
-          <button
-            style={{
-              padding: '6px 12px',
-              marginRight: 10,
-              backgroundColor: '#ffe58f',
-              border: '1px solid #d4b106',
-              borderRadius: 4,
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              setShowAddPlan(true);
-              setSelectedPlanId(null); // hide current selection
-              // pass selectedPlan as default to AddExercise later (optional)
-            }}
-          >
-            ✏️ Edit Plan
-          </button>
-
-          <button
-            style={{
-              padding: '6px 12px',
-              backgroundColor: '#ffccc7',
-              border: '1px solid #cf1322',
-              borderRadius: 4,
-              cursor: 'pointer'
-            }}
-            onClick={async () => {
-              const confirmed = confirm('Are you sure you want to delete this plan?');
-              if (!confirmed) return;
-
-              const planKey = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
-
-              try {
-                const res = await fetch('/api/Db_connection', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    table: section === 'exercise' ? 'p_workoutplan' : 'diet_plan',
-                    action: 'delete_plan',
-                    data: { plan_id: selectedPlan[planKey] }
-                  })
-                });
-
-                const result = await res.json();
-                if (res.ok && result.success) {
-                  alert('🗑️ Plan deleted successfully.');
-                  setSelectedPlanId(null);
-                  setSelectedPlan(null);
-                  setSelectedPlanItems([]);
-
-                  // Refresh plan list
-                  const refreshRes = await fetch('/api/Db_connection', {
+                  const res = await fetch('/api/Db_connection', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      table: section === 'exercise' ? 'preset_workout_plan' : 'diet_plan',
-                      action: 'get_user_plans',
-                      data: { member_ic: user.member_ic }
+                      table: 'p_workoutplan',
+                      action: 'delete_plan',
+                      data: { plan_id: selectedPlanId }
                     })
                   });
-                  const newData = await refreshRes.json();
-                  if (section === 'exercise') setExercisePlans(newData);
-                  else setFoodPlans(newData);
-                } else {
-                  alert('❌ Failed to delete plan.');
-                  console.error(result);
-                }
-              } catch (err) {
-                console.error('❌ Delete error:', err);
-              }
-            }}
-          >
-            🗑️ Delete Plan
-          </button>
-        </div>
 
-        </div>
-
-        
-      )}
-
-
+                  const result = await res.json();
+                  if (res.ok && result.success) {
+                    alert('🗑️ Deleted!');
+                    setSelectedPlanId(null);
+                    setSelectedPlan(null);
+                    setSelectedPlanItems([]);
+                    await fetchPlans();
+                  } else {
+                    alert('❌ Delete failed.');
+                  }
+                }}
+              >
+                🗑️ Delete Plan
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Add Plan */}
       {showAddPlan && section === 'exercise' && (
         <div style={{ marginTop: 30 }}>
           <AddExercise
@@ -328,22 +347,10 @@ const selectPlan = async (planId) => {
                 const result = await res.json();
                 if (res.ok && result.success) {
                   alert('✅ Plan saved!');
-                  setShowAddPlan(false); // auto-hide
-                  setSelectedPlanId(null); // reset selection
-                  // refresh plan list
-                  const updatedPlans = await fetch('/api/Db_connection', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      table: 'preset_workout_plan',
-                      action: 'get_user_plans',
-                      data: { member_ic: user.member_ic }
-                    })
-                  });
-                  const newData = await updatedPlans.json();
-                  if (Array.isArray(newData)) setExercisePlans(newData);
+                  setShowAddPlan(false);
+                  setSelectedPlanId(null);
+                  await fetchPlans();
                 } else {
-                  console.error('❌ Save failed:', result);
                   alert('❌ Failed to save plan.');
                 }
               } catch (err) {
@@ -353,9 +360,6 @@ const selectPlan = async (planId) => {
           />
         </div>
       )}
-
     </div>
-
-    
   );
 }

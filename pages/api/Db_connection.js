@@ -6,6 +6,19 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+async function getCaloriesPerSecond(exercise_id) {
+  const result = await pool.query(
+    `SELECT calories_per_sec FROM exercise WHERE exercise_id = $1`,
+    [exercise_id]
+  );
+
+  if (result.rows.length === 0) return 0;
+
+  const caloriesPerMinute = result.rows[0].calories_per_minute;
+  return caloriesPerMinute / 60;
+}
+
+
 export default async function handler(req, res) {
   const { table, action, data } = req.body || {}; // prevent destructuring error for GET
 
@@ -330,7 +343,7 @@ if (table === 'member' && action === 'create') {
         await pool.query('INSERT INTO product (name, price) VALUES ($1, $2)', [
           data.name,
           data.price,
-        ]);
+        ]); 
         return res.status(200).json({ message: 'Product added' });
       }
 
@@ -345,17 +358,17 @@ if (table === 'member' && action === 'create') {
         }
 
         // ✅ Fetch exercises in one workout plan
-        if (table === 'preset_workout_exercise' && action === 'get_plan_exercises') {
+       if (table === 'preset_workout_exercise' && action === 'get_plan_exercises') {
           const { plan_id } = data;
           const exercises = await pool.query(`
-          SELECT e.exercise_name, pe.duration_seconds, pe.estimated_calories, pe.reps, pe.set
-          FROM preset_workout_exercise pe
-          JOIN exercise e ON pe.exercise_id = e.exercise_id
-          WHERE p_workoutplan_id = $1
-
+            SELECT pe.exercise_id, e.exercise_name, pe.duration_seconds, pe.estimated_calories, pe.reps, pe.set
+            FROM preset_workout_exercise pe
+            JOIN exercise e ON pe.exercise_id = e.exercise_id
+            WHERE p_workoutplan_id = $1
           `, [plan_id]);
           return res.status(200).json(exercises.rows);
         }
+
 
         // ✅ Fetch all food plans for user
         if (table === 'diet_plan' && action === 'get_user_plans') {
@@ -391,6 +404,74 @@ if (table === 'member' && action === 'create') {
           }
           return res.status(200).json({ success: true });
         }
+
+if (table === 'p_workoutplan' && action === 'update_plan') {
+  const { plan_id, plan_name, description, exercises } = data;
+
+  try {
+    await pool.query(
+      `UPDATE preset_workout_plan SET plan_name = $3, description = $2 WHERE p_workoutplan_id = $1`,
+      [plan_id, description, plan_name]
+    );
+
+    // Delete old exercises
+    await pool.query(
+      `DELETE FROM preset_workout_exercise WHERE p_workoutplan_id = $1`,
+      [plan_id]
+    );
+
+    for (const ex of exercises) {
+      const exercise_id = parseInt(ex.exercise_id);
+
+      // Validate exercise_id
+      if (isNaN(exercise_id)) {
+        return res.status(400).json({ error: `⛔ Invalid exercise_id: ${ex.exercise_id}` });
+      }
+
+      const reps = ex.reps ? parseInt(ex.reps) : null;
+      const set = ex.set ? parseInt(ex.set) : null;
+      const duration_seconds = ex.duration_seconds ? parseInt(ex.duration_seconds) : null;
+
+      // Fetch calories_per_sec
+      const calRes = await pool.query(
+        `SELECT calories_per_sec FROM exercise WHERE exercise_id = $1 LIMIT 1`,
+        [exercise_id]
+      );
+      const calPerSec = calRes.rows[0]?.calories_per_sec;
+
+      if (!calPerSec) {
+        return res.status(400).json({ error: `❌ Calories info not found for exercise_id ${exercise_id}` });
+      }
+
+      let duration = null;
+      let estimatedCalories = null;
+
+      if (duration_seconds) {
+        duration = duration_seconds;
+        estimatedCalories = Math.round(duration * calPerSec);
+      } else if (reps && set) {
+        duration = reps * set * 5;
+        estimatedCalories = Math.round(duration * calPerSec);
+      } else {
+        return res.status(400).json({
+          error: `❌ Please provide either duration_seconds or reps & set for exercise_id ${exercise_id}`
+        });
+      }
+
+      await pool.query(
+        `INSERT INTO preset_workout_exercise (p_workoutplan_id, exercise_id, duration_seconds, estimated_calories, reps, set)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [plan_id, exercise_id, duration, estimatedCalories, reps, set]
+      );
+    }
+
+    return res.status(200).json({ success: true });
+
+  } catch (err) {
+    console.error('❌ Update Plan Error:', err);
+    return res.status(500).json({ error: 'Server error during update.' });
+  }
+}
 
         //This is end
 
