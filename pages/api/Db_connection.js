@@ -190,7 +190,7 @@ if (table === 'member' && action === 'create') {
           }
         }
         
-     if (action === 'save_plan') {
+     if (table === 'preset_workout_plan' && action === 'save_plan') {
           const { plan_name, description, member_ic, exercises } = data;
 
           const planRes = await pool.query(
@@ -276,7 +276,7 @@ if (table === 'member' && action === 'create') {
               await pool.query(
                 `INSERT INTO diet_plan_meal (d_plan_id, meal_type, food_code, serving_size, calories)
                 VALUES ($1, $2, $3, $4, $5)`,
-                [d_plan_id, meal_type, food.food_code, food.serving_size, food.calories]
+                [d_plan_id, meal_type, food.food_code, food.serving_size,Math.round(food.calories)]
               );
             }
           }
@@ -336,6 +336,65 @@ if (table === 'member' && action === 'create') {
 
         return res.status(200).json({ success: true, d_plan_id });
       }
+
+      if (table === 'diet_plan' && action === 'save_diet_plan_custom') {
+  const { member_ic, plan_name, meals } = data;
+
+  if (!member_ic || !plan_name || !Array.isArray(meals)) {
+    return res.status(400).json({ error: 'Missing diet plan data or meals' });
+  }
+
+  const insertDiet = await pool.query(
+    `INSERT INTO diet_plan (member_ic, plan_name, total_calories)
+     VALUES ($1, $2, $3) RETURNING d_plan_id`,
+    [member_ic, plan_name, 0]
+  );
+
+  const d_plan_id = insertDiet.rows[0].d_plan_id;
+
+  const mealInsert = `
+    INSERT INTO diet_plan_meal (d_plan_id, meal_type, food_code, serving_size, calories)
+    VALUES ($1, $2, $3, $4, $5)
+  `;
+
+  let totalCalories = 0;
+
+  for (const meal of meals) {
+    const mealType = meal.meal;
+
+    for (const food of meal.foods) {
+      const foodInfo = await pool.query(
+        `SELECT food_code, calories FROM food WHERE food_code = $1 LIMIT 1`,
+        [food.food_code]
+      );
+
+      if (foodInfo.rows.length === 0) {
+        console.warn(`⚠️ Food not found for code: ${food.food_code}`);
+        continue;
+      }
+
+      const { food_code, calories } = foodInfo.rows[0];
+      const calcCalories = (food.serving_size / 100) * calories;
+      totalCalories += calcCalories;
+
+      await pool.query(mealInsert, [
+        d_plan_id,
+        mealType,
+        food_code,
+        food.serving_size,
+        Math.round(calcCalories)
+      ]);
+    }
+  }
+
+  await pool.query(
+    `UPDATE diet_plan SET total_calories = $1 WHERE d_plan_id = $2`,
+    [Math.round(totalCalories), d_plan_id]
+  );
+
+  return res.status(200).json({ success: true, d_plan_id });
+}
+
 
 
       // 🛒 Create Product (extra case)
