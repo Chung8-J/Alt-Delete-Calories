@@ -19,7 +19,48 @@ export default function CustomizePlan() {
   const [exercises, setExercises] = useState([]);
   const [showAddFoodPlan, setShowAddFoodPlan] = useState(false);
   const [addFoodMode, setAddFoodMode] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editPlanData, setEditPlanData] = useState(null); // contains meals, name, etc.
+  const [allFoods, setAllFoods] = useState([]); // for dropdowns
 
+const getCaloriesPerFood = (foodName) => {
+  const food = allFoods.find(f => f.food_name === foodName);
+  return food ? food.calories_per_100g : 0;
+};
+
+const calculateTotalCalories = () => {
+  let total = 0;
+  editPlanData.meals.forEach((meal) => {
+    meal.foods.forEach((food) => {
+      const caloriesPer100g = getCaloriesPerFood(food.food_name);
+      const servingSize = parseFloat(food.serving_size);
+      if (!isNaN(servingSize)) {
+        total += (servingSize / 100) * caloriesPer100g;
+      }
+    });
+  });
+  return Math.round(total);
+};
+
+
+function groupMeals(flatMeals) {
+  const mealMap = {};
+  flatMeals.forEach(item => {
+    const { meal_type, food_name, serving_size, calories } = item;
+    if (!mealMap[meal_type]) mealMap[meal_type] = [];
+    mealMap[meal_type].push({ food_name, serving_size, calories });
+  });
+  return Object.entries(mealMap).map(([meal, foods]) => ({ meal, foods }));
+}
+
+useEffect(() => {
+  const fetchFoods = async () => {
+    const res = await fetch('/api/Fetch_food');
+    const data = await res.json();
+    if (Array.isArray(data)) setAllFoods(data);
+  };
+  fetchFoods();
+}, []);
 
 
 useEffect(() => {
@@ -587,7 +628,155 @@ const fetchFoodPlans = async () => {
             </button>
           </div>
                 </div>
-        ) : (
+       ) : section === 'food' && editMode ? (
+  <div style={{ flex: 1 }}>
+    <div style={{ border: '1px solid #ccc', padding: 20, marginTop: 20 }}>
+      <h3>✏️ Edit Food Plan</h3>
+
+      <label>Plan Name:</label>
+      <input
+        value={editPlanData.plan_name}
+        onChange={(e) =>
+          setEditPlanData({ ...editPlanData, plan_name: e.target.value })
+        }
+        style={{ width: '100%', marginBottom: 10 }}
+      />
+
+      {editPlanData.meals.map((meal, mealIdx) => (
+        <div key={meal.meal} style={{ marginBottom: 20 }}>
+          <h4>{meal.meal}</h4>
+          {meal.foods.map((food, foodIdx) => (
+            <div key={foodIdx} style={{ marginBottom: 10 }}>
+              <select
+                value={food.food_name}
+                onChange={(e) => {
+                  const newMeals = [...editPlanData.meals];
+                  newMeals[mealIdx].foods[foodIdx].food_name = e.target.value;
+                  setEditPlanData({ ...editPlanData, meals: newMeals });
+                }}
+              >
+                <option value="">Select Food</option>
+                {allFoods.map((f) => (
+                  <option key={f.food_code} value={f.food_name}>
+                    {f.food_name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                placeholder="Serving size"
+                value={food.serving_size}
+                onChange={(e) => {
+                  const newMeals = [...editPlanData.meals];
+                  newMeals[mealIdx].foods[foodIdx].serving_size = e.target.value;
+                  setEditPlanData({ ...editPlanData, meals: newMeals });
+                }}
+                style={{ marginLeft: 10 }}
+              />
+              <button
+                onClick={() => {
+                  const newMeals = [...editPlanData.meals];
+                  newMeals[mealIdx].foods.splice(foodIdx, 1);
+                  setEditPlanData({ ...editPlanData, meals: newMeals });
+                }}
+                style={{ marginLeft: 10, color: 'red' }}
+              >
+                ✖
+              </button>
+            </div>
+          ))}
+
+          <button
+            onClick={() => {
+              const newMeals = [...editPlanData.meals];
+              newMeals[mealIdx].foods.push({
+                food_name: '',
+                serving_size: '',
+                calories: 0,
+              });
+              setEditPlanData({ ...editPlanData, meals: newMeals });
+            }}
+          >
+            ➕ Add Food
+          </button>
+        </div>
+      ))}
+
+<button
+  onClick={async () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    // Map food_name → food_code before sending
+    const meals = editPlanData.meals.map((meal) => ({
+      meal: meal.meal,
+      foods: meal.foods
+        .map((f) => {
+          const matched = allFoods.find(food => food.food_name === f.food_name);
+          if (!matched) return null; // skip unknown
+          return {
+            food_code: matched.food_code,
+            serving_size: parseInt(f.serving_size, 10),
+            calories: 0 // backend recalculates
+          };
+        })
+        .filter(f => f !== null) // remove unknowns
+    }));
+
+    const res = await fetch('/api/Db_connection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        table: 'diet_plan',
+        action: 'update_diet_plan',
+        data: {
+          d_plan_id: selectedPlanId,
+          plan_name: editPlanData.plan_name,
+          meals
+        }
+      })
+    });
+
+    const result = await res.json();
+    if (res.ok && result.success) {
+      alert('✅ Plan updated!');
+      setEditMode(false);
+      fetchFoodPlans(); // optional: refresh sidebar
+      window.location.reload(); // 🔄 refresh whole page
+
+    } else {
+      alert('❌ Failed to update plan.');
+      console.error(result);
+    }
+  }}
+  style={{ marginTop: 20 }}
+>
+  💾 Update Plan
+</button>
+
+
+      <div style={{ marginTop: 10 }}>
+      <button
+        onClick={() => {
+          setEditMode(false); // Exit edit mode
+          setEditPlanData(null); // Optional: clear current edit data
+        }}
+        style={{
+          padding: '8px 12px',
+          backgroundColor: '#f44336',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginLeft: '10px'
+        }}
+      >
+        ❌ Cancel
+      </button>
+    </div>
+
+    </div>
+  </div>
+) :  (
         <div>
             <h4>
               📝 Plan Name: {selectedPlan?.plan_name || (section === 'food' ? 'Unnamed Food Plan' : 'Unnamed Plan')}
@@ -628,6 +817,22 @@ const fetchFoodPlans = async () => {
           <div style={{ marginTop: 10 }}>
             {section === 'exercise' && (
               <button onClick={startEditing} style={{ marginRight: 10 }}>
+                ✏️ Edit Plan
+              </button>
+            )}
+
+            {section === 'food' && (
+              <button
+                onClick={() => {
+                  setEditMode(true); // make sure this state exists
+                  setEditPlanData({
+                    plan_id: selectedPlan.d_plan_id,
+                    plan_name: selectedPlan.plan_name,
+                    meals: groupMeals(selectedPlanItems), // you should define groupMeals as earlier
+                  });
+                }}
+                style={{ marginRight: 10 }}
+              >
                 ✏️ Edit Plan
               </button>
             )}

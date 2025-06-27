@@ -17,6 +17,9 @@ export default function AddFood({ initialData, onPlanSaved }) {
     initialData?.meals?.some(m => m.meal === 'Snack') || false
   );
 
+
+  
+
   // Add Snack meal bracket when snackVisible is true but not already in meals
   useEffect(() => {
     if (snackVisible && !meals.some(m => m.meal === 'Snack')) {
@@ -75,17 +78,20 @@ export default function AddFood({ initialData, onPlanSaved }) {
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user?.member_ic) return alert('❌ No user found in localStorage');
 
-  let totalCalories = 0;
+    let totalCalories = 0;
+
     const mealsWithDetails = meals.map(meal => {
     const foodsWithDetails = meal.foods.map(f => {
         const foodData = foods.find(fd => fd.food_code === parseInt(f.food_code));
         const caloriesPerGram = foodData ? (foodData.calories / 100) : 0;
         const totalCal = parseFloat(f.serving_size) * caloriesPerGram;
 
+        totalCalories += totalCal; // ✅ ADD IT HERE
+
         return {
-        food_name: foodData?.food_name || 'Unknown',
+        food_code: parseInt(f.food_code),
         serving_size: parseInt(f.serving_size),
-        calories: totalCal
+        calories: Math.round(totalCal),
         };
     });
 
@@ -94,6 +100,7 @@ export default function AddFood({ initialData, onPlanSaved }) {
         foods: foodsWithDetails
     };
     });
+
 
 
   try {
@@ -129,7 +136,7 @@ export default function AddFood({ initialData, onPlanSaved }) {
     if (typeof onPlanSaved === 'function') {
         onPlanSaved(); // ✅ Notify parent to refresh
     }
-    
+
     } else {
       console.error(result);
       alert('❌ Failed to save plan');

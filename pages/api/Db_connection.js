@@ -532,6 +532,77 @@ if (table === 'p_workoutplan' && action === 'update_plan') {
   }
 }
 
+if (table === 'diet_plan' && action === 'update_diet_plan') {
+  const { d_plan_id, plan_name, meals } = data;
+
+  if (!d_plan_id || !plan_name || !Array.isArray(meals)) {
+    return res.status(400).json({ error: 'Missing diet plan ID, name or meals' });
+  }
+
+  try {
+    // 1. Update plan name only
+    await pool.query(
+      `UPDATE diet_plan SET plan_name = $1 WHERE d_plan_id = $2`,
+      [plan_name, d_plan_id]
+    );
+
+    // 2. Delete old meals
+    await pool.query(`DELETE FROM diet_plan_meal WHERE d_plan_id = $1`, [d_plan_id]);
+
+    // 3. Insert new meals and calculate total calories
+    const mealInsert = `
+      INSERT INTO diet_plan_meal (d_plan_id, meal_type, food_code, serving_size, calories)
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+
+    let totalCalories = 0;
+
+    for (const meal of meals) {
+      const mealType = meal.meal;
+
+      for (const food of meal.foods) {
+        // Fetch calories per 100g for this food_code
+        const foodRes = await pool.query(
+          `SELECT calories FROM food WHERE food_code = $1 LIMIT 1`,
+          [food.food_code]
+        );
+
+        if (foodRes.rows.length === 0) {
+          console.warn(`⚠️ Skipping unknown food code: ${food.food_code}`);
+          continue;
+        }
+
+        const calPer100g = foodRes.rows[0].calories;
+        const calcCalories = (food.serving_size / 100) * calPer100g;
+
+        totalCalories += calcCalories;
+
+        await pool.query(mealInsert, [
+          d_plan_id,
+          mealType,
+          food.food_code,
+          food.serving_size,
+          Math.round(calcCalories)
+        ]);
+      }
+    }
+
+    // 4. Update total_calories
+    await pool.query(
+      `UPDATE diet_plan SET total_calories = $1 WHERE d_plan_id = $2`,
+      [Math.round(totalCalories), d_plan_id]
+    );
+
+    return res.status(200).json({ success: true });
+
+  } catch (err) {
+    console.error('❌ Update Diet Plan Error:', err);
+    return res.status(500).json({ error: 'Failed to update diet plan', details: err.message });
+  }
+}
+
+
+
         //This is end
 
       return res.status(400).json({ error: 'Invalid POST request' });
