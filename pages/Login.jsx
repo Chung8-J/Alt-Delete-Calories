@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -76,6 +77,16 @@ export default function LoginPage() {
       <a href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
         Login
       </a>
+      <button
+          type="button"
+          onClick={() => {
+            setShowModal(false);
+            router.push('/intro');
+          }}
+          className="px-4 py-2 border border-gray-400 rounded"
+        >
+          Cancel
+        </button>
 
       <p style={{ color: 'red' }}>{message}</p>
 

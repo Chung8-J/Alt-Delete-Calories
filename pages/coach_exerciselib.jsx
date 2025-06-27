@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ExerciseLibrary from '@/components/ExerciseLibrary';
+import Layout from '../components/Layout';
 
 
 export default function CoachExercisesPage() {

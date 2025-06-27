@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/router'; // ✅ Pages Router!
 import { useEffect, useState } from 'react';
+import Layout from '../components/Layout';
 
 export default function EditExercise() {
   const router = useRouter();
@@ -60,6 +61,7 @@ export default function EditExercise() {
 
   return (
     <div className="edit_exercise">
+      <Layout>
       <h1 className="text-2xl font-bold mb-4">Edit Exercise</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,6 +135,7 @@ export default function EditExercise() {
       </form>
 
       {message && <p className="text-red-500 mt-3">{message}</p>}
+      </Layout>
     </div>
   );
 }

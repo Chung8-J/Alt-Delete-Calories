@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Layout from '../components/Layout';
 
 export default function FoodLibrary({ role }) {
   const [foods, setFoods] = useState([]);
@@ -82,6 +83,7 @@ const handlePrev = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <Layout>
       <h1 className="text-3xl font-bold mb-6">Food Library</h1>
 
       {/* Filters */}
@@ -217,6 +219,7 @@ const handlePrev = () => {
           Next ▶
         </button>
       </div>
+      </Layout>
     </div>
   );
 }

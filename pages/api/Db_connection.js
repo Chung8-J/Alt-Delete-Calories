@@ -140,7 +140,8 @@ if (table === 'member' && action === 'create') {
             return res.status(200).json({
               user: {
                 member_name: coach.coach_name,
-                member_ic: coach.coach_ic
+                member_ic: coach.coach_ic,
+                gender: coach.coach_gender
               },
               role: 'admin'
             });
