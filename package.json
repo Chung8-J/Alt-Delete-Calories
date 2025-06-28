@@ -16,6 +16,7 @@
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.6",
     "next": "15.3.3",
+    "next-connect": "^1.0.0",
     "pg": "^8.16.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

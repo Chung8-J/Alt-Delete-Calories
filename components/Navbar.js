@@ -41,14 +41,14 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="flex items-center gap-6">
+      <div className="navbar-components">
         {user.role === 'admin' && (
           <>
             <Link href="/adminhome" className="hover:text-yellow-400">🏋️ Alt+Calories</Link>|
             <Link href="/coach_foodlib" className="hover:text-yellow-400">Manage Food Library</Link>|
             <Link href="/coach_exerciselib" className="hover:text-yellow-400">Manage Exercise Library</Link>|
             <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>|
-            <Link href="/community" className="hover:text-yellow-400">Community</Link>|
+            <Link href="/community" className="hover:text-yellow-400">Community</Link>
           </>
         )}
 
@@ -59,12 +59,12 @@ export default function Navbar() {
             <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>|
             <Link href="/member_exercise" className="hover:text-yellow-400">Calories Calculator</Link>|
             <Link href="/member_exercise" className="hover:text-yellow-400">Workout/Diet Plan</Link>|
-            <Link href="/community" className="hover:text-yellow-400">Community</Link>|
+            <Link href="/community" className="hover:text-yellow-400">Community</Link>
           </>
         )}
 
         {/* Avatar Dropdown */}
-        <div className="relative" ref={dropdownRef}>
+        <div className="usertab" ref={dropdownRef}>
           <button
             onClick={() => setShowDropdown(p => !p)}
             style={{float:'right'}}
@@ -87,8 +87,8 @@ export default function Navbar() {
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-50">
-              <ul style={{ listStyleType: 'none' }}>
+            <div className="dropdown" style={{ minWidth: '160px', float:'right' }}>
+              <ul style={{ listStyleType: 'none', }}>
                 <li>
                   <Link
                     href={user.role === 'admin' ? '/adminprofile' : `/profile/view/${user.member_ic}`}
