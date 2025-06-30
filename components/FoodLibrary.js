@@ -126,11 +126,13 @@ const handlePrev = () => {
             <div key={food.food_code} className="bg-white p-4 rounded-xl shadow">
               {food.food_pic && (
                 <img
-                  src={food.food_pic}
+                  src={`https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/food/public/${food.food_pic}`}
                   alt={food.food_name}
-                  className="w-full h-40 object-cover rounded mb-3"
+                  className="w-full object-contain max-h-40 rounded mb-3"
+                  style={{ maxWidth: '300px', height: '100%' }}
                 />
               )}
+
               <h2 className="text-xl font-semibold">{food.food_name}</h2>
 
               {/* Role-Based Content */}

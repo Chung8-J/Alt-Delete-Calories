@@ -1,134 +1,192 @@
 'use client';
-import { useRouter } from 'next/router'; // ✅ Pages Router!
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useRef } from 'react';
+import { supabase } from '@/pages/supabaseClient';
+import { v4 as uuidv4 } from 'uuid';
 import Layout from '../components/Layout';
 
 export default function EditFood() {
-const router = useRouter();
-const { code } = router.query; // ✅ Get code from URL
+  const router = useRouter();
+  const { code } = router.query;
 
-const [food, setFood] = useState(null);
-const [loading, setLoading] = useState(true);
-const [message, setMessage] = useState('');
+  const [food, setFood] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadPreview, setUploadPreview] = useState('');
+  const fileInputRef = useRef(null);
 
-// ✅ Only fetch when code is defined
-useEffect(() => {
+  useEffect(() => {
     if (!code) return;
 
     fetch(`/api/Fetch_food_by_code?code=${code}`)
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         setFood(data);
         setLoading(false);
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         console.error('Failed to load food', err);
         setMessage('Error loading food');
         setLoading(false);
-    });
-}, [code]);
+      });
+  }, [code]);
 
-const handleChange = (f) => {
-    setFood({ ...food, [f.target.name]: f.target.value });
-};
+  const handleChange = (e) => {
+    setFood({ ...food, [e.target.name]: e.target.value });
+  };
 
-const handleSubmit = async (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const previewURL = URL.createObjectURL(file);
+      setUploadPreview(previewURL);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage('');
 
     try {
-    const res = await fetch('/api/Edit_food', {
+      let imageName = food.food_pic; // default: keep existing
+
+      if (imageFile) {
+        const ext = imageFile.name.split('.').pop();
+        const uuid = `${uuidv4()}.${ext}`;
+        const filePath = `public/${uuid}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('food')
+          .upload(filePath, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        imageName = uuid;
+      }
+
+      const updatedFood = {
+        ...food,
+        food_pic: imageName,
+      };
+
+      const res = await fetch('/api/Edit_food', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(food),
-    });
+        body: JSON.stringify(updatedFood),
+      });
 
-    const result = await res.json();
+      const result = await res.json();
 
-    if (res.ok) {
-        alert('✅ food updated successfully!');
+      if (res.ok) {
+        alert('✅ Food updated successfully!');
         router.push('/coach_foodlib');
-    } else {
+      } else {
         setMessage(result.error || 'Update failed.');
-    }
+      }
     } catch (err) {
-    console.error(err);
-    setMessage('Server error');
+      console.error(err);
+      setMessage('❌ Upload or update failed.');
     }
-};
+  };
 
-if (loading) return <p>Loading...</p>;
-if (!food) return <p>No food found.</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!food) return <p>No food found.</p>;
+
+  const SUPABASE_IMAGE_BASE = 'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/food/public/';
 
 return (
-<div className="max-w-3xl mx-auto p-6">
+  <div className="max-w-3xl mx-auto p-6">
     <Layout>
-    <h1 className="text-2xl font-bold mb-4">Edit Food</h1>
-    <form onSubmit={handleSubmit} className="space-y-4">
-    <strong>Food Name: </strong>
-    <input
-        type="text"
-        name="food_name"
-        value={food.food_name || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Food Name"
-    /> <br /><br />
-    <strong>Food Description: </strong>
-    <textarea
-        name="description"
-        value={food.description || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Description"
-    /><br /><br />
-    <strong>Carb per 100g: </strong>
-    <input
-        type="number"
-        step="0.01"
-        name="carbohydrate_per_100g"
-        value={food.carbohydrate_per_100g || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Carbohydrates per 100g"
-    /><br /><br />
-    <strong>Protein per 100g: </strong>
-    <input
-        type="number"
-        step="0.01"
-        name="protein_per_100g"
-        value={food.protein_per_100g || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Protein per 100g"
-    /><br /><br />
-    <strong>Fat per 100g: </strong>
-    <input
-        type="number"
-        step="0.01"
-        name="fat_per_100g"
-        value={food.fat_per_100g || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Fat per 100g"
-    /><br /><br />
-    <strong>Calories: </strong>
-    <input
-        type="number"
-        name="calories"
-        value={food.calories || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Calories"
-    /><br /><br />
-    <strong>Upload Food Picture: </strong>
-    <input
-        type="text"
-        name="food_pic"
-        value={food.food_pic || ''}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-        placeholder="Picture URL"
-    /><br /><br />
+      <h1 className="text-2xl font-bold mb-4">Edit Food</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+
+         <strong>Food Name: </strong>
+            <input
+                type="text"
+                name="food_name"
+                value={food.food_name || ''}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                placeholder="Food Name"
+            /> <br /><br />
+
+        <strong>Food Description: </strong>
+            <textarea
+                name="description"
+                value={food.description || ''}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                placeholder="Description"
+            /><br /><br />
+            <strong>Carb per 100g: </strong>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="carbohydrate_per_100g"
+                    value={food.carbohydrate_per_100g || ''}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    placeholder="Carbohydrates per 100g"
+                /><br /><br />
+            <strong>Protein per 100g: </strong>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="protein_per_100g"
+                    value={food.protein_per_100g || ''}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    placeholder="Protein per 100g"
+                /><br /><br />
+            <strong>Fat per 100g: </strong>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="fat_per_100g"
+                    value={food.fat_per_100g || ''}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    placeholder="Fat per 100g"
+                /><br /><br />
+            <strong>Calories: </strong>
+                <input
+                    type="number"
+                    name="calories"
+                    value={food.calories || ''}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    placeholder="Calories"
+                /><br /><br />
+
+
+        {/* 🔼 Image Upload Section */}
+        <div>
+          <label className="block font-semibold mb-1">Upload Food Picture</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={fileInputRef}
+            className="mt-1"
+          />
+          {uploadPreview ? (
+            <img
+              src={uploadPreview}
+              alt="Preview"
+              style={{ maxWidth: '300px', height: '100%', marginTop: '10px' }}
+            />
+          ) : food.food_pic ? (
+            <img
+              src={SUPABASE_IMAGE_BASE + food.food_pic}
+              alt="Current"
+              style={{ maxWidth: '300px', height: '100%', marginTop: '10px' }}
+            />
+          ) : null}
+        </div>
+
+   <br /><br />
 
     {/* Dropdown for food_genre enum */}
     <strong>Category: </strong>
@@ -153,9 +211,11 @@ return (
     >
         Update Food
     </button>
-    </form>
-    {message && <p className="text-red-500 mt-3">{message}</p>}
+      </form>
+
+      {message && <p className="text-red-500 mt-3">{message}</p>}
     </Layout>
-</div>
+  </div>
 );
-}
+
+} 

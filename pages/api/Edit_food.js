@@ -1,4 +1,3 @@
-// /pages/api/Edit_food.js
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
   } = req.body;
 
   if (!food_code) {
-    return res.status(400).json({ error: 'Missing food code' });
+    return res.status(400).json({ error: 'Missing food_code' });
   }
 
   try {
@@ -40,21 +39,21 @@ export default async function handler(req, res) {
         calories = $8
       WHERE food_code = $9`,
       [
-        food_name,
-        description,
+        typeof food_name === 'string' ? food_name.trim() : food_name,
+        typeof description === 'string' ? description.trim() : description,
         carbohydrate_per_100g,
         protein_per_100g,
         fat_per_100g,
-        food_pic,
-        food_genre,
+        typeof food_pic === 'string' ? food_pic.trim() : food_pic,
+        typeof food_genre === 'string' ? food_genre.trim() : food_genre,
         calories,
-        food_code,
+        food_code, // allow number or string
       ]
     );
 
-    res.status(200).json({ message: 'Food updated successfully' });
+    res.status(200).json({ message: '✅ Food updated successfully' });
   } catch (err) {
-    console.error('Edit food error:', err);
+    console.error('❌ Edit food error:', err);
     res.status(500).json({ error: 'Database error' });
   }
 }
