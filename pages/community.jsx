@@ -27,21 +27,36 @@ export default function CommunityPage() {
   };
 
   const timeAgo = (utcDateStr) => {
-    const secondsAgo = Math.floor((new Date() - new Date(utcDateStr)) / 1000);
-    const units = [
-      ['year', 31536000],
-      ['month', 2592000],
-      ['day', 86400],
-      ['hour', 3600],
-      ['minute', 60],
-      ['second', 1],
-    ];
-    for (let [name, sec] of units) {
-      const c = Math.floor(secondsAgo / sec);
-      if (c > 0) return `${c} ${name}${c !== 1 ? 's' : ''} ago`;
-    }
-    return 'just now';
-  };
+  // Convert to ISO format
+  const isoStr = utcDateStr.replace(' ', 'T');
+
+  // Parse as UTC, then convert to local time
+  const utcDate = new Date(isoStr);
+
+  // Create local date from UTC parts
+  const localDate = new Date(utcDate.getTime() + (8 * 60 * 60 * 1000)); // +8 hours for Malaysia
+
+  const secondsAgo = Math.floor((new Date() - localDate) / 1000);
+
+  const units = [
+    ['year', 31536000],
+    ['month', 2592000],
+    ['day', 86400],
+    ['hour', 3600],
+    ['minute', 60],
+    ['second', 1],
+  ];
+
+  for (let [name, sec] of units) {
+    const c = Math.floor(secondsAgo / sec);
+    if (c > 0) return `${c} ${name}${c !== 1 ? 's' : ''} ago`;
+  }
+
+  return 'just now';
+};
+
+
+
 
   const handlePostCreated = () => {
     fetchPosts();
@@ -92,7 +107,8 @@ export default function CommunityPage() {
         body: JSON.stringify({
           post_id: postId,
           member_ic: currentUser.member_ic,
-          content: newComment
+          content: newComment,
+          role: currentUser.role 
         }),
       });
 
@@ -115,11 +131,14 @@ export default function CommunityPage() {
         <div style={{ marginTop: '6px' }}>
           {comments.map((c) => (
             <div key={c.comment_id} style={{ marginBottom: '8px' }}>
-              <strong>{c.member_name}</strong> ·{' '}
-              <small>{timeAgo(c.created_at)}</small>
+              <strong>
+                {c.member_name} {c.poster_role === 'coach' && <span style={{ color: 'red' }}>(coach)</span>}
+              </strong>{' '}
+              · <small>{timeAgo(c.created_at)}</small>
               <p style={{ margin: '4px 0' }}>{c.content}</p>
             </div>
           ))}
+
         </div>
 
         {currentUser && (
