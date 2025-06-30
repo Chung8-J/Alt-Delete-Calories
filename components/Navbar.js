@@ -48,6 +48,7 @@ export default function Navbar() {
             <Link href="/coach_foodlib" className="hover:text-yellow-400">Manage Food Library</Link>|
             <Link href="/coach_exerciselib" className="hover:text-yellow-400">Manage Exercise Library</Link>|
             <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>|
+            <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>|
             <Link href="/community" className="hover:text-yellow-400">Community</Link>
           </>
         )}
@@ -57,8 +58,8 @@ export default function Navbar() {
             <Link href="/userhome" className="hover:text-yellow-400">🏋️ Alt+Calories</Link>|
             <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>|
             <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>|
-            <Link href="/member_exercise" className="hover:text-yellow-400">Calories Calculator</Link>|
-            <Link href="/member_exercise" className="hover:text-yellow-400">Workout/Diet Plan</Link>|
+            <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>|
+            <Link href="/customizeplan" className="hover:text-yellow-400">Workout/Diet Plan</Link>|
             <Link href="/community" className="hover:text-yellow-400">Community</Link>
           </>
         )}
@@ -91,7 +92,13 @@ export default function Navbar() {
               <ul style={{ listStyleType: 'none', }}>
                 <li>
                   <Link
-                    href={user.role === 'admin' ? '/adminprofile' : `/profile/view/${user.member_ic}`}
+                    href={
+                      user.member_ic
+                        ? `/userprofile`
+                        : user.coach_ic
+                        ? '/adminprofile'
+                        : '#'
+                    }
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     View/Edit Profile

@@ -189,10 +189,12 @@ const handlePrev = () => {
                     >
                       View More Details
                     </button>
-                  )}
+                    
+                  )}<hr />
                 </>
               )}
             </div>
+            
           ))}
         </div>
       )}

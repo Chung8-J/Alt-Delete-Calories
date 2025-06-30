@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Layout from '../components/Layout';
 
 export default function CaloriesCalculator() {
   const [section, setSection] = useState('tdee');

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Layout from '../components/Layout';
 
 
 const bodyParts = [
@@ -235,6 +236,7 @@ export default function UserDashboard() {
   if (isNewcomer && !plan) {
     return (
       <div style={{ padding: 20 }}>
+        <Layout>
         <h2>👋 Welcome, Newcomer!</h2>
         <input type="number" name="height" placeholder="Height (cm)" value={form.height} onChange={handleChange} /><br /><br />
         <input type="number" name="weight" placeholder="Weight (kg)" value={form.weight} onChange={handleChange} /><br /><br />
@@ -255,6 +257,7 @@ export default function UserDashboard() {
         <button onClick={handleSave} disabled={loading}>
           {loading ? 'Generating Plan...' : '💾 Save Info & Generate Plan'}
         </button>
+        </Layout>
       </div>
     );
   }
@@ -262,6 +265,7 @@ export default function UserDashboard() {
   if (plan && isNewcomer) {
     return (
       <div style={{ padding: 20 }}>
+        <Layout>
         <h3>🎯 Personalized Fitness Plan</h3>
         <div style={{ background: '#f0f8ff', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
           {plan.workout?.length > 0 && (
@@ -316,23 +320,17 @@ export default function UserDashboard() {
             <button onClick={handleFinalPlanSave}>💾 Save Final Plan</button>
           </div>
         )}
+        </Layout>
       </div>
     );
   }
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Welcome, {user.member_name || user.name}!, This is DashBoard page!!</h1>
-      <a href="/community">Community</a><br /><br />
-      <a href="/member_exercise">Exercise Library</a><br /><br />
-      <a href="/member_food">Food Library</a><br /><br />
-      <a href="/customizeplan">Customize Plan</a><br /><br />
-      <a href="/caloriescalculator">Calories Calculator</a><br /><br />
-      <a href="/userprofile">Profile</a><br /><br />
-      <button onClick={() => {
-        localStorage.removeItem('user');
-        router.push('/Login');
-      }}>Logout</button>
+      <Layout>
+      <h1>Welcome, {user.member_name || user.name}! This is DashBoard page!!</h1>
+     
+      </Layout>
     </div>
   );
 }
