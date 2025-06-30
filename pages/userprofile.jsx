@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Layout from '../components/Layout';
 
 export default function UserProfile() {
   const router = useRouter();
@@ -76,6 +77,7 @@ export default function UserProfile() {
 
   return (
     <div style={{ padding: '30px', maxWidth: '600px', margin: 'auto' }}>
+      <Layout>
       <h2>👤 User Profile</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <tbody>
@@ -144,6 +146,7 @@ export default function UserProfile() {
           Logout
         </button>
       </div>
+      </Layout>
     </div>
   );
 }

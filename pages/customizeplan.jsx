@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AddExercise from '@/components/Addexercise';
 import AddFood from '@/components/Addfood';
+import Layout from '../components/Layout';
 
 export default function CustomizePlan() {
   const router = useRouter();

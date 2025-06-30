@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Layout from '../components/Layout';
 
 export default function ViewProfile() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function ViewProfile() {
 
   return (
     <div className="max-w-2xl mx-auto mt-24 p-6 bg-white rounded shadow text-gray-800">
+      <Layout>
       <h1 className="text-2xl font-bold mb-4">👤 {user.role === 'admin' ? 'Coach' : 'Member'} Profile</h1>
 
       <div className="flex items-center gap-4 mb-6">
@@ -78,6 +80,7 @@ export default function ViewProfile() {
           </>
         )}
       </div>
+      </Layout>
     </div>
   );
 }

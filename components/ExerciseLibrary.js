@@ -113,6 +113,7 @@ export default function ExerciseLibrary({ role }) {
               <p className="text-sm"><strong>Calories/sec:</strong> {ex.calories_per_sec}</p>
               <p className="text-sm"><strong>Target Area:</strong> {ex.targeted_area}</p>
               <p className="text-sm"><strong>Genre:</strong> {ex.exercise_genre}</p>
+              <hr />
 
               
 
