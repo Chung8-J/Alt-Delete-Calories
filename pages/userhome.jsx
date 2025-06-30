@@ -174,7 +174,7 @@ export default function UserDashboard() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      table: 'p_workoutplan',
+      table: 'preset_workout_plan',
       action: 'save_plan',
       data: {
         member_ic: user.member_ic,
@@ -186,6 +186,7 @@ export default function UserDashboard() {
   });
 
   const workoutResult = await workoutRes.json();
+  console.log('🔥 Workout‑plan response:', workoutRes.status, workoutResult); 
   if (!workoutRes.ok || !workoutResult.success) {
     alert('❌ Failed to save workout plan.');
     console.error(workoutResult);
@@ -309,7 +310,8 @@ export default function UserDashboard() {
           <>
             <p>Would you like to use this plan or customize it?</p>
             <button onClick={() => setPlanAccepted(true)}>✅ Use This Plan</button>
-            <button onClick={() => alert('🛠️ Customize plan not available yet.')}>✏️ Customize Plan</button>
+            <button onClick={() => router.push('/customizeplan')}>✏️ Customize Plan</button>
+
           </>
         ) : (
           <div style={{ marginTop: 20 }}>
