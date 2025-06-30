@@ -15,12 +15,13 @@ export default async function handler(req, res) {
     exercise_name,
     description,
     calories_per_sec,
-    example_pic,
+    example_pic, // now should contain FULL public URL
     targeted_area,
     exercise_genre,
   } = req.body;
 
   if (!exercise_id) return res.status(400).json({ error: 'Missing ID' });
+  if (!example_pic) return res.status(400).json({ error: 'Image URL missing' });
 
   try {
     await pool.query(
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
         exercise_name,
         description,
         calories_per_sec,
-        example_pic,
+        example_pic, // ✅ store full Supabase URL here
         targeted_area,
         exercise_genre,
         exercise_id,
