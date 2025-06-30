@@ -100,13 +100,14 @@ export default function ExerciseLibrary({ role }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pageData.map(ex => (
             <div key={ex.exercise_id} className="bg-white rounded-xl shadow p-4">
-              {ex.example_pic && (
-                <img
-                  src={ex.example_pic}
-                  alt={ex.exercise_name}
-                  className="w-full h-40 object-cover rounded mb-3"
-                />
-              )}
+            {ex.example_pic && (
+              <img
+                src={`https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/${ex.example_pic}`}
+                alt={ex.exercise_name}
+                className="w-full max-h-40 object-contain rounded mb-3"
+              />
+            )}
+  
               <h2 className="text-xl font-semibold">{ex.exercise_name}</h2>
               <p className="text-sm text-gray-600 mb-2">{ex.description}</p>
               <p className="text-sm"><strong>Calories/sec:</strong> {ex.calories_per_sec}</p>

@@ -24,6 +24,6 @@ export default function CoachHome() {
       <main className="">
         <h1>Welcome Admin, {admin?.coach_name || admin?.name}!</h1>
       </main>
-    </Layout>
+    </Layout> 
   );
 }
