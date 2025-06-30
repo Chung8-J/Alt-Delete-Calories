@@ -14,14 +14,18 @@ export default function CreatePostPage({ onPostCreated }) {
   const fileInputRef = useRef(null);
 
   // Load user from localStorage on mount
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.member_ic) {
-      setUser(storedUser);
-    } else {
-      alert('⚠️ You must be logged in to create a post.');
-    }
-  }, []);
+useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  if (storedUser && storedUser.member_ic && storedUser.role) {
+    setUser({
+      ic: storedUser.member_ic,
+      role: storedUser.role,
+    });
+  } else {
+    alert('⚠️ You must be logged in to create a post.');
+  }
+}, []);
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -39,10 +43,7 @@ export default function CreatePostPage({ onPostCreated }) {
       return;
     }
 
-    if (!user?.member_ic) {
-      alert('⚠️ Member IC not found. Please login again.');
-      return;
-    }
+
 
     setUploading(true);
 
@@ -67,24 +68,48 @@ export default function CreatePostPage({ onPostCreated }) {
       .getPublicUrl(filePath);
 
     const imageUrl = urlData.publicUrl;
+    
 
-    // Save post to Neon DB
     const response = await fetch('/api/Create_post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         description: postText,
         image: fileName,
-        member_ic: user.member_ic,
         created_at: new Date().toISOString(),
+        member_ic: user.ic   , 
+        role: user.role            
       }),
     });
 
-    const result = await response.json();
+    console.log("📤 Sending post data:", {
+  description: postText,
+  image: fileName,
+  created_at: new Date().toISOString(),
+  ...(user?.role === 'admin'
+    ? { admin_ic: user.member_ic }
+    : { member_ic: user.member_ic })
+});
 
-    if (!response.ok) {
-      console.error(result.error);
-      alert('❌ Failed to save post in database.');
+
+
+let result;
+try {
+  result = await response.json();
+} catch (e) {
+  console.error('❌ Invalid JSON from backend:', e);
+  alert('❌ Failed to parse server response');
+  return;
+}
+
+if (!response.ok) {
+  console.error('❌ Backend error:', result.error);
+  alert(`❌ Failed to save post: ${result.error || 'Unknown error'}`);
+  return;
+
+
+
+      
     } else {
       alert('✅ Post created!');
       setFinalImageUrl(imageUrl);
