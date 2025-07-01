@@ -34,8 +34,8 @@ export default function Navbar() {
   const avatarUrl = user.avatar
     ? user.avatar
     : (user.gender == 'female' || user.coach_gender == 'female')
-    ? '/images/female_avt.png'
-    : '/images/male_avt.png';
+    ? '/user_avatar/female_avt.png'
+    : '/user_avatar/male_avt.png';
 
   const userIc = user.coach_ic || user.member_ic;
 
@@ -93,13 +93,12 @@ export default function Navbar() {
                 <li>
                   <Link
                     href={
-                      user.member_ic
-                        ? `/userprofile`
-                        : user.coach_ic
+                      user.role === 'admin'
                         ? '/adminprofile'
+                        : userIc
+                        ? `/userprofile/${userIc}`
                         : '#'
                     }
-                    className="block px-4 py-2 hover:bg-gray-100"
                   >
                     View/Edit Profile
                   </Link>
