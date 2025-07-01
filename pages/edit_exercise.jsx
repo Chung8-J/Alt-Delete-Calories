@@ -160,6 +160,7 @@ export default function EditExercise() {
         <h1 className="text-2xl font-bold mb-4">Edit Exercise</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <strong>Exercise Name: </strong>
           <input
             type="text"
             name="exercise_name"
@@ -167,16 +168,18 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Exercise Name"
-          />
+          /><br />
 
+          <strong>Description: </strong>
           <textarea
             name="description"
             value={exercise.description}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Description"
-          />
+          /><br />
 
+          <strong>Calories Per Sec: </strong>
           <input
             type="number"
             step="0.01"
@@ -185,11 +188,11 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Calories/sec"
-          />
+          /><br />
 
 
          <div>
-            <label className="block mb-1 font-semibold">Change Media (Image or Video)</label>
+            <label className="block mb-1 font-semibold"><strong>Media (Image OR Video) </strong></label>
             <input
               type="file"
               accept="image/*,video/*"
@@ -202,7 +205,7 @@ export default function EditExercise() {
                 }
               }}
               ref={fileInputRef}
-            />
+            /><br />
 
             {/* Show preview based on file type */}
             {uploadPreview ? (
@@ -220,7 +223,7 @@ export default function EditExercise() {
             ) : null}
           </div>
 
-
+          <strong>Targeted Area: </strong>
           <input
             type="text"
             name="targeted_area"
@@ -228,8 +231,9 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Targeted Area"
-          />
+          /><br />
 
+          <strong>Exercise Genre: </strong>
           <select
             name="exercise_genre"
             value={exercise.exercise_genre}
@@ -245,7 +249,7 @@ export default function EditExercise() {
             <option value="Stretch">Stretch</option>
             <option value="Yoga">Yoga</option>
 
-          </select>
+          </select><br /><br />
 
           <button
             type="submit"
