@@ -1,0 +1,122 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #011126;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.dashboard-container {
+    display: flex;
+    /* ensures horizontal layout */
+    justify-content: space-between;
+    align-items: stretch;
+    width: 1200px;
+    min-height: 550px;
+    /* ensure there's height to stretch into */
+    background: linear-gradient(to right,
+            rgba(18, 44, 111, 0.7),
+            rgba(130, 21, 202, 0.7),
+            rgba(18, 44, 111, 0.7));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 3px solid rgba(147, 5, 241, 0.45);
+    font-size: 18px;
+    margin-top: 15px;
+}
+
+
+/* Make sure text is fully opaque */
+
+
+.dashboard-container h1,
+h2,
+p,
+ul,
+li,
+label,
+strong {
+    color: #fff;
+}
+
+
+.middle-container {
+    padding-left: 60px !important;
+    padding-right: 60px !important;
+}
+
+.WorkoutCompleted p {
+    color: black;
+
+}
+
+.WorkoutCompleted {
+    margin-bottom: 100px;
+
+}
+
+
+
+.FoodPlans h2 {
+    align-self: center;
+}
+
+
+
+.middle-container {
+    flex: 1;
+    padding: 0 10px;
+    border-right: 1px solid #ccc;
+}
+
+.Notification {
+    flex: 1;
+    padding-left: 10px;
+}
+
+
+.FoodPlans,
+.middle-container,
+.Notification {
+    flex: 1;
+    /* equal width */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 20px;
+    min-width: 0;
+    /* allows shrinking if needed */
+}
+
+
+.Dashboard-btn {
+    background-color: #50DA00;
+    margin-top: 10px;
+    padding: 11px 26px;
+    width: 250px;
+    color: black;
+    border: none;
+    border-Radius: 20px;
+    bottom: 10px;
+    font-weight: 800;
+
+    cursor: pointer;
+    margin-bottom: 15px;
+
+    margin-top: auto;
+    /* pushes it to bottom of the flex container */
+    align-self: center;
+font-size: medium;
+
+}
+
+.Dashboard-btn:hover {
+    background-color: #5eff00;
+}

@@ -11,6 +11,13 @@ export default function CaloriesCalculator() {
   const [foodList, setFoodList] = useState([]);
   const [foodRows, setFoodRows] = useState([{ food_code: '', grams: '' }]);
   const [calculatedFoods, setCalculatedFoods] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+
+
+  useEffect(() => {
+    const u = JSON.parse(localStorage.getItem('user'));
+    setCurrentUser(u);
+  }, []);
 
   useEffect(() => {
     fetch('/api/Fetch_food')
@@ -81,7 +88,7 @@ export default function CaloriesCalculator() {
 
         <h1>Calories Calculator</h1>
 
-        <a href="/userhome">Back</a>
+        <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
 
       <div style={{ marginBottom: '20px', textAlign: 'center' }}>
         <button onClick={() => setSection('tdee')}>TDEE Calculator</button>

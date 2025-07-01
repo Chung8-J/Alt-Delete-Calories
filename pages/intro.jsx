@@ -27,7 +27,7 @@ export default function introPage() {
 
       <div className="intro-Workout section-row">
         <div className="section-image">
-          <img src="/images/Replacement picture.jpg" alt="Replacement" className="Advi-Small-img" />
+          <img src="/images/Workout and food.jpg" alt="Replacement" className="Advi-Small-img" />
         </div>
         <div className="section-text">
           <h1>Workout & Food Calorie Library</h1>
@@ -53,14 +53,14 @@ export default function introPage() {
   </div>
 
   <div className="section-image">
-    <img src="/images/Replacement picture.jpg" alt="Community Feed" />
+    <img src="/images/Fitness Community.jpg" alt="Community Feed" />
   </div>
 </div>
 
 
      <div className="intro-Workout section-row">
         <div className="section-image">
-          <img src="/images/Replacement picture.jpg" alt="Replacement" className="Advi-Small-img" />
+          <img src="/images/Customize plan.jpeg" alt="Replacement" className="Advi-Small-img" />
         </div>
         <div className="section-text">
           <h1>Personalized Workout Plans</h1>
