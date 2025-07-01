@@ -15,7 +15,7 @@ export default function UserProfile() {
     const stored = JSON.parse(localStorage.getItem('user'));
     if (!stored || !stored.member_ic || !stored.role) {
       alert('⚠️ Not logged in!');
-      router.push('/login');
+      router.push('/Login');
       return;
     }
 

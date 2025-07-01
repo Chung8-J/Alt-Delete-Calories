@@ -601,7 +601,138 @@ if (table === 'diet_plan' && action === 'update_diet_plan') {
     return res.status(500).json({ error: 'Failed to update diet plan', details: err.message });
   }
 }
+if (table === 'workout_log' && action === 'update_or_extend_log') {
+  const { member_ic, p_workoutplan_id, new_duration, new_calories, exercises } = data;
 
+  const today = new Date();
+  const todayDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+  // Fetch latest log
+  const existingLogQuery = await pool.query(`
+    SELECT * FROM workout_log
+    WHERE member_ic = $1 AND p_workoutplan_id = $2
+    ORDER BY log_id DESC
+    LIMIT 1
+  `, [member_ic, p_workoutplan_id]);
+
+  let logIdToUse;
+  let dayToUse = 1;
+
+  if (existingLogQuery.rowCount === 0) {
+    // 🆕 No log exists → insert new
+    const insertLog = await pool.query(`
+      INSERT INTO workout_log (
+        member_ic, p_workoutplan_id, completion_date,
+        total_duration_seconds, total_calories_burned, day
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING log_id
+    `, [
+      member_ic,
+      p_workoutplan_id,
+      todayDate,
+      new_duration,
+      new_calories,
+      dayToUse
+    ]);
+    logIdToUse = insertLog.rows[0].log_id;
+  } else {
+    // ✅ Log exists
+    const log = existingLogQuery.rows[0];
+    const lastLogDate = new Date(log.completion_date);
+    const sameDay = lastLogDate.toDateString() === today.toDateString();
+
+    if (sameDay) {
+      // 🔁 Same day → extend existing log
+      await pool.query(`
+        UPDATE workout_log
+        SET 
+          total_duration_seconds = total_duration_seconds + $1,
+          total_calories_burned = total_calories_burned + $2
+        WHERE log_id = $3
+      `, [new_duration, new_calories, log.log_id]);
+
+      logIdToUse = log.log_id;
+      dayToUse = log.day;
+    } else {
+      // 📅 New day → insert new log
+      const newDay = log.day + 1;
+
+      const insertLog = await pool.query(`
+        INSERT INTO workout_log (
+          member_ic, p_workoutplan_id, completion_date,
+          total_duration_seconds, total_calories_burned, day
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING log_id
+      `, [
+        member_ic,
+        p_workoutplan_id,
+        todayDate,
+        new_duration,
+        new_calories,
+        newDay
+      ]);
+
+      logIdToUse = insertLog.rows[0].log_id;
+      dayToUse = newDay;
+    }
+  }
+
+  // 🏋️ Add exercises
+  for (const ex of exercises) {
+    await pool.query(`
+      INSERT INTO workout_log_exercise (
+        log_id, exercise_id, sets_completed, reps_per_set,
+        weight_per_set, duration_seconds, calories_burned, day
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `, [
+      logIdToUse,
+      ex.exercise_id,
+      ex.sets_completed,
+      ex.reps_per_set,
+      ex.weight_per_set || '',
+      ex.duration_seconds,
+      ex.calories_burned,
+      dayToUse
+    ]);
+  }
+
+  return res.status(200).json({
+    
+  });
+}
+
+
+
+  // ➕ Add exercise details to workout_log_exercise
+if (table === 'workout_log_exercise' && action === 'insert_exercises') {
+  const { log_id, exercises, day } = data;
+
+  for (const ex of exercises) {
+    await pool.query(`
+      INSERT INTO workout_log_exercise (
+        log_id,
+        exercise_id,
+        sets_completed,
+        reps_per_set,
+        weight_per_set,
+        duration_seconds,
+        calories_burned,
+        day
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `, [
+      log_id,
+      ex.exercise_id,
+      ex.sets_completed || 0,
+      ex.reps_per_set || '',
+      ex.weight_per_set || '',
+      ex.duration_seconds || 0,
+      ex.calories_burned || 0,
+      day
+    ]);
+  }
+
+  return res.status(200).json({ message: 'Exercises logged successfully' });
+}
 
 
         //This is end
