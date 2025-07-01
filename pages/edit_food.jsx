@@ -163,7 +163,7 @@ return (
 
         {/* 🔼 Image Upload Section */}
         <div>
-          <label className="block font-semibold mb-1">Upload Food Picture</label>
+          <label className="block font-semibold mb-1"><strong>Upload Food Picture: </strong></label><br /><br />
           <input
             type="file"
             accept="image/*"
@@ -203,6 +203,7 @@ return (
         <option value="Vegetable">Vegetable</option>
         <option value="Fruits">Fruits</option>
         <option value="Snacks">Snacks</option>
+        <option value="Snacks">Drinks</option>
     </select><br /><br />
 
     <button

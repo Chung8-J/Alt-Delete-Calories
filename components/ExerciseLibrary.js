@@ -99,12 +99,12 @@ export default function ExerciseLibrary({ role }) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pageData.map(ex => (
-            <div key={ex.exercise_id} className="bg-white rounded-xl shadow p-4">
+            <div key={ex.exercise_id} className="bg-white rounded-x5 shadow p-4">
             {ex.example_pic && (
               <img
                 src={`https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/${ex.example_pic}`}
                 alt={ex.exercise_name}
-                className="w-full max-h-40 object-contain rounded mb-3"
+                className="w-full max-h-50 object-contain rounded mb-3"
               />
             )}
   
@@ -119,7 +119,7 @@ export default function ExerciseLibrary({ role }) {
 
               {role === 'admin' && (
                 <div className="flex gap-2 mt-3">
-                  <hr />
+                  
                   <button
                     onClick={() => router.push(`edit_exercise/${ex.exercise_id}`)}
                     className="px-3 py-1 text-sm rounded bg-yellow-400 hover:bg-yellow-500 text-white"
