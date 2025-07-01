@@ -1,5 +1,5 @@
 'use client';
-import Navbar from './Navbar';
+import Navbar from './navbar';
 
 export default function Layout({ children }) {
   return (
