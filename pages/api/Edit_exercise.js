@@ -15,13 +15,13 @@ export default async function handler(req, res) {
     exercise_name,
     description,
     calories_per_sec,
-    example_pic, // now should contain FULL public URL
+    example_pic, // ✅ Either image or video filename
     targeted_area,
     exercise_genre,
   } = req.body;
 
   if (!exercise_id) return res.status(400).json({ error: 'Missing ID' });
-  if (!example_pic) return res.status(400).json({ error: 'Image URL missing' });
+  if (!example_pic) return res.status(400).json({ error: 'Media file is missing' });
 
   try {
     await pool.query(
@@ -37,14 +37,14 @@ export default async function handler(req, res) {
         exercise_name,
         description,
         calories_per_sec,
-        example_pic, // ✅ store full Supabase URL here
+        example_pic, // ✅ video or image filename
         targeted_area,
         exercise_genre,
         exercise_id,
       ]
     );
 
-    res.status(200).json({ message: 'Exercise updated' });
+    res.status(200).json({ message: 'Exercise updated (image/video)' });
   } catch (err) {
     console.error('Update error:', err);
     res.status(500).json({ error: 'Database error' });
