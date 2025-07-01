@@ -39,6 +39,13 @@ export default function ExerciseLibrary({ role }) {
 
   const uniqueGenres = [...new Set(exercises.map(ex => ex.exercise_genre))];
 
+  const isVideo = (filename) => {
+    if (!filename) return false;
+    const ext = filename.split('.').pop().toLowerCase();
+    return ['mp4', 'mov', 'webm'].includes(ext);
+  };
+
+  const SUPABASE_MEDIA_BASE = 'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/';
 
 
 
@@ -99,12 +106,12 @@ export default function ExerciseLibrary({ role }) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pageData.map(ex => (
-            <div key={ex.exercise_id} className="bg-white rounded-x5 shadow p-4">
+            <div key={ex.exercise_id} className="bg-white rounded-xl shadow p-4">
             {ex.example_pic && (
               <img
                 src={`https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/${ex.example_pic}`}
                 alt={ex.exercise_name}
-                className="w-full max-h-50 object-contain rounded mb-3"
+                className="w-full max-h-40 object-contain rounded mb-3"
               />
             )}
   

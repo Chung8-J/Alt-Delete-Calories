@@ -16,6 +16,7 @@ export default function EditExercise() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const fileInputRef = useRef(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const SUPABASE_IMAGE_BASE =
     'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/';
@@ -40,6 +41,32 @@ export default function EditExercise() {
     setExercise({ ...exercise, [e.target.name]: e.target.value });
   };
 
+  const handleVideoChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+    setUploadPreview(previewUrl);
+    setSelectedVideo(file); // Use this to upload to Supabase
+  }
+};
+
+  const imageStyle = {
+    maxWidth: '300px',
+    height: 'auto',
+    objectFit: 'contain',
+    border: '1px solid #ccc',
+    marginTop: '8px',
+  };
+
+  const videoStyle = {
+    maxWidth: '300px',
+    height: 'auto',
+    objectFit: 'contain',
+    border: '1px solid #ccc',
+    marginTop: '8px',
+  };
+
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -50,33 +77,58 @@ export default function EditExercise() {
     }
   };
 
+  const isVideo = (file) => {
+    const ext = file?.split('.').pop()?.toLowerCase();
+    return ['mp4', 'mov', 'webm'].includes(ext);
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setUploading(true);
-    setMessage('');
+  e.preventDefault();
+  setUploading(true);
+  setMessage('');
 
-    try {
-      let imageName = exercise.example_pic; // use existing
+  try {
+    let imageName = exercise.example_pic; // keep existing image if not changed
+    let videoName = exercise.example_video; // keep existing video if not changed
 
-      if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
+    // 🔼 Upload Image to Supabase
+    if (imageFile) {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `public/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('exercise') // ✅ Your bucket name
+        .upload(filePath, imageFile);
+
+      if (uploadError) throw uploadError;
+
+      imageName = fileName;
+    }
+
+    // 🎥 Upload Video to Supabase
+    if (selectedVideo) {
+        const fileExt = selectedVideo.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExt}`;
-        const filePath = `public/${fileName}`;
+        const filePath = `videos/${fileName}`; // Can use 'videos/' folder inside same bucket
 
-        const { error: uploadError } = await supabase.storage
-          .from('exercise')
-          .upload(filePath, imageFile);
+        const { error: videoError } = await supabase.storage
+          .from('exercise') // ✅ Same bucket
+          .upload(filePath, selectedVideo);
 
-        if (uploadError) throw uploadError;
+        if (videoError) throw videoError;
 
-        imageName = fileName; // store only filename in DB
+        videoName = fileName;
       }
 
+      // 📦 Prepare updated exercise data
       const updatedExercise = {
         ...exercise,
-        example_pic: imageName, // just the filename
+        example_pic: imageName,
+        example_video: videoName,
       };
 
+      // 📝 Save to Neon (PostgreSQL)
       const res = await fetch('/api/Edit_exercise', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +144,7 @@ export default function EditExercise() {
         setMessage(result.error || 'Update failed.');
       }
     } catch (err) {
-      console.error(err);
+      console.error('❌ Error:', err);
       setMessage('❌ Upload or update failed');
     } finally {
       setUploading(false);
@@ -135,28 +187,39 @@ export default function EditExercise() {
             placeholder="Calories/sec"
           />
 
-          <div>
-            <label className="block mb-1 font-semibold">Change Image</label>
+
+         <div>
+            <label className="block mb-1 font-semibold">Change Media (Image or Video)</label>
             <input
               type="file"
-              accept="image/*"
-              onChange={handleImageChange}
+              accept="image/*,video/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const previewURL = URL.createObjectURL(file);
+                  setUploadPreview(previewURL);
+                  setImageFile(file); // you can rename to setMediaFile if preferred
+                }
+              }}
               ref={fileInputRef}
             />
+
+            {/* Show preview based on file type */}
             {uploadPreview ? (
-              <img
-                src={uploadPreview}
-                alt="Preview"
-                style={{ maxWidth: '300px', height: '100%', objectFit: 'contain', border: '1px solid #ccc', marginTop: '8px' }}
-              />
+              isVideo(uploadPreview) ? (
+                <video src={uploadPreview} controls style={videoStyle} />
+              ) : (
+                <img src={uploadPreview} alt="Preview" style={imageStyle} />
+              )
             ) : exercise.example_pic ? (
-              <img
-                src={SUPABASE_IMAGE_BASE + exercise.example_pic}
-                alt="Current Example"
-                style={{ maxWidth: '300px', height: '100%', objectFit: 'contain', border: '1px solid #ccc', marginTop: '8px' }}
-              />
+              isVideo(exercise.example_pic) ? (
+                <video src={SUPABASE_IMAGE_BASE + exercise.example_pic} controls style={videoStyle} />
+              ) : (
+                <img src={SUPABASE_IMAGE_BASE + exercise.example_pic} alt="Current Example" style={imageStyle} />
+              )
             ) : null}
           </div>
+
 
           <input
             type="text"
