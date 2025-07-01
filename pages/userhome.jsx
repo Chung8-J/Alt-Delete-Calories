@@ -18,8 +18,39 @@ export default function UserDashboard() {
   const [dailyGoalCalories, setDailyGoalCalories] = useState(0); 
   const [exerciseStarted, setExerciseStarted] = useState(false);
   const [recentComments, setRecentComments] = useState([]);
+  const [exercisePlans, setExercisePlans] = useState([]);
+  const [selectedExercisePlanId, setSelectedExercisePlanId] = useState(null);
+  const [selectedExerciseDetails, setSelectedExerciseDetails] = useState([]);
+  const [totalExerciseTime, setTotalExerciseTime] = useState(0); // total seconds
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [exerciseInProgress, setExerciseInProgress] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [timerId, setTimerId] = useState(null);
+  const togglePause = () => {
+    setIsPaused(prev => !prev);
+  };
+  const [timeUsed, setTimeUsed] = useState(0);
+const [currentLogId, setCurrentLogId] = useState(null); 
+const [workoutCompleted, setWorkoutCompleted] = useState(false);
+const [exerciseDone, setExerciseDone] = useState(false);
+
+
 
   const router = useRouter();
+
+  useEffect(() => {
+  let timeUsedInterval;
+
+  if (exerciseInProgress && !isPaused) {
+    timeUsedInterval = setInterval(() => {
+      setTimeUsed(prev => prev + 1);
+    }, 1000);
+  }
+
+  return () => clearInterval(timeUsedInterval);
+}, [exerciseInProgress, isPaused]);
+
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -29,6 +60,28 @@ export default function UserDashboard() {
     }
 
     setUser(storedUser);
+    
+    const lastWorkoutKey = `lastWorkoutTime-${storedUser.member_ic}`;
+    const lastWorkoutTime = localStorage.getItem(lastWorkoutKey);
+
+    if (lastWorkoutTime) {
+      const last = new Date(lastWorkoutTime);
+      const now = new Date();
+
+      // 4AM next day after workout
+      const resetTime = new Date(last);
+      resetTime.setDate(last.getDate() + 1);
+      resetTime.setHours(4, 0, 0, 0);
+
+      if (now < resetTime) {
+        setExerciseDone(true); // ✅ Hide section
+      } else {
+        setExerciseDone(false); // ✅ Past 4AM, allow again
+        localStorage.removeItem(lastWorkoutKey); // optional
+      }
+    }
+
+
 
     fetch(`/api/Db_connection?member_ic=${storedUser.member_ic}&role=user`)
       .then(res => res.json())
@@ -38,19 +91,73 @@ export default function UserDashboard() {
         }
         if (data.tdee) {
           setTdee(data.tdee);
-            const currentWeight = parseFloat(data.weight);
-            const goalWeight = parseFloat(data.goal_weight);
-            const diff = currentWeight - goalWeight;
-            const totalCalorieDeficit = diff * 7700; // 7700 kcal per kg
-            const dailyDeficit = totalCalorieDeficit / 30;
+          const currentWeight = parseFloat(data.weight);
+          const goalWeight = parseFloat(data.goal_weight);
+          const weightDiff = goalWeight - currentWeight;
 
-            const goal = Math.round(data.tdee - dailyDeficit);
-            setDailyGoalCalories(goal > 0 ? goal : 0); // Prevent negatives
+          const totalCalorieAdjustment = weightDiff * 7700; // 7700 kcal per kg
+          const dailyAdjustment = totalCalorieAdjustment / 30;
+
+          const goalCalories = Math.round(data.tdee + dailyAdjustment);
+          setDailyGoalCalories(goalCalories > 0 ? goalCalories : 0);
         }
+
       })
       .catch(err => console.error('❌ Error checking profile:', err));
   }, [router]);
 
+  // fetch exercise plan and details
+  useEffect(() => {
+    if (user) {
+      fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'preset_workout_plan',
+          action: 'get_user_plans',
+          data: { member_ic: user.member_ic }
+        })
+      })
+        .then(res => res.json())
+        .then(plans => {
+          setExercisePlans(plans || []);
+          if (plans && plans.length > 0) {
+            setSelectedExercisePlanId(plans[0].p_workoutplan_id); // ✅ Default to first plan
+          }
+        })
+        .catch(err => console.error('❌ Failed to fetch exercise plans:', err));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedExercisePlanId) {
+      fetch('/api/Db_connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'preset_workout_exercise',
+          action: 'get_plan_exercises',
+          data: { plan_id: selectedExercisePlanId }
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          setSelectedExerciseDetails(data || []);
+
+          let totalSeconds = 0;
+          for (const ex of data) {
+            if (ex.reps && ex.set) {
+              totalSeconds += ex.reps * ex.set * 5; // Assume 5 seconds per rep
+            } else if (ex.duration_seconds) {
+              totalSeconds += ex.duration_seconds;
+            }
+          }
+          setTotalExerciseTime(totalSeconds);
+        })
+
+        .catch(err => console.error('❌ Failed to fetch exercise plan details:', err));
+    }
+  }, [selectedExercisePlanId]);
 
 
   useEffect(() => {
@@ -68,7 +175,7 @@ export default function UserDashboard() {
         .then(async plans => {
           setFoodPlans(plans || []);
 
-          if (plans.length === 1) {
+          if (plans && plans.length > 0) {
             setSelectedPlanId(plans[0].d_plan_id);
           }
 
@@ -115,6 +222,45 @@ export default function UserDashboard() {
   }
 }, [user]);
 
+useEffect(() => {
+  if (exerciseInProgress && countdown > 0 && !isPaused) {
+    const id = setInterval(() => {
+      setCountdown(prev => prev - 1);
+    }, 1000);
+    setTimerId(id);
+    return () => clearInterval(id);
+  }
+}, [countdown, exerciseInProgress, isPaused]);
+
+
+  const handleExercisePlanSelect = async (planId) => {
+    setSelectedExercisePlanId(planId);
+
+    const res = await fetch('/api/Db_connection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        table: 'preset_workout_exercise',
+        action: 'get_plan_exercises',
+        data: { plan_id: planId }
+      })
+    });
+
+    const exercises = await res.json();
+    setSelectedExerciseDetails(exercises || []);
+
+    let totalSeconds = 0;
+    for (const ex of exercises) {
+      if (ex.reps && ex.set) {
+        totalSeconds += ex.reps * ex.set * 5; // Assume 5 seconds per rep
+      } else if (ex.duration_seconds) {
+        totalSeconds += ex.duration_seconds;
+      }
+    }
+    setTotalExerciseTime(totalSeconds);
+  };
+
+
 
   const handleCheckboxChange = (key, calories) => {
     const newSelected = {
@@ -136,6 +282,29 @@ export default function UserDashboard() {
     setTotalCalories(total);
   };
 
+    const handleNextExercise = () => {
+    const nextIndex = currentExerciseIndex + 1;
+    if (nextIndex < selectedExerciseDetails.length) {
+      const next = selectedExerciseDetails[nextIndex];
+      setCurrentExerciseIndex(nextIndex);
+      if (next.duration_seconds) {
+        setCountdown(next.duration_seconds);
+      } else {
+        setCountdown(0);
+      }
+    } else {
+      alert('✅ Workout complete!');
+      setExerciseInProgress(false);
+      setExerciseStarted(false);
+      setExerciseDone(true);
+      localStorage.setItem(`lastWorkoutTime-${user.member_ic}`, new Date().toISOString());
+
+
+
+    }
+  };
+
+
   const renderPlanDetails = (planId) => {
     const meals = planMeals[planId] || [];
 
@@ -145,6 +314,7 @@ export default function UserDashboard() {
       return acc;
     }, {});
 
+    
     return (
       <div style={{ marginBottom: '20px' }}>
         {Object.entries(groupedMeals).map(([mealType, foods]) => (
@@ -185,21 +355,199 @@ return (
     {exerciseStarted ? (
       <div style={{ padding: '40px', textAlign: 'center' }}>
         <h2>🏋️ Exercise Mode Started</h2>
-        <p>Focus on your workout now!</p>
-        <button
-          onClick={() => setExerciseStarted(false)}
-          style={{
-            marginTop: '20px',
-            padding: '10px 20px',
-            backgroundColor: '#dc3545',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
+
+        {selectedExercisePlanId && (
+          <>
+            <h3 style={{ marginTop: '20px' }}>
+              Plan: {exercisePlans.find(p => p.p_workoutplan_id === selectedExercisePlanId)?.plan_name}
+            </h3>
+
+            {!exerciseInProgress && (
+              <>
+                <ul style={{ marginTop: '10px', textAlign: 'left', display: 'inline-block' }}>
+                  {selectedExerciseDetails.map((ex, index) => (
+                    <li key={index}>
+                      {ex.exercise_name} –{' '}
+                      {ex.reps && ex.set
+                        ? `${ex.reps} reps × ${ex.set} sets`
+                        : `${ex.duration_seconds} seconds`} – 🔥 {ex.estimated_calories} kcal
+                    </li>
+                  ))}
+                </ul>
+
+                <p style={{ marginTop: '10px' }}>
+                  🕒 Time needed:{' '}
+                  <strong>
+                    {Math.floor(totalExerciseTime / 60)} min {totalExerciseTime % 60} sec
+                  </strong>
+                </p>
+
+                <p style={{ marginTop: '10px', fontWeight: 'bold' }}>
+                  🕒 Time used: {Math.floor(timeUsed / 60)}m {timeUsed % 60}s
+                </p>
+
+              </>
+            )}
+          </>
+        )}
+
+        {exerciseInProgress ? (
+          <div style={{ marginTop: '30px', textAlign: 'center' }}>
+            <h3>💪 Current Exercise</h3>
+            <p><strong>{selectedExerciseDetails[currentExerciseIndex]?.exercise_name}</strong></p>
+
+            {selectedExerciseDetails[currentExerciseIndex]?.exercise_image && (
+              <img 
+                src={selectedExerciseDetails[currentExerciseIndex].exercise_image} 
+                alt="Exercise" 
+                style={{ maxWidth: '300px', margin: '10px auto' }} 
+              />
+            )}
+
+           <p style={{ fontSize: '18px', marginTop: '10px' }}>
+            {selectedExerciseDetails[currentExerciseIndex]?.reps && selectedExerciseDetails[currentExerciseIndex]?.set
+              ? `${selectedExerciseDetails[currentExerciseIndex].reps} reps × ${selectedExerciseDetails[currentExerciseIndex].set} sets`
+              : `⏱️ Time left: ${Math.floor(countdown / 60)}m ${countdown % 60}s`
+            }
+          </p>
+
+
+            <div style={{ marginTop: '20px' }}>
+              <button onClick={handleNextExercise} style={{ marginRight: 10, padding: '10px 20px' }}>
+                ⏭️ Next Exercise
+              </button>
+
+              <button onClick={togglePause} style={{ marginRight: 10, padding: '10px 20px' }}>
+                {isPaused ? '▶️ Resume' : '⏸️ Pause'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setExerciseInProgress(false);
+                  setExerciseStarted(false);
+                  setCurrentExerciseIndex(0);
+                  setCountdown(0);
+                  setTimeUsed(0); // ⏱️ Reset again
+                  clearInterval(timerId);
+                }}
+
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#dc3545',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px'
+                }}
+              >
+                ⏹️ Stop
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ marginTop: '20px' }}>
+            <button
+           onClick={async () => {
+            const first = selectedExerciseDetails[0];
+            if (first.duration_seconds) {
+              setCountdown(first.duration_seconds);
+            }
+
+            // Step 1: Add or get existing log
+            const logResponse = await fetch('/api/Db_connection', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                table: 'workout_log',
+                action: 'update_or_extend_log',
+                data: {
+                  member_ic: user.member_ic,
+                  p_workoutplan_id: selectedExercisePlanId,
+                  new_duration: timeUsed,
+                  new_calories: selectedExerciseDetails.reduce((sum, ex) => sum + (ex.estimated_calories || 0), 0),
+                  exercises: selectedExerciseDetails.map(ex => ({
+                    exercise_id: ex.exercise_id,
+                    sets_completed: ex.set || 0,
+                    reps_per_set: ex.reps ? `${ex.reps}` : '',
+                    weight_per_set: '',
+                    duration_seconds: ex.duration_seconds || (ex.reps && ex.set ? ex.reps * ex.set * 5 : 0),
+                    calories_burned: ex.estimated_calories || 0
+                  }))
+                }
+              })
+            });
+
+
+
+            const logData = await logResponse.json();
+            const logId = logData?.log?.log_id;
+            setCurrentLogId(logId); // ✅ Store it
+
+
+            // Step 2: Insert exercises under the log
+            if (logId) {
+              const exercisesToInsert = selectedExerciseDetails.map(ex => ({
+                exercise_id: ex.exercise_id,
+                sets_completed: ex.set || 0,
+                reps_per_set: ex.reps ? `${ex.reps}` : '',
+                weight_per_set: '', // optional
+                duration_seconds: ex.duration_seconds || (ex.reps && ex.set ? ex.reps * ex.set * 5 : 0),
+                calories_burned: ex.estimated_calories || 0
+              }));
+
+              await fetch('/api/Db_connection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  table: 'workout_log_exercise',
+                  action: 'insert_exercises',
+                  data: {
+                    log_id: logId,
+                    exercises: exercisesToInsert,
+                    day: new Date().getDate()
+                  }
+                })
+              });
+            }
+
+            // Step 3: Start the exercise
+            setExerciseInProgress(true);
+            setCurrentExerciseIndex(0);
+            
+            setTimeUsed(0);
           }}
-        >
-          ⏹️ Stop Exercise
-        </button>
+
+              style={{
+                marginRight: '10px',
+                padding: '10px 20px',
+                backgroundColor: '#28a745',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+              }}
+            >
+              ▶️ Start Now
+            </button>
+
+
+
+
+
+            <button
+              onClick={() => setExerciseStarted(false)}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#dc3545',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+              }}
+            >
+              ⏹️ Stop Exercise
+            </button>
+          </div>
+        )}
       </div>
     ) : (
       <div style={{ display: 'flex', gap: '20px', paddingTop: '20px' }}>
@@ -232,7 +580,12 @@ return (
               <label><strong>Select a food plan:</strong></label>
               <select
                 value={selectedPlanId || ''}
-                onChange={(e) => setSelectedPlanId(Number(e.target.value))}
+                onChange={(e) => {
+                  setSelectedPlanId(Number(e.target.value));
+                  setSelectedPlans({}); // ⬅️ Clear all selected checkboxes
+                  setTotalCalories(0);  // ⬅️ Reset total food calories if needed
+                }}
+
                 style={{ display: 'block', margin: '10px 0', padding: '5px' }}
               >
                 <option value="" disabled>Select plan</option>
@@ -268,29 +621,100 @@ return (
           <p>🔥 You’ve burned <strong>{totalExerciseCalories} kcal</strong> through exercise.</p>
           <p>🎯 Your goal is to stay within <strong>{dailyGoalCalories} kcal</strong> for today.</p>
 
-          <hr />
-
           <p>
             {totalFoodCalories - totalExerciseCalories > dailyGoalCalories
               ? '🚨 You’re over your calorie goal today. Try adjusting your intake or activity.'
               : '✅ You’re on track with your calorie goal. Keep it up!'}
           </p>
 
+          <hr />
+          
+          {/* 🏋️ Exercise Plan Section (conditionally shown) */}
+<div style={{ marginTop: '20px' }}>
+  {!exerciseDone ? (
+    <>
+      <h2>🏋️ Your Exercise Plan</h2>
+      {exercisePlans.length === 0 ? (
+        <div>
+          <p>You don’t have any exercise plan yet.</p>
+          <button
+            onClick={() => router.push('/customizeplan')}
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              backgroundColor: '#0070f3',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px'
+            }}
+          >
+            Customize Plan Now!
+          </button>
+        </div>
+      ) : (
+        <>
+          {exercisePlans.length > 1 ? (
+            <select
+              value={selectedExercisePlanId || ''}
+              onChange={(e) => setSelectedExercisePlanId(Number(e.target.value))}
+              style={{ padding: '6px', marginBottom: '10px' }}
+            >
+              <option value="" disabled>Select your exercise plan</option>
+              {exercisePlans.map(plan => (
+                <option key={plan.p_workoutplan_id} value={plan.p_workoutplan_id}>
+                  {plan.plan_name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <h4>{exercisePlans[0]?.plan_name}</h4>
+          )}
+
+          {selectedExerciseDetails.length > 0 && (
+            <div style={{ marginTop: '10px', textAlign: 'left' }}>
+              <ul>
+                {selectedExerciseDetails.map((exercise, index) => (
+                  <li key={index}>
+                    {exercise.exercise_name} –{' '}
+                    {exercise.reps && exercise.set
+                      ? `${exercise.reps} reps × ${exercise.set} sets`
+                      : `${exercise.duration_seconds} seconds`}
+                    {' '}– 🔥 {exercise.estimated_calories} kcal
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button
             onClick={() => setExerciseStarted(true)}
             style={{
-              marginTop: '20px',
+              marginTop: '15px',
               padding: '10px 20px',
               backgroundColor: '#ff6f00',
               color: '#fff',
               border: 'none',
               borderRadius: '6px',
-              cursor: 'pointer',
+              cursor: 'pointer'
             }}
           >
             ▶️ Start Exercise
           </button>
+        </>
+      )}
+    </>
+  ) : (
+    <div style={{ padding: '10px', backgroundColor: '#e6ffed', borderRadius: '6px', marginTop: '10px' }}>
+      <h3>✅ Workout Completed!</h3>
+      <p>Great job! You’ve finished your exercise for today.</p>
+
+    </div>
+  )}
+</div>
+
         </div>
+
+
+
 
         {/* 🔔 Notifications – Right */}
         {/* 🔔 Notifications – Right */}
