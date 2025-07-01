@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
 
+
 export default function FoodLibrary({ role }) {
   const [foods, setFoods] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -82,12 +83,12 @@ const handlePrev = () => {
 
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="library">
       <Layout>
       <h1 className="text-3xl font-bold mb-6">Food Library</h1>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
+      <div className="filters">
         <input
           type="text"
           placeholder="Search food..."
@@ -121,9 +122,9 @@ const handlePrev = () => {
       {currentFoods.length === 0 ? (
         <p>No food items found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="food_card">
           {currentFoods.map(food => (
-            <div key={food.food_code} className="bg-white p-4 rounded-xl shadow">
+            <div key={food.food_code} className="food_pic">
               {food.food_pic && (
                 <img
                   src={`https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/food/public/${food.food_pic}`}
@@ -133,7 +134,7 @@ const handlePrev = () => {
                 />
               )}
 
-              <h2 className="text-xl font-semibold">{food.food_name}</h2>
+              <h2 className="food_name">{food.food_name}</h2>
 
               {/* Role-Based Content */}
               {role === 'admin' ? (
@@ -147,7 +148,6 @@ const handlePrev = () => {
                     {food.protein_per_100g}g protein<br />
                     {food.fat_per_100g}g fat
                   </p>
-                  <hr />
 
                   <div className="flex gap-2 mt-3">
                     <button
@@ -162,7 +162,7 @@ const handlePrev = () => {
                     >
                       Delete
                     </button>
-                  </div><hr />
+                  </div>
                 </>
               ) : (
                 <>
@@ -202,7 +202,7 @@ const handlePrev = () => {
       )}
 
       {/* Pagination Controls */}
-      <div className="flex justify-center mt-6 gap-4">
+      <div className="pagination-controls">
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}

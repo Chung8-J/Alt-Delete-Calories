@@ -13,6 +13,15 @@ export default function ExerciseLibrary({ role }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+  const [newExercise, setNewExercise] = useState({
+    exercise_name: '',
+    description: '',
+    targeted_area: '',
+    exercise_genre: '',
+    calories_per_sec: '',
+    example_pic: '',
+  });
 
   useEffect(() => {
     fetch('/api/Fetch_exercise')
@@ -68,17 +77,76 @@ export default function ExerciseLibrary({ role }) {
     }
   };
 
+  const handleAddExercise = async () => {
+  if (!newExercise.file) return alert('Please upload a media file');
+
+  const fileExt = newExercise.file.name.split('.').pop();
+  const fileName = `${Date.now()}.${fileExt}`;
+  const filePath = `public/${fileName}`;
+
+  try {
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('exercise')
+      .upload(filePath, newExercise.file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      return alert('Upload failed');
+    }
+
+    // Add to database
+    const exerciseData = {
+      exercise_name: newExercise.exercise_name,
+      description: newExercise.description,
+      targeted_area: newExercise.targeted_area,
+      exercise_genre: newExercise.exercise_genre,
+      calories_per_sec: newExercise.calories_per_sec,
+      example_pic: fileName, // store filename only
+    };
+
+    const res = await fetch('/api/Add_exercise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(exerciseData),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      setExercises(prev => [...prev, result]);
+      setShowModal(false);
+      setNewExercise({
+        exercise_name: '',
+        description: '',
+        targeted_area: '',
+        exercise_genre: '',
+        calories_per_sec: '',
+        file: null,
+      });
+      alert('Exercise added successfully.');
+    } else {
+      alert(result.error || 'Failed to add exercise.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error occurred while adding exercise.');
+  }
+};
+
+
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const pageData = filtered.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="library">
       <Layout>
-      <h1 className="text-3xl font-bold mb-6">Exercise Library</h1>
+      <h1 className="">Exercise Library</h1>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
+      <div className="filters">
         <input
           type="text"
           placeholder="Search exercises..."
@@ -99,14 +167,25 @@ export default function ExerciseLibrary({ role }) {
         </select>
       </div>
 
+      {/*Modal to add exercise*/}
+      {role === 'admin' && (
+        <button
+          onClick={() => setShowModal(true)}
+          className="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          + Add New Exercise
+        </button>
+      )}
+
+
 
       {/* Exercise Grid */}
       {pageData.length === 0 ? (
         <p>No exercises found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="exercise_card">
           {pageData.map(ex => (
-            <div key={ex.exercise_id} className="bg-white rounded-xl shadow p-4">
+            <div key={ex.exercise_id} className="exercise_video">
               
               {ex.example_pic && (
                 isVideo(ex.example_pic) ? (
@@ -125,12 +204,11 @@ export default function ExerciseLibrary({ role }) {
               )}
 
   
-              <h2 className="text-xl font-semibold">{ex.exercise_name}</h2>
+              <h2 className="exercise_name">{ex.exercise_name}</h2>
               <p className="text-sm text-gray-600 mb-2">{ex.description}</p>
               <p className="text-sm"><strong>Calories/sec:</strong> {ex.calories_per_sec}</p>
               <p className="text-sm"><strong>Target Area:</strong> {ex.targeted_area}</p>
               <p className="text-sm"><strong>Genre:</strong> {ex.exercise_genre}</p>
-              <hr />
 
               
 
@@ -149,7 +227,7 @@ export default function ExerciseLibrary({ role }) {
                   >
                     Delete
                     
-                  </button><hr />
+                  </button>
                 </div>
               )} 
             </div>
@@ -160,7 +238,7 @@ export default function ExerciseLibrary({ role }) {
 
       {/* Pagination Controls */}
       {filtered.length > itemsPerPage && (
-        <div className="flex justify-between items-center mt-6">
+        <div className="pagination-controls">
           <button
             onClick={() => {
               setCurrentPage(p => Math.max(1, p - 1));
@@ -190,6 +268,70 @@ export default function ExerciseLibrary({ role }) {
         </div>
       )}
       </Layout>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-96">
+            <h2 className="text-xl mb-4">Add New Exercise</h2>
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="Exercise Name"
+                value={newExercise.exercise_name}
+                onChange={e => setNewExercise({ ...newExercise, exercise_name: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <textarea
+                placeholder="Description"
+                value={newExercise.description}
+                onChange={e => setNewExercise({ ...newExercise, description: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Targeted Area"
+                value={newExercise.targeted_area}
+                onChange={e => setNewExercise({ ...newExercise, targeted_area: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Genre"
+                value={newExercise.exercise_genre}
+                onChange={e => setNewExercise({ ...newExercise, exercise_genre: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="number"
+                placeholder="Calories Per Second"
+                value={newExercise.calories_per_sec}
+                onChange={e => setNewExercise({ ...newExercise, calories_per_sec: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="file"
+                accept="image/*,video/*"
+                onChange={e => setNewExercise({ ...newExercise, file: e.target.files[0] })}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddExercise}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
