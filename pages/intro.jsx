@@ -81,7 +81,7 @@ export default function introPage() {
         </div>
       </footer>
       </nav>
-
+      <Footer />
     </html>
   
     </>

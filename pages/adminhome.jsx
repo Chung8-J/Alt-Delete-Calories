@@ -2,6 +2,7 @@
 import Layout from '../components/Layout';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Footer from '../components/footer';
 
 export default function CoachHome() {
   const [admin, setAdmin] = useState(null);
@@ -31,9 +32,9 @@ export default function CoachHome() {
 
   return (
     <Layout user={admin}>
-      <main className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Welcome Admin, {admin?.coach_name || admin?.name}!</h1>
-        <p className="text-gray-700 mb-6">
+      <main className="dashboard">
+        <h1 className="title">Welcome Admin, {admin?.coach_name || admin?.name}!</h1>
+        <p className="content">
           This admin dashboard provides an overview of the system. As a coach in this platform, you play a vital role in:
           <ul>
             <li>Helping members achieve their health and fitness goals.</li>
@@ -62,7 +63,9 @@ export default function CoachHome() {
         ) : (
           <p className="text-gray-500 mt-4">Loading stats...</p>
         )}
+        <Footer />
       </main>
     </Layout>
+    
   );
 }

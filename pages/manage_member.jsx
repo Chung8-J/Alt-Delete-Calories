@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function ManageMembers() {
   const [members, setMembers] = useState([]);
@@ -50,7 +51,7 @@ export default function ManageMembers() {
   const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="member_list">
       <Layout>
       <h1 className="text-3xl font-bold mb-6">Manage Members</h1>
 
@@ -58,7 +59,7 @@ export default function ManageMembers() {
         <p>No members found.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="member_card">
             {currentMembers.map((member) => (
               <div key={member.member_ic} className="bg-white shadow p-4 rounded-xl">
                 <h2 className="text-xl font-semibold">{member.member_name}</h2>
@@ -78,13 +79,13 @@ export default function ManageMembers() {
                 >
                     Delete
                     
-                  </button><hr />
+                  </button>
               </div>
             ))}
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex justify-center mt-6 gap-4">
+          <div className="pagination-controls">
             <button
               onClick={handlePrev}
               disabled={currentPage === 1}
@@ -103,6 +104,7 @@ export default function ManageMembers() {
           </div>
         </>
       )}
+      <Footer />
       </Layout>
     </div>
   );

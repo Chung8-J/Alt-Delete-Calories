@@ -2,6 +2,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import '../style/common.css';
 
 export default function Navbar() {
   const router = useRouter();
@@ -40,51 +41,65 @@ export default function Navbar() {
   const userIc = user.coach_ic || user.member_ic;
 
   return (
-    <nav className="navbar">
-      <div className="navbar-components">
-        {user.role === 'admin' && (
-          <>
-            <Link href="/adminhome" className="hover:text-yellow-400">🏋️ Alt+Calories</Link>|
-            <Link href="/coach_foodlib" className="hover:text-yellow-400">Manage Food Library</Link>|
-            <Link href="/coach_exerciselib" className="hover:text-yellow-400">Manage Exercise Library</Link>|
-            <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>|
-            <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>|
-            <Link href="/community" className="hover:text-yellow-400">Community</Link>
-          </>
-        )}
-
-        {user.role === 'user' && (
-          <>
-            <Link href="/userhome" className="hover:text-yellow-400">🏋️ Alt+Calories</Link>|
-            <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>|
-            <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>|
-            <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>|
-            <Link href="/customizeplan" className="hover:text-yellow-400">Workout/Diet Plan</Link>|
-            <Link href="/community" className="hover:text-yellow-400">Community</Link>
-          </>
-        )}
+    <nav className="loginnavbar">
+      <div className="loginnavbar-components">
+        <div className="nav-links flex gap-3 items-center">
+          {user.role === 'admin' && (
+            <>
+              <Link href="/adminhome" className="hover:text-yellow-400">
+               <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
+              </Link>
+              <Link href="/coach_foodlib" className="hover:text-yellow-400">Manage Food Library</Link>
+              <Link href="/coach_exerciselib" className="hover:text-yellow-400">Manage Exercise Library</Link>
+              <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>
+              <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
+              <Link href="/community" className="hover:text-yellow-400">Community</Link>
+            </>
+          )}
+          {user.role === 'user' && (
+            <>
+              <Link href="/userhome" className="hover:text-yellow-400">
+                <img src="/images/" alt="Alt+Calories Logo" className="Logo" />
+              </Link>
+              <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>
+              <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>
+              <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
+              <Link href="/customizeplan" className="hover:text-yellow-400">Workout/Diet Plan</Link>
+              <Link href="/community" className="hover:text-yellow-400">Community</Link>
+            </>
+          )}
+        </div>
 
         {/* Avatar Dropdown */}
-        <div className="usertab" ref={dropdownRef}>
+        <div className="usertab" ref={dropdownRef}
+          style={{
+                borderRadius: '5px',
+                objectFit: 'cover',
+                verticalAlign: 'middle',
+                border: '2px solid',
+                color: 'green',
+                width:'130px',
+                backgroundColor:'blue'
+              }}
+          >
           <button
             onClick={() => setShowDropdown(p => !p)}
-            style={{float:'right'}}
             className="flex items-center gap-2 focus:outline-none"
           >
             <img
               src={avatarUrl}
               alt="avatar"
+              className="usertab-avatar"
               style={{
-                width: '70px',
-                height: '70px',
+                width: '50px',
+                height: '50px',
                 borderRadius: '50%',
                 objectFit: 'cover',
                 verticalAlign: 'middle',
-                border: '2px solid white'
+                marginLeft:'5px'
               }}
-              className="w-6 h-6 rounded-full border-2 border-white object-cover"
             />
-            <span className="text-sm" style={{ fontSize: '14px', verticalAlign: 'middle', marginLeft: '8px' }}>{user.name || user.member_name}</span>
+            <span className="usertab-name" style={{padding:'0.894rem'}}>{user.name || user.member_name}</span>
           </button>
 
           {showDropdown && (

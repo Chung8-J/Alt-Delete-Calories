@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import '../style/common.css'; 
+import Footer from '../components/footer';
 
 export default function LoginPage() {
   const [name, setName] = useState('');
@@ -53,7 +55,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className='login'>
       <h1>Login</h1>
 
       <label htmlFor="name">Name:</label><br />
@@ -74,9 +76,9 @@ export default function LoginPage() {
         placeholder="Enter your password"
       /><br /><br />
 
-      <a href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
+      <button href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
         Login
-      </a>
+      </button>
       <button
           type="button"
           onClick={() => {
@@ -88,11 +90,13 @@ export default function LoginPage() {
           Cancel
         </button>
 
-      <p style={{ color: 'red' }}>{message}</p>
+      <p>{message}</p>
 
       <br />
       <Link href="/Signup">Sign Up</Link><br />
       <a href="/forgetpassword">Forget password</a>
+      <Footer />
     </div>
+    
   );
 }

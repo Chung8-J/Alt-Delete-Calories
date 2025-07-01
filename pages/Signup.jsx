@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import '../style/common.css'; 
+import Footer from '../components/footer';
 
 export default function SignupPage() {
   const [ic, setIc] = useState('');
@@ -78,7 +80,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div>
+    <div className='signup'>
       <h1>Sign Up</h1>
 
       <label htmlFor="ic">IC Number (12 digits):</label><br />
@@ -104,15 +106,14 @@ export default function SignupPage() {
         <option value="">-- Select Gender --</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
-        <option value="other">Other</option>
       </select><br /><br />
 
       <label htmlFor="email">Email:</label><br />
       <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" /><br /><br />
 
       <button onClick={handleSignup}>Sign Up</button><br /><br />
-
       <Link href="/Login">Back to Login</Link>
+      <Footer />
     </div>
   );
 }
