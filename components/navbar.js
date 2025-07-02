@@ -59,7 +59,7 @@ export default function Navbar() {
           {user.role === 'user' && (
             <>
               <Link href="/userhome" className="hover:text-yellow-400">
-                <img src="/images/" alt="Alt+Calories Logo" className="Logo" />
+                <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
               </Link>
               <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>
               <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import '../style/common.css'; 
 import Footer from '../components/footer';
 
+
 export default function LoginPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -55,40 +56,39 @@ export default function LoginPage() {
   };
 
   return (
+    
+   
     <div className='login'>
+
+        <Link href="/intro" >
+          <img src="/images/logo.png" alt="Alt+Calories Logo" className="login-logo" />
+        </Link>
       <h1>Login</h1>
 
-      <label htmlFor="name">Name:</label><br />
+      <label htmlFor="name"></label><br />
       <input
         type="text"
         id="name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Enter your username"
-      /><br /><br />
+        placeholder="Username"
+        className='login-name'
+      /><br />
 
-      <label htmlFor="password">Password:</label><br />
+      <label htmlFor="password"></label><br />
       <input
         type="password"
         id="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter your password"
+        placeholder="Password"
+        className='login-password'
       /><br /><br />
 
       <button href="#" onClick={(e) => { e.preventDefault(); handleLogin(); }}>
         Login
       </button>
-      <button
-          type="button"
-          onClick={() => {
-            setShowModal(false);
-            router.push('/intro');
-          }}
-          className="px-4 py-2 border border-gray-400 rounded"
-        >
-          Cancel
-        </button>
+     
 
       <p>{message}</p>
 

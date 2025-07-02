@@ -63,7 +63,7 @@ export default function CoachHome() {
         ) : (
           <p className="text-gray-500 mt-4">Loading stats...</p>
         )}
-        <Footer />
+        <footer />
       </main>
     </Layout>
     

@@ -46,6 +46,16 @@ strong {
     color: #fff;
 }
 
+.dashboard-container h2{
+    font-size: 28px;
+}
+
+.dashboard-container p{
+    font-size: 17px;
+}
+
+
+
 
 .middle-container {
     padding-left: 60px !important;
@@ -61,6 +71,10 @@ strong {
     margin-bottom: 100px;
 
 }
+.dashboard-container h2{
+    padding-bottom: 10px;
+     padding-top: 10px;
+}
 
 
 
@@ -72,7 +86,7 @@ strong {
 
 .middle-container {
     flex: 1;
-    padding: 0 10px;
+
     border-right: 1px solid #ccc;
 }
 
@@ -95,6 +109,9 @@ strong {
     /* allows shrinking if needed */
 }
 
+.middle-container{
+    padding-top: 40px;
+}
 
 .Dashboard-btn {
     background-color: #50DA00;
@@ -119,4 +136,12 @@ font-size: medium;
 
 .Dashboard-btn:hover {
     background-color: #5eff00;
+}
+
+.middle-DailySummary {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 12px 20px;           /* Remove horizontal padding */
+  margin: 0 -60px;    
+  padding-left: px;     /* Pull edges outwards to touch container borders */
 }

@@ -370,8 +370,11 @@ html, body {
     
 }
 
+
+
+
 .login {
-  width: 40%;
+  width: 400px;
   margin: 100px auto;
   padding: 40px;
   background: linear-gradient(to right, #122C6F, #8215ca,#122C6F ) ;
@@ -379,47 +382,61 @@ html, body {
   color: white;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   font-size:20px;
+
+  
 }
 
 .login h1{
-    font-size: 40px;
+    font-size: 32px;
     font-weight: bold;
-    padding:0 0 20px;
+    padding:0 0px 10px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+
+
+.login-logo{
+    height: 50px;
+    width: auto;
+    align-items: center;
 }
 
 .login input {
+  background-color: transparent !important;
   width: 100%;
   padding: 15px;
   margin-top: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #eaeaea;
-  color: black;
+  color: white;
+    border: none; /* Remove all borders first */
+ 
+  border-bottom: 1px solid #ccc;
+
 }
 
+
 .login a {
-  display: inline-block;
-  margin-top: 15px;
+  display: block; /* or inline-block, but block works best for margin auto */
+  margin: 2px auto 0; /* top: 15px, left/right: auto, bottom: 0 */
   font-weight: bold;
   color: #50DA00;
   cursor: pointer;
   font-size: 15px;
+  text-align: center; /* Optional: if the link text needs to be centered */
 }
 
 .login button {
-  border: none;
-  display: inline-block;
-  margin: 30px 10px 0;
+  display: block; 
+  margin: 30px auto 0; 
   padding: 15px 0px;
   font-weight: bold;
   background-color: #50DA00;
   color: black;
   cursor: pointer;
-  margin: 0 auto;
-  width:50%;
+  width: 80%;
   font-size: 18px;
-  cursor: pointer;
-  
+  border: none;
+  border-radius: 20px;
 }
 
 .login button:hover {
@@ -532,7 +549,7 @@ html, body {
 }
 
 .nav-links a:hover {
-  color: #50DA00;
+  color: #ea00ff;
 }
 
 /* Optional underline animation */

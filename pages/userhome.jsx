@@ -316,35 +316,42 @@ export default function UserDashboard() {
       return acc;
     }, {});
 
-
     return (
       <div style={{ marginBottom: '20px' }}>
-        {Object.entries(groupedMeals).map(([mealType, foods]) => (
-          <div key={mealType} style={{ marginTop: '8px' }}>
-            <strong>{mealType}</strong>
-            <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
-              {foods.map((food) => {
-                const foodKey = `${selectedPlanId}-${mealType}-${food.food_name}`;
-                const isChecked = !!selectedPlans[foodKey];
-                return (
-                  <li key={foodKey}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => handleCheckboxChange(foodKey, food.calories)}
-                        style={{ marginRight: '8px' }}
-                      />
-                      {food.food_name} – {food.serving_size}g – {food.calories} kcal
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+        {['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((mealType) => {
+          const foods = groupedMeals[mealType];
+          if (!foods) return null; // Skip if the meal type doesn't exist
+
+          return (
+            <div key={mealType} style={{ marginTop: '8px' }}>
+              <div style={{ paddingBottom: '4px', borderBottom: '1px solid #ccc' }}>
+                <strong>{mealType}</strong>
+              </div>
+              <ul style={{ paddingLeft: '20px', marginTop: '12px' }}>
+                {foods.map((food) => {
+                  const foodKey = `${selectedPlanId}-${mealType}-${food.food_name}`;
+                  const isChecked = !!selectedPlans[foodKey];
+                  return (
+                    <li key={foodKey}>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleCheckboxChange(foodKey, food.calories)}
+                          style={{ marginRight: '8px' }}
+                        />
+                        {food.food_name} – {food.serving_size}g – {food.calories} kcal
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </div>
     );
+
   };
 
   if (!user) return <p>Loading...</p>;
@@ -355,20 +362,20 @@ export default function UserDashboard() {
   return (
     <Layout>
 
-      <div className="dashboard-container" style={{ display: 'flex' }}>
+      <div className="dashboard-container" style={{ display: 'flex',gap: '0' }}>
         {exerciseStarted ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
             <h2>🏋️ Exercise Mode Started</h2>
 
             {selectedExercisePlanId && (
               <>
-                <h3 style={{ marginTop: '20px' }}>
+                <h3 >
                   Plan: {exercisePlans.find(p => p.p_workoutplan_id === selectedExercisePlanId)?.plan_name}
                 </h3>
 
                 {!exerciseInProgress && (
                   <>
-                    <ul style={{ marginTop: '10px', textAlign: 'left', display: 'inline-block' }}>
+                    <ul style={{ marginTop: '1px', textAlign: 'left', display: 'inline-block' }}>
                       {selectedExerciseDetails.map((ex, index) => (
                         <li key={index}>
                           {ex.exercise_name} –{' '}
@@ -554,7 +561,7 @@ export default function UserDashboard() {
             )}
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '20px', }}>
+          <div style={{ display: 'flex'}}>
             {/* 🥗 Food Plans – Left */}
             <div className='FoodPlans' style={{ flex: 1, borderRight: '1px solid #ccc' }}>
               <h2>🥗 Food Plans</h2>
@@ -606,7 +613,7 @@ export default function UserDashboard() {
 
             {/* 🧩 Middle – Summary */}
             <div className="middle-container" style={{ borderRight: '1px solid #ccc' }}>
-              <div className="middle-Daily Summary">
+              <div className="middle-DailySummary">
                 <h2>🧩 Daily Summary</h2>
                 <p>You’ve consumed: <strong>{totalCalories} kcal</strong> from food today.</p>
                 <p>🔥 You’ve burned <strong>{totalExerciseCalories} kcal</strong> through exercise.</p>
@@ -617,12 +624,16 @@ export default function UserDashboard() {
                     ? '🚨 You’re over your calorie goal today. Try adjusting your intake or activity.'
                     : '✅ You’re on track with your calorie goal. Keep it up!'}
                 </p>
-              </div>
+                
+            </div>
+
+
+           
 
 
 
               {/* 🏋️ Exercise Plan Section (conditionally shown) */}
-              <div style={{ marginTop: '20px' }}>
+              <div >
                 {!exerciseDone ? (
                   <>
                     <h2>🏋️ Your Exercise Plan</h2>
@@ -656,8 +667,17 @@ export default function UserDashboard() {
                         )}
 
                         {selectedExerciseDetails.length > 0 && (
-                          <div style={{ marginTop: '10px', textAlign: 'left' }}>
-                            <ul>
+                          <div
+                            style={{
+                              marginTop: '10px',
+                              marginBottom: '60px',
+                              textAlign: 'left',
+                              maxHeight: selectedExerciseDetails.length > 4 ? '160px' : 'auto',
+                              overflowY: selectedExerciseDetails.length > 4 ? 'auto' : 'visible',
+                              paddingRight: '5px', // for scrollbar space
+                            }}
+                          >
+                            <ul style={{ margin: 0, paddingLeft: '20px' }}>
                               {selectedExerciseDetails.map((exercise, index) => (
                                 <li key={index}>
                                   {exercise.exercise_name} –{' '}
@@ -670,6 +690,7 @@ export default function UserDashboard() {
                             </ul>
                           </div>
                         )}
+
                         <button
                           onClick={() => setExerciseStarted(true)}
                           className='Dashboard-btn'

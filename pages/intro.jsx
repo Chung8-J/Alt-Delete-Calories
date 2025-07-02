@@ -2,6 +2,8 @@ import Link from 'next/link';
 import '../style/common.css';
 import Navbar from '@/components/intro-nav'; // or use relative path if needed
 import Image from 'next/image';
+import Footer from '../components/footer';
+
 
 // can become component
 
