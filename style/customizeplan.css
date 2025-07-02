@@ -1,0 +1,108 @@
+* {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #011126;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.customize-plan-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 1500px;
+  min-height: 750px;
+  background: linear-gradient(to right,
+    rgba(18, 44, 111, 0.7),
+    rgba(130, 21, 202, 0.7),
+    rgba(18, 44, 111, 0.7));
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 3px solid rgba(147, 5, 241, 0.45);
+  font-size: 18px;
+  margin-top: 120px;
+  padding: 20px;
+}
+
+.plan-list-ul button {
+    font-size: 15px !important;
+    font-weight: 650 !important;
+}
+.customize-sidebar {
+  flex: 1!important;
+  min-width: 220px;
+  border: 1px solid red;
+  padding-left: 10px;
+
+  border-right: 1px solid white;
+}
+
+.customize-main-content {
+  flex: 2 !important;
+  min-width: 0;
+  border: 1px solid lime;
+  padding-left: 40px;
+}
+
+.customize-sidebar h2{
+    font-size: 32px;
+    margin-bottom: 15px;
+    margin-top:10px ;
+}
+
+
+.exercisefood-btn {
+  background-color: rgba(130, 21, 202, 0.5); /* darker for unselected */
+  color: white;
+  border: none;
+  border-radius: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 200px;
+  transition: background-color 0.3s ease;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.exercisefood-btn.selected {
+  background-color: rgba(130, 21, 202, 1); /* brighter for selected */
+}
+.toggle-add-plan-btn {
+  background-color: #50DA00;
+  border: none !important;
+  min-width: 260px !important;
+  height: auto;
+  font-size: 17px;
+  font-weight: bolder;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* ✨ Add this */
+  transition: box-shadow 0.3s ease; /* Optional: smooth hover effect */
+  border-radius: 15px !important;
+
+  margin-top: 25px !important;
+}  
+
+.toggle-add-plan-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Optional: stronger on hover */
+}
+
+.customize-plan-container h3{
+    margin-bottom: 10px;
+    font-size: 34px;
+
+    margin-top: 10px;
+    margin-left: 0px;
+}

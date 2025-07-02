@@ -36,10 +36,19 @@ export default function UserDashboard() {
   const [currentLogId, setCurrentLogId] = useState(null);
   const [workoutCompleted, setWorkoutCompleted] = useState(false);
   const [exerciseDone, setExerciseDone] = useState(false);
+  const [currentExamplePic, setCurrentExamplePic] = useState('');
 
-
+  const [mediaUrls, setMediaUrls] = useState({});
 
   const router = useRouter();
+  const SUPABASE_MEDIA_BASE = 'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/exercise/public/';
+
+  const isVideo = (filename) => {
+    if (!filename) return false;
+    const ext = filename.split('.').pop().toLowerCase();
+    return ['mp4', 'mov', 'webm'].includes(ext);
+  };
+  ;
 
   useEffect(() => {
     let timeUsedInterval;
@@ -85,6 +94,8 @@ export default function UserDashboard() {
 
 
 
+
+
     fetch(`/api/Db_connection?member_ic=${storedUser.member_ic}&role=user`)
       .then(res => res.json())
       .then(data => {
@@ -107,6 +118,37 @@ export default function UserDashboard() {
       })
       .catch(err => console.error('❌ Error checking profile:', err));
   }, [router]);
+  useEffect(() => {
+    const fetchExamplePic = async () => {
+      const currentExercise = selectedExerciseDetails[currentExerciseIndex];
+      if (!currentExercise || !currentExercise.exercise_id) return;
+
+      try {
+        const res = await fetch('/api/Db_connection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            table: 'exercise',
+            action: 'get_by_id',
+            data: { exercise_id: currentExercise.exercise_id },
+          }),
+        });
+
+        const result = await res.json();
+        if (res.ok && result?.example_pic) {
+          setCurrentExamplePic(result.example_pic);
+        } else {
+          setCurrentExamplePic('');
+        }
+      } catch (err) {
+        console.error('Failed to fetch example_pic:', err);
+        setCurrentExamplePic('');
+      }
+    };
+
+    fetchExamplePic();
+  }, [currentExerciseIndex]);
+
 
   // fetch exercise plan and details
   useEffect(() => {
@@ -362,76 +404,107 @@ export default function UserDashboard() {
   return (
     <Layout>
 
-      <div className="dashboard-container" style={{ display: 'flex',gap: '0' }}>
+      <div className="dashboard-container" style={{
+        display: 'flex', gap: '0', minHeight: exerciseInProgress ? '80vh' : '50vh', marginTop: exerciseInProgress ? '180px' : '10px'
+
+      }}>
         {exerciseStarted ? (
-          <div style={{ textAlign: 'center' }}>
-            <h2>🏋️ Exercise Mode Started</h2>
+          <div style={{ textAlign: 'center' }} className="exercise-inprogress">
 
-            {selectedExercisePlanId && (
-              <>
-                <h3 >
-                  Plan: {exercisePlans.find(p => p.p_workoutplan_id === selectedExercisePlanId)?.plan_name}
-                </h3>
+            <div className="exercise-inprogress-menu">
+              {selectedExercisePlanId && (
+                <>
 
-                {!exerciseInProgress && (
-                  <>
-                    <ul style={{ marginTop: '1px', textAlign: 'left', display: 'inline-block' }}>
-                      {selectedExerciseDetails.map((ex, index) => (
-                        <li key={index}>
-                          {ex.exercise_name} –{' '}
-                          {ex.reps && ex.set
-                            ? `${ex.reps} reps × ${ex.set} sets`
-                            : `${ex.duration_seconds} seconds`} – 🔥 {ex.estimated_calories} kcal
-                        </li>
-                      ))}
-                    </ul>
+                  {!exerciseInProgress && (
+                    <>
 
-                    <p style={{ marginTop: '10px' }}>
-                      🕒 Time needed:{' '}
-                      <strong>
-                        {Math.floor(totalExerciseTime / 60)} min {totalExerciseTime % 60} sec
-                      </strong>
-                    </p>
+                      <h2> Exercise Mode Started</h2>
 
-                    <p style={{ marginTop: '10px', fontWeight: 'bold' }}>
-                      🕒 Time used: {Math.floor(timeUsed / 60)}m {timeUsed % 60}s
-                    </p>
+                      <h3 >
+                        Plan: {exercisePlans.find(p => p.p_workoutplan_id === selectedExercisePlanId)?.plan_name}
+                      </h3>
 
-                  </>
-                )}
-              </>
-            )}
+
+                      <ul style={{ marginTop: '1px', textAlign: 'left', display: 'inline-block' }}>
+                        {selectedExerciseDetails.map((ex, index) => (
+                          <li key={index}>
+                            {ex.exercise_name} –{' '}
+                            {ex.reps && ex.set
+                              ? `${ex.reps} reps × ${ex.set} sets`
+                              : `${ex.duration_seconds} seconds`} – 🔥 {ex.estimated_calories} kcal
+                          </li>
+                        ))}
+                      </ul>
+
+                      <p style={{ marginTop: '10px' }}>
+                        🕒 Time needed:{' '}
+                        <strong>
+                          {Math.floor(totalExerciseTime / 60)} min {totalExerciseTime % 60} sec
+                        </strong>
+                      </p>
+
+
+
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+
 
             {exerciseInProgress ? (
-              <div style={{ marginTop: '30px', textAlign: 'center' }}>
-                <h3>💪 Current Exercise</h3>
-                <p><strong>{selectedExerciseDetails[currentExerciseIndex]?.exercise_name}</strong></p>
+              <div>
 
-                {selectedExerciseDetails[currentExerciseIndex]?.exercise_image && (
-                  <img
-                    src={selectedExerciseDetails[currentExerciseIndex].exercise_image}
-                    alt="Exercise"
-                    style={{ maxWidth: '300px', margin: '10px auto' }}
-                  />
+                <h2 >
+                  Plan: {exercisePlans.find(p => p.p_workoutplan_id === selectedExercisePlanId)?.plan_name}
+                </h2>
+
+                <p style={{ marginTop: '10px', fontWeight: 'bold' }}>
+                  🕒 Time used: {Math.floor(timeUsed / 60)}m {timeUsed % 60}s
+                </p>
+                {currentExamplePic && (
+                  isVideo(currentExamplePic) ? (
+                    <video
+                      src={SUPABASE_MEDIA_BASE + currentExamplePic}
+                      controls
+                      autoPlay
+                      loop
+                      muted
+                      className="dashboard-exercise-video"
+                    />
+                  ) : (
+                    <img
+                      src={SUPABASE_MEDIA_BASE + currentExamplePic}
+                      alt="Exercise"
+                      className="dashboard-exercise-img"
+                    />
+                  )
                 )}
 
-                <p style={{ fontSize: '18px', marginTop: '10px' }}>
+
+
+                <h2><strong>{selectedExerciseDetails[currentExerciseIndex]?.exercise_name}</strong></h2>
+
+
+                <h3 style={{ fontSize: '18px', marginTop: '10px' }}>
                   {selectedExerciseDetails[currentExerciseIndex]?.reps && selectedExerciseDetails[currentExerciseIndex]?.set
                     ? `${selectedExerciseDetails[currentExerciseIndex].reps} reps × ${selectedExerciseDetails[currentExerciseIndex].set} sets`
-                    : `⏱️ Time left: ${Math.floor(countdown / 60)}m ${countdown % 60}s`
+                    : `⏱ Time left: ${Math.floor(countdown / 60)}m ${countdown % 60}s`
                   }
-                </p>
+                </h3>
 
 
                 <div style={{ marginTop: '20px' }}>
-                  <button onClick={handleNextExercise} style={{ marginRight: 10, padding: '10px 20px' }}>
-                    ⏭️ Next Exercise
-                  </button>
-
                   <button onClick={togglePause} style={{ marginRight: 10, padding: '10px 20px' }}>
-                    {isPaused ? '▶️ Resume' : '⏸️ Pause'}
+                    {isPaused ? '▶ Resume' : '⏸ Pause'}
                   </button>
 
+                  <button onClick={handleNextExercise} style={{ marginRight: 10, padding: '10px 20px' }}>
+                    ⏭ Next Exercise
+                  </button>
+
+
+                  <br />
                   <button
                     onClick={() => {
                       setExerciseInProgress(false);
@@ -450,13 +523,16 @@ export default function UserDashboard() {
                       borderRadius: '6px'
                     }}
                   >
-                    ⏹️ Stop
+                    ⏹ Stop
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={{ marginTop: '20px' }}>
+
+
+              <div style={{ marginTop: '20px' }} className="exercise-inprogress-menu-btn-container">
                 <button
+                  className="exercise-inprogress-menu-btn"
                   onClick={async () => {
                     const first = selectedExerciseDetails[0];
                     if (first.duration_seconds) {
@@ -537,7 +613,7 @@ export default function UserDashboard() {
                     cursor: 'pointer',
                   }}
                 >
-                  ▶️ Start Now
+                  ▶ Start Now
                 </button>
 
 
@@ -545,6 +621,7 @@ export default function UserDashboard() {
 
 
                 <button
+                  className="exercise-inprogress-menu-btn"
                   onClick={() => setExerciseStarted(false)}
                   style={{
                     padding: '10px 20px',
@@ -555,16 +632,16 @@ export default function UserDashboard() {
                     cursor: 'pointer',
                   }}
                 >
-                  ⏹️ Stop Exercise
+                  ⏹ Stop Exercise
                 </button>
               </div>
             )}
           </div>
         ) : (
-          <div style={{ display: 'flex'}}>
+          <div style={{ display: 'flex' }}>
             {/* 🥗 Food Plans – Left */}
             <div className='FoodPlans' style={{ flex: 1, borderRight: '1px solid #ccc' }}>
-              <h2>🥗 Food Plans</h2>
+              <h2>Food Plans</h2>
 
               {foodPlans.length === 0 ? (
                 <p>You haven’t had a food plan. Let’s add one now!</p>
@@ -614,21 +691,21 @@ export default function UserDashboard() {
             {/* 🧩 Middle – Summary */}
             <div className="middle-container" style={{ borderRight: '1px solid #ccc' }}>
               <div className="middle-DailySummary">
-                <h2>🧩 Daily Summary</h2>
-                <p>You’ve consumed: <strong>{totalCalories} kcal</strong> from food today.</p>
-                <p>🔥 You’ve burned <strong>{totalExerciseCalories} kcal</strong> through exercise.</p>
-                <p>🎯 Your goal is to stay within <strong>{dailyGoalCalories} kcal</strong> for today.</p>
+                <h2>Daily Summary</h2>
+                <p>Consumed from food: <strong>{totalCalories} kcal</strong>.</p>
+                <p> burned through exercise.<strong>{totalExerciseCalories} kcal</strong> </p>
+                <p> Today goal's is to stay within <strong>{dailyGoalCalories} kcal</strong></p>
 
                 <p>
                   {totalFoodCalories - totalExerciseCalories > dailyGoalCalories
-                    ? '🚨 You’re over your calorie goal today. Try adjusting your intake or activity.'
+                    ? ' You’re over your calorie goal today. Try adjusting your intake or activity.'
                     : '✅ You’re on track with your calorie goal. Keep it up!'}
                 </p>
-                
-            </div>
+
+              </div>
 
 
-           
+
 
 
 
@@ -636,7 +713,7 @@ export default function UserDashboard() {
               <div >
                 {!exerciseDone ? (
                   <>
-                    <h2>🏋️ Your Exercise Plan</h2>
+                    <h2>Your Exercise Plan</h2>
                     {exercisePlans.length === 0 ? (
                       <div>
                         <p>You don’t have any exercise plan yet.</p>
@@ -684,7 +761,7 @@ export default function UserDashboard() {
                                   {exercise.reps && exercise.set
                                     ? `${exercise.reps} reps × ${exercise.set} sets`
                                     : `${exercise.duration_seconds} seconds`}
-                                  {' '}– 🔥 {exercise.estimated_calories} kcal
+                                  {' '}–  {exercise.estimated_calories} kcal
                                 </li>
                               ))}
                             </ul>
@@ -693,9 +770,9 @@ export default function UserDashboard() {
 
                         <button
                           onClick={() => setExerciseStarted(true)}
-                          className='Dashboard-btn'
+                          className='Dashboard-btn-start'
                         >
-                          ▶️ Start Exercise
+                          ▶ Start Exercise
                         </button>
                       </>
                     )}

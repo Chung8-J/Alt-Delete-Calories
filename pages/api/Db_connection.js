@@ -735,6 +735,16 @@ if (table === 'workout_log_exercise' && action === 'insert_exercises') {
 }
 
 
+if (table === 'exercise' && action === 'get_by_id') {
+  const { exercise_id } = data;
+  const result = await pool.query(
+    'SELECT example_pic FROM exercise WHERE exercise_id = $1',
+    [exercise_id]
+  );
+  return res.status(200).json(result.rows[0]);
+}
+
+
         //This is end
 
       return res.status(400).json({ error: 'Invalid POST request' });

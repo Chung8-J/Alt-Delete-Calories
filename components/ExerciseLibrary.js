@@ -46,6 +46,8 @@ export default function ExerciseLibrary({ role }) {
     setCurrentPage(1); // Reset to first page when filters change
   }, [search, genreFilter, areaFilter, exercises]);
 
+
+  
   const uniqueGenres = [...new Set(exercises.map(ex => ex.exercise_genre))];
 
   const isVideo = (filename) => {
