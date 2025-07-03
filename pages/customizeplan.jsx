@@ -24,6 +24,8 @@ export default function CustomizePlan() {
   const [editMode, setEditMode] = useState(false);
   const [editPlanData, setEditPlanData] = useState(null); // contains meals, name, etc.
   const [allFoods, setAllFoods] = useState([]); // for dropdowns
+  const mealOrder = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+
 
   const getCaloriesPerFood = (foodName) => {
     const food = allFoods.find(f => f.food_name === foodName);
@@ -248,25 +250,39 @@ export default function CustomizePlan() {
     });
   };
 
-  return (
-  <Layout>
-    <div
-      style={{
-        display: 'flex',
-        padding: 20,
-        justifyContent: showAddPlan ? 'center' : 'flex-start',
+  const groupedMeals = section === 'food' ? groupMeals(selectedPlanItems) : null;
 
-      }}
-      className="customize-plan-container"
-    >
+  const groupedMealsSorted = groupedMeals?.sort(
+    (a, b) => mealOrder.indexOf(a.meal) - mealOrder.indexOf(b.meal)
+  );
+
+
+  const sortedMeals = editPlanData?.meals?.slice().sort(
+    (a, b) => mealOrder.indexOf(a.meal) - mealOrder.indexOf(b.meal)
+  );
+  return (
+    <Layout>
+      <div
+        style={{
+          display: 'flex',
+          padding: 20,
+          justifyContent: showAddPlan ? 'center' : 'flex-start',
+
+        }}
+        className="customize-plan-container"
+      >
         {/* Sidebar */}
-        <div style={{ flex: 1 }} className="customize-sidebar">
+        <div style={{ flex: 1 }} className="scrollable-section-sidebar ustomize-sidebar">
           <h2>Customize Plan</h2>
           <button
             className={`exercisefood-btn ${section === 'exercise' ? 'selected' : ''}`}
             onClick={() => {
               setSection('exercise');
               setSelectedPlanId(null);
+              setShowAddPlan(false);
+              setIsEditing(false);
+              setShowAddFoodPlan(false);
+              setEditMode(false);
             }}
           >
             Exercise Plan
@@ -277,6 +293,10 @@ export default function CustomizePlan() {
             onClick={() => {
               setSection('food');
               setSelectedPlanId(null);
+              setShowAddPlan(false);
+              setIsEditing(false);
+              setShowAddFoodPlan(false);
+              setEditMode(false);
             }}
           >
             Food Plan
@@ -284,7 +304,8 @@ export default function CustomizePlan() {
 
 
           <div style={{ marginTop: 20, maxWidth: 200 }} className="plan-list">
-            <h4>{section === 'exercise' ? 'Your Exercise Plans' : 'Your Food Plans'}</h4>
+
+            <h4 >{section === 'exercise' ? 'Your Exercise Plans' : 'Your Food Plans'}</h4>
             <ul style={{ listStyle: 'none', padding: 0 }} className="plan-list-ul">
               {(section === 'exercise' ? exercisePlans : foodPlans).map(plan => {
                 const key = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
@@ -300,7 +321,7 @@ export default function CustomizePlan() {
                         border: 'none',
                         padding: '8px',
                         cursor: 'pointer',
-                       color: plan[key] === selectedPlanId ? 'black' : 'white'
+                        color: plan[key] === selectedPlanId ? 'black' : 'white'
                       }}
                       onClick={() => selectPlan(plan[key])}
                     >
@@ -336,7 +357,7 @@ export default function CustomizePlan() {
 
             {section === 'food' && (
               <button
-                className="toggle-add-plan-btn food"
+                className="toggle-add-plan-btn"
                 style={{
                   marginTop: 10,
                   padding: '8px',
@@ -368,7 +389,7 @@ export default function CustomizePlan() {
           <h3>Details</h3>
 
           {showAddPlan ? (
-            <div style={{ width: '100%', maxWidth: '600px' }} className="add-plan-form">
+            <div style={{ width: '100%', maxWidth: '600px' }} className="scrollable-section add-plan-form">
               <AddExercise
                 onSave={async (planData) => {
                   try {
@@ -376,7 +397,7 @@ export default function CustomizePlan() {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        table: 'p_workoutplan',
+                        table: 'preset_workout_plan',
                         action: 'save_plan',
                         data: {
                           member_ic: user.member_ic,
@@ -406,7 +427,7 @@ export default function CustomizePlan() {
 
           ) : showAddFoodPlan ? (
             // AddFood form, similar to AddExercise
-            <div style={{ width: '100%', maxWidth: '600px' }} className="add-plan-form">
+            <div style={{ width: '100%', maxWidth: '600px' }} className="scrollable-section add-plan-form">
               <AddFood
                 onPlanSaved={() => {
                   fetchFoodPlans();        // 🔄 refresh sidebar list
@@ -421,9 +442,9 @@ export default function CustomizePlan() {
 
             </div>
           ) : !selectedPlanId && !isEditing ? (
-            <p>Please choose a plan to view its contents.</p>
+            <p> Please choose a plan to view its contents.</p>
           ) : isEditing ? (
-            <div className="edit-plan-form">
+            <div className="scrollable-section edit-plan-form">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '545px' }}>
                 <label style={{ fontWeight: 'bold' }}>Plan Name:</label>
                 <input
@@ -623,7 +644,7 @@ export default function CustomizePlan() {
                   fontWeight: 'bold'
                 }}
               >
-                ➕ Add Exercise
+                Add Exercise
               </button>
 
               <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
@@ -656,30 +677,54 @@ export default function CustomizePlan() {
               </div>
             </div>
           ) : section === 'food' && editMode ? (
-            <div style={{ flex: 1 }} className="edit-food-plan-form">
-              <div style={{ border: '1px solid #ccc', padding: 20, marginTop: 20 }}>
-                <h3>✏️ Edit Food Plan</h3>
+            <div style={{ flex: 1 }} className="scrollable-section edit-food-plan-form">
+              <div style={{ border: '1px solid #ccc', borderRadius: 8, padding: 20, marginTop: 20, backgroundColor: '#f9f9f9' }}>
+                <h3 style={{ marginBottom: 20, color: 'black' }}>Edit Food Plan</h3>
 
-                <label>Plan Name:</label>
+                <label style={{ fontWeight: 'bold', color: 'black' }}>Plan Name:</label>
                 <input
                   value={editPlanData.plan_name}
-                  onChange={(e) =>
-                    setEditPlanData({ ...editPlanData, plan_name: e.target.value })
-                  }
-                  style={{ width: '100%', marginBottom: 10 }}
+                  onChange={(e) => setEditPlanData({ ...editPlanData, plan_name: e.target.value })}
+                  style={{
+                    width: '100%',
+                    marginBottom: 20,
+                    padding: '8px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px'
+                  }}
                 />
 
-                {editPlanData.meals.map((meal, mealIdx) => (
-                  <div key={meal.meal} style={{ marginBottom: 20 }}>
-                    <h4>{meal.meal}</h4>
+                {sortedMeals.map((meal, mealIdx) => (
+                  <div key={meal.meal} style={{
+                    marginBottom: 24,
+                    padding: 16,
+                    backgroundColor: '#ffffff',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd'
+                    , color: 'black'
+                  }}>
+                    <h4 style={{ marginBottom: 12 }}>{meal.meal}</h4>
+
                     {meal.foods.map((food, foodIdx) => (
-                      <div key={foodIdx} style={{ marginBottom: 10 }}>
+                      <div key={foodIdx} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        marginBottom: 12,
+                        position: 'relative'
+                      }}>
                         <select
                           value={food.food_name}
                           onChange={(e) => {
                             const newMeals = [...editPlanData.meals];
                             newMeals[mealIdx].foods[foodIdx].food_name = e.target.value;
                             setEditPlanData({ ...editPlanData, meals: newMeals });
+                          }}
+                          style={{
+                            flex: 1,
+                            padding: '6px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc'
                           }}
                         >
                           <option value="">Select Food</option>
@@ -689,6 +734,7 @@ export default function CustomizePlan() {
                             </option>
                           ))}
                         </select>
+
                         <input
                           type="number"
                           placeholder="Serving size"
@@ -698,34 +744,63 @@ export default function CustomizePlan() {
                             newMeals[mealIdx].foods[foodIdx].serving_size = e.target.value;
                             setEditPlanData({ ...editPlanData, meals: newMeals });
                           }}
-                          style={{ marginLeft: 10 }}
+                          style={{
+                            width: '120px',
+                            padding: '6px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc'
+                          }}
                         />
+
                         <button
                           onClick={() => {
                             const newMeals = [...editPlanData.meals];
-                            newMeals[mealIdx].foods.splice(foodIdx, 1);
-                            setEditPlanData({ ...editPlanData, meals: newMeals });
+                            const originalMealIdx = newMeals.findIndex(m => m.meal === meal.meal);
+                            if (originalMealIdx !== -1) {
+                              newMeals[originalMealIdx].foods.splice(foodIdx, 1);
+                              setEditPlanData({ ...editPlanData, meals: newMeals });
+                            }
                           }}
-                          style={{ marginLeft: 10, color: 'red' }}
+                          style={{
+                            backgroundColor: '#ffdddd',
+                            border: '1px solid red',
+                            color: 'red',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
                         >
-                          ✖
+                          Remove
                         </button>
                       </div>
                     ))}
 
                     <button
+                      style={{
+                        padding: '6px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        background: '#e8fce9',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+
                       onClick={() => {
                         const newMeals = [...editPlanData.meals];
-                        newMeals[mealIdx].foods.push({
-                          food_name: '',
-                          serving_size: '',
-                          calories: 0,
-                        });
-                        setEditPlanData({ ...editPlanData, meals: newMeals });
+                        const originalMealIdx = newMeals.findIndex(m => m.meal === meal.meal);
+                        if (originalMealIdx !== -1) {
+                          newMeals[originalMealIdx].foods.push({
+                            food_name: '',
+                            serving_size: '',
+                            calories: 0,
+                          });
+                          setEditPlanData({ ...editPlanData, meals: newMeals });
+                        }
                       }}
                     >
-                      ➕ Add Food
+                      Add Food
                     </button>
+
                   </div>
                 ))}
 
@@ -733,20 +808,19 @@ export default function CustomizePlan() {
                   onClick={async () => {
                     const user = JSON.parse(localStorage.getItem('user'));
 
-                    // Map food_name → food_code before sending
                     const meals = editPlanData.meals.map((meal) => ({
                       meal: meal.meal,
                       foods: meal.foods
                         .map((f) => {
                           const matched = allFoods.find(food => food.food_name === f.food_name);
-                          if (!matched) return null; // skip unknown
+                          if (!matched) return null;
                           return {
                             food_code: matched.food_code,
                             serving_size: parseInt(f.serving_size, 10),
-                            calories: 0 // backend recalculates
+                            calories: 0
                           };
                         })
-                        .filter(f => f !== null) // remove unknowns
+                        .filter(f => f !== null)
                     }));
 
                     const res = await fetch('/api/Db_connection', {
@@ -765,47 +839,51 @@ export default function CustomizePlan() {
 
                     const result = await res.json();
                     if (res.ok && result.success) {
-                      alert('✅ Plan updated!');
+                      alert('Plan updated successfully!');
                       setEditMode(false);
-                      fetchFoodPlans(); // optional: refresh sidebar
-                      window.location.reload(); // 🔄 refresh whole page
-
+                      fetchFoodPlans();
+                      window.location.reload();
                     } else {
-                      alert('❌ Failed to update plan.');
+                      alert('Failed to update plan.');
                       console.error(result);
                     }
                   }}
-                  style={{ marginTop: 20 }}
+                  style={{
+                    marginTop: 20,
+                    padding: '10px 16px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
                 >
-                  💾 Update Plan
+                  Update Plan
                 </button>
 
-
-                <div style={{ marginTop: 10 }}>
-                  <button
-                    onClick={() => {
-                      setEditMode(false); // Exit edit mode
-                      setEditPlanData(null); // Optional: clear current edit data
-                    }}
-                    style={{
-                      padding: '8px 12px',
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      marginLeft: '10px'
-                    }}
-                  >
-                    ❌ Cancel
-                  </button>
-                </div>
-
+                <button
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditPlanData(null);
+                  }}
+                  style={{
+                    marginTop: 10,
+                    padding: '8px 12px',
+                    backgroundColor: '#f44336',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    marginLeft: '10px'
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           ) : (
             <div className="plan-details">
-              <h4>
+              <h4 className='Planname'>
                 Plan Name: {selectedPlan?.plan_name || (section === 'food' ? 'Unnamed Food Plan' : 'Unnamed Plan')}
               </h4>
 
@@ -813,43 +891,60 @@ export default function CustomizePlan() {
               {section === 'exercise' && selectedPlan?.description && (
                 <p>Description: {selectedPlan.description}</p>
               )}
-
               {selectedPlanItems.length > 0 ? (
-                <ul>
-                  {section === 'exercise' ? (
-                    selectedPlanItems.map((ex, idx) => (
-                      <li key={idx}>
-                        <strong>{ex.exercise_name}</strong><br />
-                        {ex.reps != null && ex.set != null ? (
-                          <>Reps: {ex.reps}, Sets: {ex.set}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                        ) : (
-                          <>Duration: {formatDuration(ex.duration_seconds)}, Calories: {Math.round(ex.estimated_calories)} kcal</>
-                        )}
-                      </li>
-                    ))
-                  ) : (
-                    selectedPlanItems.map((meal, idx) => (
-                      <li key={idx} style={{ marginBottom: '8px' }}>
-                        <strong>{meal.meal_type || 'Meal'}</strong>: {meal.food_name || 'Unnamed Food'}<br />
-                        Serving Size: {meal.serving_size || 'N/A'}<br />
-                        Calories: {meal.calories != null ? Math.round(meal.calories) : 'N/A'} kcal
-                      </li>
-                    ))
-                  )}
-                </ul>
+                section === 'exercise' ? (
+                  <div className="scrollable-section">
+                    {selectedPlanItems.map((ex, idx) => (
+                      <div key={idx} style={{ marginBottom: '16px' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '19px', paddingBottom: '8px', marginTop: '5px' }}>{ex.exercise_name}</div>
+                        <div style={{ fontWeight: 'normal', fontSize: '19px', marginLeft: '8px', paddingBottom: '8px' }}>
+                          {ex.reps != null && ex.set != null ? (
+                            <>
+                              Reps: {ex.reps}, Sets: {ex.set} <br />
+                              Calories: {Math.round(ex.estimated_calories)} kcal
+                            </>
+                          ) : (
+                            <>
+                              Duration: {formatDuration(ex.duration_seconds)} <br />
+                              Calories: {Math.round(ex.estimated_calories)} kcal
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                ) : (
+                  <div>
+                    {groupedMeals.map((mealGroup, idx) => (
+                      <div key={idx} style={{ marginBottom: '20px' }}>
+                        <h4>{mealGroup.meal}</h4>
+                        <ul style={{ marginTop: '6px', paddingLeft: '16px' }}>
+                          {mealGroup.foods.map((food, i) => (
+                            <li key={i}>
+                              {food.food_name} — {food.serving_size}g — {food.calories} kcal
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )
               ) : (
                 <p>⚠️ {section === 'exercise' ? 'This plan has no exercises yet.' : 'This food plan has no meals yet.'}</p>
               )}
 
-              <div style={{ marginTop: 10 }}>
+
+              <div style={{ marginTop: 10 }} className='editdelete-btn'>
                 {section === 'exercise' && (
-                  <button onClick={startEditing} style={{ marginRight: 10 }}>
-                    ✏️ Edit Plan
+                  <button onClick={startEditing} style={{ marginRight: 10 }} className="editdelete-btn confirm">
+                    Edit Plan
                   </button>
                 )}
 
                 {section === 'food' && (
                   <button
+                    className="editdelete-btn confirm"
                     onClick={() => {
                       setEditMode(true); // make sure this state exists
                       setEditPlanData({
@@ -860,18 +955,12 @@ export default function CustomizePlan() {
                     }}
                     style={{ marginRight: 10 }}
                   >
-                    ✏️ Edit Plan
+                    Edit Plan
                   </button>
                 )}
 
                 <button
-                  style={{
-                    backgroundColor: '#ffcccc',
-                    border: '1px solid #cc0000',
-                    borderRadius: 4,
-                    padding: '5px 10px',
-                    cursor: 'pointer',
-                  }}
+                  className="editdelete-btn cancel"
                   onClick={async () => {
                     if (!confirm('Are you sure you want to delete this plan?')) return;
 
@@ -899,15 +988,15 @@ export default function CustomizePlan() {
                     }
                   }}
                 >
-                  🗑️ Delete Plan
+                  Delete Plan
                 </button>
               </div>
             </div>
           )}
         </div>
-      
 
-    </div>
+
+      </div>
     </Layout>
   );
 }

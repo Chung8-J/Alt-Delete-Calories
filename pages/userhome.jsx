@@ -745,6 +745,7 @@ export default function UserDashboard() {
 
                         {selectedExerciseDetails.length > 0 && (
                           <div
+                          className="custom-scroll"
                             style={{
                               marginTop: '10px',
                               marginBottom: '60px',
