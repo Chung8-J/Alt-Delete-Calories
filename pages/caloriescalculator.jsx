@@ -117,7 +117,7 @@ export default function CaloriesCalculator() {
 
   const totalCalories = calculatedFoods.reduce((sum, f) => sum + f.totalCalories, 0);
 
-  const container = { 
+  const container = {
     maxWidth: '600px',
     margin: 'auto',
     padding: '20px',
@@ -128,8 +128,9 @@ export default function CaloriesCalculator() {
   };
 
   return (
-    <div className="calculator-page">
-      <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>← Back</a>
+    <Layout>
+      <div className="calculator-page">
+        <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>← Back</a>
 
         <div className="calculator-buttons">
           <button onClick={() => setSection('tdee')}>TDEE Calculator</button>
@@ -312,8 +313,9 @@ export default function CaloriesCalculator() {
         )}
         <Footer />
       </div>
-    </div>
     </Layout>
+    
+  
     
   );
 }
