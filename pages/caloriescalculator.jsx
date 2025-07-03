@@ -127,8 +127,8 @@ export default function CaloriesCalculator() {
   };
 
   return (
-    <div className="calculator-page">
-      <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>← Back</a>
+    <Layout>
+<div className="calculator-page" style={{marginTop:140}}>
 
       <div className="calculator-buttons">
         <button onClick={() => setSection('tdee')}>TDEE Calculator</button>
@@ -310,5 +310,7 @@ export default function CaloriesCalculator() {
         </div>
       )}
     </div>
+    </Layout>
+    
   );
 }
