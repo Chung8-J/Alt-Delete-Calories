@@ -54,10 +54,10 @@ export default function Navbar() {
               <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>
               <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
               <Link href="/community" className="hover:text-yellow-400">Community</Link>
-              <Link href="/feedback_list" className="hover:text-yellow-400">Feeback List</Link>
+              <Link href="/feedback_list" className="hover:text-yellow-400">Feedback List</Link>
             </>
           )}
-          {user.role === 'user' && (
+          {user.role === 'user' && (  
             <>
               <Link href="/userhome" className="hover:text-yellow-400">
                 <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />

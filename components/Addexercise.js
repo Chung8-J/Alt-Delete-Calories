@@ -266,7 +266,7 @@ export default function AddExercise({ onSave }) {
 
     {selectedExercises.some(ex => ex.exercise_id) && (
       <>
-        <h4 style={{ marginTop: '20px' }}>👀 Plan Preview</h4>
+        <h4 style={{ marginTop: '20px' }}>Plan Preview</h4>
         <ul>
           {selectedExercises.map((ex, i) => {
             if (!ex.exercise_id) return null;

@@ -1,18 +1,43 @@
 // /pages/api/Add_exercise.js
-import { supabase } from '../supabaseClient';
+import { Pool } from 'pg';
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-  const { exercise_name, description, targeted_area, exercise_genre, calories_per_sec, example_pic } = req.body;
+  const {
+    exercise_name,
+    description,
+    calories_per_sec,
+    targeted_area,
+    exercise_genre,
+    example_pic
+  } = req.body;
 
-  const { data, error } = await supabase
-    .from('exercise')
-    .insert([{ exercise_name, description, targeted_area, exercise_genre, calories_per_sec, example_pic }])
-    .select()
-    .single();
+  try {
+    const result = await pool.query(
+      `INSERT INTO exercise (
+        exercise_name,
+        description,
+        calories_per_sec,
+        targeted_area,
+        exercise_genre,
+        example_pic
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *`,
+      [exercise_name, description, calories_per_sec, targeted_area, exercise_genre, example_pic]
+    );
 
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.status(200).json(data);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('❌ DB Insert Error:', err);
+    res.status(500).json({ error: 'Database insert failed' });
+  }
 }
