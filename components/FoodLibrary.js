@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
 import Footer from '../components/footer';
+import AddLibraryFood from '../components/Addlibraryfood'; // ✅ adjust if path differs
 
 export default function FoodLibrary({ role }) {
   const [foods, setFoods] = useState([]);
@@ -17,6 +18,7 @@ export default function FoodLibrary({ role }) {
   const indexOfFirstFood = indexOfLastFood - foodsPerPage;
   const currentFoods = filtered.slice(indexOfFirstFood, indexOfLastFood);
   const totalPages = Math.ceil(filtered.length / foodsPerPage);
+const [showForm, setShowForm] = useState(false);
 
   const router = useRouter();
 
@@ -30,17 +32,18 @@ export default function FoodLibrary({ role }) {
       .catch(err => console.error('Failed to fetch foods:', err));
   }, []);
 
-  useEffect(() => {
-    const result = foods
-      .filter(f =>
-        f.food_name.toLowerCase().includes(search.toLowerCase()) ||
-        f.description.toLowerCase().includes(search.toLowerCase())
-      )
-      .filter(f => (genreFilter ? f.food_genre === genreFilter : true));
+useEffect(() => {
+  const result = foods
+    .filter(f =>
+      (f.food_name?.toLowerCase().includes(search.toLowerCase()) || '') ||
+      (f.description?.toLowerCase().includes(search.toLowerCase()) || '')
+    )
+    .filter(f => (genreFilter ? f.food_genre === genreFilter : true));
 
-    setFiltered(result);
-    setCurrentPage(1); // Reset to first page when filters/search change
-  }, [search, genreFilter, foods]);
+  setFiltered(result);
+  setCurrentPage(1);
+}, [search, genreFilter, foods]);
+
 
   const uniqueGenres = [...new Set(foods.map(f => f.food_genre))];
 
@@ -224,6 +227,45 @@ const handlePrev = () => {
         </button>
       </div>
       </Layout>
+
+
+
+            {/* ✅ Floating Add Food Button for Admins */}
+      {role === 'admin' && (
+        <>
+          <button
+            onClick={() => setShowForm(prev => !prev)}
+            style={{
+                        position: 'fixed',
+          bottom: '140px',
+          right: '70px',
+          padding: '15px 20px',
+          backgroundColor: '#28a745',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          borderRadius: '50px',
+          border: 'none',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          cursor: 'pointer',
+          zIndex: 1000,
+            }}
+          >
+            {showForm ? '× Close' : '+ Add Food'}
+          </button>
+
+          {showForm && (
+            <AddLibraryFood
+              onFoodAdded={(newFood) => {
+                setFoods(prev => [...prev, newFood]);
+                setShowForm(false);
+              }}
+              onClose={() => setShowForm(false)}
+            />
+          )}
+        </>
+      )}
+
       <Footer />
     </div>
   );
