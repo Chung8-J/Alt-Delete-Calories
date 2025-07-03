@@ -1,3 +1,10 @@
+* {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
 html,
 body {
     height: 100%;
@@ -33,7 +40,10 @@ body {
 }
 
 
-/* Make sure text is fully opaque */
+.dashboard-container::-webkit-scrollbar {
+  width: 8px;               /* or 0px to hide */
+  background: transparent !important;  /* ✅ removes default scrollbar background */
+}
 
 
 .dashboard-container h1,
@@ -46,14 +56,18 @@ strong {
     color: #fff;
 }
 
-.dashboard-container h2{
+.dashboard-container h2 {
     font-size: 28px;
 }
 
-.dashboard-container p{
+.dashboard-container p {
     font-size: 17px;
 }
 
+.dashboard-container li {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
 
 
 
@@ -71,9 +85,10 @@ strong {
     margin-bottom: 100px;
 
 }
-.dashboard-container h2{
+
+.dashboard-container h2 {
     padding-bottom: 10px;
-     padding-top: 10px;
+    padding-top: 10px;
 }
 
 
@@ -109,7 +124,7 @@ strong {
     /* allows shrinking if needed */
 }
 
-.middle-container{
+.middle-container {
     padding-top: 40px;
 }
 
@@ -130,8 +145,27 @@ strong {
     margin-top: auto;
     /* pushes it to bottom of the flex container */
     align-self: center;
-font-size: medium;
+    font-size: medium;
 
+}
+
+.Dashboard-btn-start {
+  background-color: #50DA00;
+  padding: 11px 26px;
+  max-width: 100%;
+  width: 350px;
+  color: black;
+  border: none;
+  border-radius: 20px; /* lowercase! */
+  font-weight: 800;
+  cursor: pointer;
+  margin: auto auto 15px auto; /* center horizontally and add bottom margin */
+  font-size: medium;
+  display: block;
+}
+
+.Dashboard-btn-start:hover {
+    background-color: #5eff00;
 }
 
 .Dashboard-btn:hover {
@@ -139,9 +173,102 @@ font-size: medium;
 }
 
 .middle-DailySummary {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  padding: 12px 20px;           /* Remove horizontal padding */
-  margin: 0 -60px;    
-  padding-left: px;     /* Pull edges outwards to touch container borders */
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 12px 20px;
+    /* Remove horizontal padding */
+    margin: 0 -60px;
+    padding-left: px;
+    /* Pull edges outwards to touch container borders */
+}
+
+.dashboard-exercise-video {
+    max-width: 600px;
+    height: auto;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.exercise-inprogress {
+    position: absolute;
+    top: 57%;
+    left: 50.5%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    min-width: 800px;
+}
+
+.exercise-inprogress{}
+
+.exercise-inprogress button {
+    margin-bottom: 10px;
+
+    background-color: #50DA00;
+    color: black;
+    border: none;
+    border-radius: 15px;
+    padding: 8px 13px;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: bolder;
+    min-width: 200px;
+    max-height: 80px;
+}
+
+.exercise-inprogress h3 {
+    font-size: 22px !important;
+}
+
+.exercise-inprogress h2 {
+    font-size: 27px !important;
+    font-weight: 600;
+
+}
+.exercise-inprogress-menu {
+  position: relative;
+  top: 40%;
+  left: 51%;
+  transform: translate(-50%, -40%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 800px;
+
+
+}
+
+
+
+.exercise-inprogress-menu-btn-container {
+  position: absolute;
+  bottom:30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.custom-scroll {
+  background: transparent !important;
+}
+
+/* Chrome, Safari, Edge */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4); /* or use any color you like */
+  border-radius: 4px;
 }

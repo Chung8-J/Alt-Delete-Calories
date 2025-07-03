@@ -1,0 +1,199 @@
+* {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #011126;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.customize-plan-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 1500px;
+    min-height: 750px;
+    background: linear-gradient(to right,
+            rgba(18, 44, 111, 0.7),
+            rgba(130, 21, 202, 0.7),
+            rgba(18, 44, 111, 0.7));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 3px solid rgba(147, 5, 241, 0.45);
+    font-size: 18px;
+    margin-top: 120px;
+    padding: 20px;
+}
+
+.plan-list-ul button {
+    font-size: 15px !important;
+    font-weight: 650 !important;
+}
+
+.customize-sidebar {
+    flex: 1 !important;
+    min-width: 220px;
+    border: 1px solid red;
+    padding-left: 10px;
+
+    border-right: 1px solid white;
+}
+
+.customize-main-content {
+    flex: 2 !important;
+    min-width: 0;
+    padding-left: 40px;
+    border-left: 1px solid white;
+}
+
+.customize-sidebar h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+
+.exercisefood-btn {
+    background-color: rgba(130, 21, 202, 0.5);
+    /* darker for unselected */
+    color: white;
+    border: none;
+    border-radius: 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 200px;
+    transition: background-color 0.3s ease;
+    font-size: 17px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.exercisefood-btn.selected {
+    background-color: rgba(130, 21, 202, 1);
+    /* brighter for selected */
+}
+
+.toggle-add-plan-btn {
+    background-color: #50DA00 !important;
+    border: none !important;
+    min-width: 260px !important;
+    height: auto;
+    font-size: 17px;
+    font-weight: bolder;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    /* ✨ Add this */
+    transition: box-shadow 0.3s ease;
+    /* Optional: smooth hover effect */
+    border-radius: 15px !important;
+
+    margin-top: 25px !important;
+}
+
+.toggle-add-plan-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    /* Optional: stronger on hover */
+}
+
+
+.editdelete-btn button {
+  width: 160px;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  color: white;
+  margin-right: 10px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  margin-top: 15px;
+}
+.customize-main-content h3{
+    font-size: 32px;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.Planname{
+    font-size: 28px !important ;
+    margin: 0;
+        margin-bottom: 10px;
+
+}
+
+.customize-main-content p{
+    margin: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid white;
+
+}
+
+/* Cancel button (red) */
+.editdelete-btn.cancel {
+  background-color: #fa3e3e; /* red */
+}
+.editdelete-btn.cancel:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* Save/Update button (green or blue, your choice) */
+.editdelete-btn.confirm {
+  background-color: #0031FD; /* blue */
+}
+.editdelete-btn.confirm:hover {
+  background-color: #0930cc;
+  transform: translateY(-2px);
+}
+.scrollable-section {
+  max-height: 55vh; /* You can adjust this to control scroll area height */
+  overflow-y: auto;
+  padding-right: 10px;
+  background-color: transparent !important;
+}
+.scrollable-section-sidebar {
+  max-height: 70vh; /* You can adjust this to control scroll area height */
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.scrollable-section::-webkit-scrollbar-track {
+  background: transparent !important; /* also ensure track is transparent */
+}
+.scrollable-section::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3); /* light, translucent thumb */
+  border-radius: 4px;
+}
+
+.scrollable-section::-webkit-scrollbar {
+  width: 8px;
+  background: transparent !important;
+}
+
+
+.scrollable-section-sidebar::-webkit-scrollbar-track {
+  background: transparent !important; /* also ensure track is transparent */
+}
+.scrollable-section-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3); /* light, translucent thumb */
+  border-radius: 4px;
+}
+
+.scrollable-section-sidebar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent !important;
+}

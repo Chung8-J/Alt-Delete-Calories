@@ -128,47 +128,77 @@ if (!response.ok) {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>🖼️ Create Community Post</h2>
+  <div style={{
+    position: 'fixed',
+    bottom: '130px', // so it doesn’t block the fixed button
+    right: '70px',
+    width: '380px',
+    padding: '20px',
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    zIndex: 1000
+  }}>
+<h3 style={{
+  color: 'black',
+  textAlign: 'center',
+  fontSize: '24px',
+  fontWeight: 'bold',
+  marginBottom:20
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        ref={fileInputRef}
-      />
-      <br /><br />
+}}>
+  Create Post
+</h3>
 
-      {uploadUrl && (
-        <div style={{ marginTop: '10px' }}>
-          <p>🖼️ Image Preview:</p>
-          <img src={uploadUrl} alt="Preview" width="300" />
-        </div>
-      )}
-      <br />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      ref={fileInputRef}
+      style={{ marginBottom: '10px' }}
+    />
 
-      <textarea
-        rows="5"
-        cols="50"
-        maxLength="1000"
-        placeholder="Write your post content here..."
-        value={postText}
-        onChange={(e) => setPostText(e.target.value)}
-        style={{ resize: 'none', width: '40%', height: '120px' }}
-      />
-      <br /><br />
+    {uploadUrl && (
+      <div style={{ marginBottom: '10px' }}>
+        <p>Preview:</p>
+        <img src={uploadUrl} alt="Preview" style={{ width: '100%', borderRadius: '6px' }} />
+      </div>
+    )}
 
-      <button onClick={handleUpload} disabled={uploading}>
-        {uploading ? 'Uploading...' : 'Upload Post'}
-      </button>
+    <textarea
+      rows="4"
+      maxLength="1000"
+      placeholder="Write your post content..."
+      value={postText}
+      onChange={(e) => setPostText(e.target.value)}
+      style={{
+        resize: 'none',
+        width: '100%',
+        height: '100px',
+        marginBottom: '10px',
+        borderRadius: '6px',
+        padding: '8px',
+        border: '1px solid #ccc'
+      }}
+    />
 
-      {finalImageUrl && (
-        <div style={{ marginTop: '20px' }}>
-          <p>✅ Uploaded Image:</p>
-          <img src={finalImageUrl} alt="Uploaded" width="300" />
-          <p>{postText}</p>
-        </div>
-      )}
-    </div>
-  );
+    <button
+      onClick={handleUpload}
+      disabled={uploading}
+      style={{
+        width: '100%',
+        padding: '10px',
+        backgroundColor: '#6200ea',
+        color: 'white',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer'
+      }}
+    >
+      {uploading ? 'Uploading...' : 'Upload Post'}
+    </button>
+  </div>
+);
+
 }
