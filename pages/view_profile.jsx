@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 
+
 export default function ViewProfile() {
   const router = useRouter();
   const [user, setUser] = useState(null);

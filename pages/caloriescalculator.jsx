@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function CaloriesCalculator() {
   const [section, setSection] = useState('tdee');
@@ -84,8 +85,9 @@ export default function CaloriesCalculator() {
   };
 
   return (
+    
     <div style={{ padding: 20 }}>
-
+      <Layout></Layout>
         <h1>Calories Calculator</h1>
 
         <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
@@ -174,6 +176,7 @@ export default function CaloriesCalculator() {
           )}
         </div>
       )}
+      <Footer />
     </div>
   );
 }

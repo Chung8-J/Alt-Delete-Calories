@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import AddExercise from '@/components/Addexercise';
 import AddFood from '@/components/Addfood';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function CustomizePlan() {
   const router = useRouter();
@@ -255,6 +256,7 @@ const fetchFoodPlans = async () => {
         justifyContent: showAddPlan ? 'center' : 'flex-start',
       }}
     >
+      <Layout></Layout>
       {/* Sidebar */}
       <div style={{ flex: 1 }}>
         <h2>📋 Customize Plan</h2>
@@ -879,6 +881,7 @@ const fetchFoodPlans = async () => {
         </div>
       )}
       </div>
+      <Footer />
     </div>
   );
 }

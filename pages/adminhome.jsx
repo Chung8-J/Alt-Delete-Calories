@@ -42,9 +42,10 @@ export default function CoachHome() {
             <li>Manage members information</li>
             <li>Share fitness tips in community.</li>
             <li>Providing dietary guidance using the exercise and food library.</li>
+            <li>Collect feedback about coaching and website's member experience.</li>
           </ul>
         </p>
-        <hr />
+        <hr style={{border: '2px solid #50DA00;'}}/>
         {stats ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mt-6">
             <div className="bg-blue-100 p-4 rounded shadow">
@@ -63,8 +64,9 @@ export default function CoachHome() {
         ) : (
           <p className="text-gray-500 mt-4">Loading stats...</p>
         )}
-        <footer />
+        
       </main>
+      <Footer />
     </Layout>
     
   );

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import CreatePost from '@/components/createpost';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
@@ -230,6 +231,7 @@ export default function CommunityPage() {
         </div>
       ))}
       </Layout>
+      <Footer />
     </div>
   );
 }

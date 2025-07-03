@@ -5,6 +5,7 @@ import { supabase } from '@/pages/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import Layout from '../components/Layout';
 import '../style/common.css';
+import Footer from '../components/footer';
 
 export default function EditFood() {
   const router = useRouter();
@@ -217,6 +218,7 @@ return (
 
       {message && <p className="text-red-500 mt-3">{message}</p>}
     </Layout>
+    <Footer />
   </div>
 );
 

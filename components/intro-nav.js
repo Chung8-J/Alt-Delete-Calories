@@ -13,9 +13,9 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="navbar navbar-expand-lg fixed-top">
+    <nav className="navbar">
       <div className="container-fluid">
-        <a className="navbar-brand me-auto" href="#">Logo</a>
+        <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
 
         <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
           <div className="offcanvas-header">
@@ -25,10 +25,6 @@ export default function Navbar() {
         </div>
 
         <Link href="/Login" className="LoginSignup_Button">Login/SignUp</Link>
-
-        <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-          <span className="navbar-toggler-icon"></span>
-        </button>
       </div>
     </nav>
     

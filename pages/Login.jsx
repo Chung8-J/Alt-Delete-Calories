@@ -94,7 +94,7 @@ export default function LoginPage() {
 
       <br />
       <Link href="/Signup">Sign Up</Link><br />
-      <a href="/forgetpassword">Forget password</a>
+      <a href="/forgetpassword">Forgot password? Reset it!</a>
       <Footer />
     </div>
     

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
-
+import Footer from '../components/footer';
 
 export default function FoodLibrary({ role }) {
   const [foods, setFoods] = useState([]);
@@ -224,6 +224,7 @@ const handlePrev = () => {
         </button>
       </div>
       </Layout>
+      <Footer />
     </div>
   );
 }

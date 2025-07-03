@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
-
+import Footer from '../components/footer';
 
 export default function ExerciseLibrary({ role }) {
   const [exercises, setExercises] = useState([]);
@@ -176,7 +176,7 @@ export default function ExerciseLibrary({ role }) {
           + Add New Exercise
         </button>
       )}
-
+    
 
 
       {/* Exercise Grid */}
@@ -268,70 +268,7 @@ export default function ExerciseLibrary({ role }) {
         </div>
       )}
       </Layout>
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded w-96">
-            <h2 className="text-xl mb-4">Add New Exercise</h2>
-            <div className="space-y-2">
-              <input
-                type="text"
-                placeholder="Exercise Name"
-                value={newExercise.exercise_name}
-                onChange={e => setNewExercise({ ...newExercise, exercise_name: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <textarea
-                placeholder="Description"
-                value={newExercise.description}
-                onChange={e => setNewExercise({ ...newExercise, description: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Targeted Area"
-                value={newExercise.targeted_area}
-                onChange={e => setNewExercise({ ...newExercise, targeted_area: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Genre"
-                value={newExercise.exercise_genre}
-                onChange={e => setNewExercise({ ...newExercise, exercise_genre: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="number"
-                placeholder="Calories Per Second"
-                value={newExercise.calories_per_sec}
-                onChange={e => setNewExercise({ ...newExercise, calories_per_sec: e.target.value })}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <input
-                type="file"
-                accept="image/*,video/*"
-                onChange={e => setNewExercise({ ...newExercise, file: e.target.files[0] })}
-                className="w-full border px-3 py-2 rounded"
-              />
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddExercise}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <Footer />
     </div>
   );
 }
