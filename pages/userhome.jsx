@@ -693,8 +693,8 @@ export default function UserDashboard() {
             <div className="middle-container" style={{ borderRight: '1px solid #ccc' }}>
               <div className="middle-DailySummary">
                 <h2>Daily Summary</h2>
-                <p>Consumed from food: <strong>{totalCalories} kcal</strong>.</p>
-                <p> burned through exercise.<strong>{totalExerciseCalories} kcal</strong> </p>
+                <p>Consumed from food: <strong style={{color:'#50da00'}}>{totalCalories} </strong>kcal.</p>
+                <p> burned through exercise.<strong  >{totalExerciseCalories}  </strong> kcal </p>
                 <p> Today goal's is to stay within <strong>{dailyGoalCalories} kcal</strong></p>
 
                 <p>
