@@ -2,6 +2,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function EditMemberPage() {
   const router = useRouter();
@@ -214,6 +215,7 @@ export default function EditMemberPage() {
 
       {message && <p className="text-red-500 mt-3">{message}</p>}
       </Layout>
+      <Footer />
     </div>
   );
 }

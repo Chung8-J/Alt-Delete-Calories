@@ -54,6 +54,7 @@ export default function Navbar() {
               <Link href="/manage_member" className="hover:text-yellow-400">Manage Member</Link>
               <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
               <Link href="/community" className="hover:text-yellow-400">Community</Link>
+              <Link href="/feedback_list" className="hover:text-yellow-400">Feeback List</Link>
             </>
           )}
           {user.role === 'user' && (
@@ -78,7 +79,7 @@ export default function Navbar() {
                 verticalAlign: 'middle',
                 border: '2px solid',
                 color: 'green',
-                width:'130px',
+                width:'120px',
                 backgroundColor:'blue'
               }}
           >
@@ -111,7 +112,7 @@ export default function Navbar() {
                       user.role === 'admin'
                         ? '/adminprofile'
                         : userIc
-                        ? `/userprofile/${userIc}`
+                        ? `/userprofile`
                         : '#'
                     }
                   >

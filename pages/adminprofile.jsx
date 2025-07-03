@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function AdminProfile() {
   const router = useRouter();
@@ -236,6 +237,7 @@ export default function AdminProfile() {
 
         {message && <p className="text-red-500 mt-3">{message}</p>}
       </Layout>
+      <Footer />
     </div>
   );
 }

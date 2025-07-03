@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 
 export default function UserProfile() {
   const router = useRouter();
@@ -73,6 +74,42 @@ export default function UserProfile() {
     }
   }
 
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
+function handleFeedbackSubmit() {
+  if (!feedbackMessage.trim()) {
+    alert('⚠️ Please enter your feedback message.');
+    return;
+  }
+
+  fetch('/api/Feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      member_ic: user.member_ic,
+      message: feedbackMessage.trim(),
+    }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert('✅ Feedback submitted!');
+        setShowFeedbackModal(false);
+        setFeedbackMessage('');
+      } else {
+        alert('❌ Failed to submit feedback.');
+        console.error(data.error);
+      }
+    })
+    .catch(err => {
+      console.error('❌ Network error:', err);
+      alert('❌ Failed to submit feedback.');
+    });
+}
+
+
+
   if (!profile) return <p>Loading profile...</p>;
 
   return (
@@ -137,6 +174,13 @@ export default function UserProfile() {
           <button onClick={() => setEditing(true)}>✏️ Edit Profile</button>
         )}
         <button
+          style={{ marginTop: '20px', background: '#eee', padding: '5px 10px' }}
+          onClick={() => setShowFeedbackModal(true)}
+        >
+          📝 Leave Feedback
+        </button>
+        
+        <button
           style={{ float: 'right', color: 'red' }}
           onClick={() => {
             localStorage.removeItem('user');
@@ -145,8 +189,36 @@ export default function UserProfile() {
         >
           Logout
         </button>
+
       </div>
       </Layout>
+      <Footer />
+      {showFeedbackModal && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
+            justifyContent: 'center', alignItems: 'center',
+            color:'black'
+          }}>
+            <div style={{ background: '#fff', padding: '20px', borderRadius: '8px' }}>
+              <h3 style={{textAlign:'center',marginBottom:'15px'}}>📝 Submit Feedback</h3>
+              <label style={{color:'black'}}>
+                Type your feedback here:<br /><br />
+                <input
+                  type="text"
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  style={{ marginLeft: '0px',width:'520px',height:'220px',display:'flex',flexDirection:'column',verticalAlign:'text-top' }}
+                />
+              </label>
+              <div style={{ marginTop: '10px' }}>
+                <button onClick={handleFeedbackSubmit} style={{ marginRight: '10px' }}>✅ Submit</button>
+                <button onClick={() => setShowFeedbackModal(false)}>❌ Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
+    
   );
 }

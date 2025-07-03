@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 import '../style/calculator.css';
 
 export default function CaloriesCalculator() {
@@ -127,188 +128,190 @@ export default function CaloriesCalculator() {
   };
 
   return (
-    <Layout>
-<div className="calculator-page" style={{marginTop:140}}>
+    <div className="calculator-page">
+      <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>← Back</a>
 
-      <div className="calculator-buttons">
-        <button onClick={() => setSection('tdee')}>TDEE Calculator</button>
-        <button onClick={() => setSection('food')}>Food Calculator</button>
-      </div>
-
-      {section === 'tdee' && (
-        <div className="calculator-container calculator-section">
-          <h2>TDEE Calculator</h2>
-
-          {!showTdeeResultOnly ? (
-            <>
-              <div className="form-row">
-                <label>Gender:</label>
-                <select value={tdeeInput.gender} onChange={e => setTdeeInput({ ...tdeeInput, gender: e.target.value })}>
-                  <option value="">-- Select --</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-
-              <div className="form-row">
-                <label>Weight (kg):</label>
-                <input type="number" value={tdeeInput.weight} onChange={e => setTdeeInput({ ...tdeeInput, weight: e.target.value })} />
-              </div>
-
-              <div className="form-row">
-                <label>Height (cm):</label>
-                <input type="number" value={tdeeInput.height} onChange={e => setTdeeInput({ ...tdeeInput, height: e.target.value })} />
-              </div>
-
-              <div className="form-row">
-                <label>Age:</label>
-                <input type="number" value={tdeeInput.age} onChange={e => setTdeeInput({ ...tdeeInput, age: e.target.value })} />
-              </div>
-
-              <div className="form-row">
-                <label>Activity Level:</label>
-                <select value={tdeeInput.activity} onChange={e => setTdeeInput({ ...tdeeInput, activity: e.target.value })}>
-                  <option value="1.2">Sedentary</option>
-                  <option value="1.375">Lightly active</option>
-                  <option value="1.55">Moderately active</option>
-                  <option value="1.725">Very active</option>
-                  <option value="1.9">Super active</option>
-                </select>
-              </div>
-
-              <div className="button-wrapper">
-                <button className='tdee-btn' onClick={calculateTDEE}>Calculate</button>
-              </div>
-            </>
-          ) : (
-            <div style={{ textAlign: 'center', marginTop: '25px', fontSize: 19 }}>
-              <p><strong>Result:</strong> <br />{tdeeResult} kcal/day</p>
-              <button
-                onClick={() => {
-                  setShowTdeeResultOnly(false);
-                  setTdeeResult(null);
-                }}
-                className="tdee-btn"
-                style={{ marginTop: '20px' }}
-              >
-                Back
-              </button>
-            </div>
-          )}
+        <div className="calculator-buttons">
+          <button onClick={() => setSection('tdee')}>TDEE Calculator</button>
+          <button onClick={() => setSection('food')}>Food Calculator</button>
         </div>
-      )}
 
+        {section === 'tdee' && (
+          <div className="calculator-container calculator-section">
+            <h2>TDEE Calculator</h2>
 
-      {section === 'food' && (
-        <div className="calculator-container calculator-section">
-          <h2>Food Calories Calculator</h2>
-
-          {!foodCalculated && (
-            <>
-              {foodRows.map((row, index) => (
-                <div key={index}>
-                  <div className="form-row">
-                    <label>Food:</label>
-                    <select
-                      value={row.food_code}
-                      onChange={e => handleFoodChange(index, 'food_code', e.target.value)}
-                    >
-                      <option value="">-- Select Food --</option>
-                      {foodList.map(f => (
-                        <option key={f.food_code} value={f.food_code}>
-                          {f.food_name} — {f.calories} kcal/100g
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* ✅ Remove Button beside the dropdown */}
-                    {index !== 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveRow(index)}
-                        style={{
-                          marginLeft: '10px',
-                          padding: '2px 5px',
-                          backgroundColor: '#ff4d4d',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          height: '36px',         // Match select box height
-                          lineHeight: '1',        // Align text
-                          verticalAlign: 'middle',
-                          marginTop: '-8px'
-                        }}
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-
-
-                  <div className="form-row">
-                    <label>Grams:</label>
-                    <input
-                      type="number"
-                      value={row.grams}
-                      onChange={e => handleFoodChange(index, 'grams', e.target.value)}
-                    />
-
-
-
-                  </div>
-
+            {!showTdeeResultOnly ? (
+              <>
+                <div className="form-row">
+                  <label>Gender:</label>
+                  <select value={tdeeInput.gender} onChange={e => setTdeeInput({ ...tdeeInput, gender: e.target.value })}>
+                    <option value="">-- Select --</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
                 </div>
-              ))}
 
+                <div className="form-row">
+                  <label>Weight (kg):</label>
+                  <input type="number" value={tdeeInput.weight} onChange={e => setTdeeInput({ ...tdeeInput, weight: e.target.value })} />
+                </div>
 
-              <div className="calculator-buttons">
-                <button onClick={handleAddRow}>Add Food</button>
-                <button onClick={calculateFoodCalories}>Calculate Calories</button>
-              </div>
-            </>
-          )}
+                <div className="form-row">
+                  <label>Height (cm):</label>
+                  <input type="number" value={tdeeInput.height} onChange={e => setTdeeInput({ ...tdeeInput, height: e.target.value })} />
+                </div>
 
+                <div className="form-row">
+                  <label>Age:</label>
+                  <input type="number" value={tdeeInput.age} onChange={e => setTdeeInput({ ...tdeeInput, age: e.target.value })} />
+                </div>
 
+                <div className="form-row">
+                  <label>Activity Level:</label>
+                  <select value={tdeeInput.activity} onChange={e => setTdeeInput({ ...tdeeInput, activity: e.target.value })}>
+                    <option value="1.2">Sedentary</option>
+                    <option value="1.375">Lightly active</option>
+                    <option value="1.55">Moderately active</option>
+                    <option value="1.725">Very active</option>
+                    <option value="1.9">Super active</option>
+                  </select>
+                </div>
 
-          {foodCalculated && (
-            <div className="results food-result">
-              <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'black' }}>Food Calories Result</h4>
-
-              <ul style={{ listStyle: 'none', padding: 0, color: 'black' }}>
-                {calculatedFoods.map((f, i) => (
-                  <li key={i} style={{ textAlign: 'center', marginBottom: '5px' }}>
-                    {f.food_name}: <strong>{f.grams}g</strong> = <strong>{f.totalCalories} kcal</strong>
-                  </li>
-                ))}
-              </ul>
-
-              <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold', fontSize: '18px', color: 'black' }}>
-                Total Calories: <span style={{ color: '#4CAF50' }}>{totalCalories}</span> kcal
-              </p>
-
-              {/* 🔙 Back Button */}
-              <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <div className="button-wrapper">
+                  <button className='tdee-btn' onClick={calculateTDEE}>Calculate</button>
+                </div>
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', marginTop: '25px', fontSize: 19 }}>
+                <p><strong>Result:</strong> <br />{tdeeResult} kcal/day</p>
                 <button
-                  onClick={() => setFoodCalculated(false)}
-                  style={{
-                    padding: '8px 18px',
-                    backgroundColor: '#50DA00',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: 'pointer'
+                  onClick={() => {
+                    setShowTdeeResultOnly(false);
+                    setTdeeResult(null);
                   }}
+                  className="tdee-btn"
+                  style={{ marginTop: '20px' }}
                 >
                   Back
                 </button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
-        </div>
-      )}
+
+        {section === 'food' && (
+          <div className="calculator-container calculator-section">
+            <h2>Food Calories Calculator</h2>
+
+            {!foodCalculated && (
+              <>
+                {foodRows.map((row, index) => (
+                  <div key={index}>
+                    <div className="form-row">
+                      <label>Food:</label>
+                      <select
+                        value={row.food_code}
+                        onChange={e => handleFoodChange(index, 'food_code', e.target.value)}
+                      >
+                        <option value="">-- Select Food --</option>
+                        {foodList.map(f => (
+                          <option key={f.food_code} value={f.food_code}>
+                            {f.food_name} — {f.calories} kcal/100g
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* ✅ Remove Button beside the dropdown */}
+                      {index !== 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRow(index)}
+                          style={{
+                            marginLeft: '10px',
+                            padding: '2px 5px',
+                            backgroundColor: '#ff4d4d',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            height: '36px',         // Match select box height
+                            lineHeight: '1',        // Align text
+                            verticalAlign: 'middle',
+                            marginTop: '-8px'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+
+
+                    <div className="form-row">
+                      <label>Grams:</label>
+                      <input
+                        type="number"
+                        value={row.grams}
+                        onChange={e => handleFoodChange(index, 'grams', e.target.value)}
+                      />
+
+
+
+                    </div>
+
+                  </div>
+                ))}
+
+
+                <div className="calculator-buttons">
+                  <button onClick={handleAddRow}>Add Food</button>
+                  <button onClick={calculateFoodCalories}>Calculate Calories</button>
+                </div>
+              </>
+            )}
+
+
+
+            {foodCalculated && (
+              <div className="results food-result">
+                <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'black' }}>Food Calories Result</h4>
+
+                <ul style={{ listStyle: 'none', padding: 0, color: 'black' }}>
+                  {calculatedFoods.map((f, i) => (
+                    <li key={i} style={{ textAlign: 'center', marginBottom: '5px' }}>
+                      {f.food_name}: <strong>{f.grams}g</strong> = <strong>{f.totalCalories} kcal</strong>
+                    </li>
+                  ))}
+                </ul>
+
+                <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold', fontSize: '18px', color: 'black' }}>
+                  Total Calories: <span style={{ color: '#4CAF50' }}>{totalCalories}</span> kcal
+                </p>
+
+                {/* 🔙 Back Button */}
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <button
+                    onClick={() => setFoodCalculated(false)}
+                    style={{
+                      padding: '8px 18px',
+                      backgroundColor: '#50DA00',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      border: 'none',
+                      borderRadius: '10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Back
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+        <Footer />
+      </div>
     </div>
     </Layout>
     

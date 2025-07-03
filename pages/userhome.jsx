@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
 import NewcomerSetup from '../components/NewcomerSetup';
 import '../style/userdashboard.css';
+import Footer from '../components/footer';
 
 
 export default function UserDashboard() {
@@ -829,8 +830,9 @@ export default function UserDashboard() {
           </div>
         )}
       </div>
-
+    <Footer />
     </Layout>
+    
   );
 
 }

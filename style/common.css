@@ -25,7 +25,7 @@ html, body {
 }
 .navbar {
     background: linear-gradient(to right, #122C6F, #8215ca,#122C6F ) ;
-    margin-top: 30px ;
+    margin-top: 20px ;
     margin-right: 100px;
     margin-left: 100px; 
     border-radius: 15px;
@@ -38,7 +38,8 @@ html, body {
     color: black;
     border: none;
     border-radius: 15px;
-    padding: 8px 13px;
+    padding: 10px 13px;
+    margin:10px;
     text-decoration: none;
     font-size: 17px;
     font-weight: bolder;
@@ -655,7 +656,6 @@ html, body {
 
 }
 
-
 .fixed-footer {
   position: fixed;
   bottom: 0;
@@ -676,7 +676,7 @@ html, body {
 
 /* Exercise Library Main Container */
 .library {
-  padding-top: 120px; /* adjust based on navbar height */
+  padding-top: 150px; /* adjust based on navbar height */
   padding-left: 100px;
   padding-right: 100px;
   color: white;
@@ -710,11 +710,13 @@ html, body {
 
 .filters button{
     width:100px;
+    padding: 2px 5px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: bold;
     color: white;
-    background:#8215ca;
+    background-color:#8215ca;
+    font-size: 15px;
 }
 
 /* Exercise Card Grid */
@@ -975,7 +977,9 @@ html, body {
 
 /* === Manage Members Page Styles === */
 .member_list {
-  padding: 150px 100px 40px;
+  padding-top: 180px; /* adjust based on navbar height */
+  padding-left: 100px;
+  padding-right: 100px;
   background-color: #011126;
   color: white;
   font-family: 'Inter', sans-serif;
@@ -1165,6 +1169,64 @@ html, body {
   max-width: 24rem; /* 384px */
 }
 
+/* Add Exercise Modal - Wrapper */
+.add_exercise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.5); /* dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content Box */
+.add_exercise .modal-content {
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 0.3s ease-out;
+}
+
+/* Input Styles */
+.add_exercise input[type="text"],
+.add_exercise input[type="number"],
+.add_exercise input[type="file"],
+.add_exercise select,
+.add_exercise textarea {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  margin-top: 0.2rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+/* Button group inside modal */
+.add_exercise .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Fade in animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 
 

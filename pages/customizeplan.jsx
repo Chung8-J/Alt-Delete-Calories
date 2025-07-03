@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import AddExercise from '@/components/Addexercise';
 import AddFood from '@/components/Addfood';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
 import '../style/customizeplan.css';
 
 export default function CustomizePlan() {

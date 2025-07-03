@@ -152,6 +152,35 @@ if (table === 'member' && action === 'create') {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      // If request.body.action === 'getPasswordByEmail'
+      // 🔐 Reset Password
+      if (action === 'reset_password') {
+        const { email, newPassword } = data;
+
+        if (!email || !newPassword) {
+          return res.status(400).json({ error: 'Email and new password required' });
+        }
+
+        try {
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+          const result = await pool.query(
+            `UPDATE member SET password = $1 WHERE email = $2`,
+            [hashedPassword, email]
+          );
+
+          if (result.rowCount > 0) {
+            return res.status(200).json({ message: '✅ Password reset successful' });
+          } else {
+            return res.status(404).json({ error: '❌ Email not found' });
+          }
+        } catch (err) {
+          console.error('❌ Password reset error:', err);
+          return res.status(500).json({ error: 'Server error during password reset' });
+        }
+      }
+
+
 
       // ✏️ Update Profile (member or coach)
        if (action === 'update_profile') {

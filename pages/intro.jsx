@@ -15,7 +15,7 @@ export default function introPage() {
           <Navbar /> 
       
       <div className="advertise-board">
-        <h2>Logo</h2>
+        <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" style={{float:'left',width:'340px',height:'100px'}}/>
         <img className="Advi-model" src="../images/Advi-model.png" alt="Advimodel" />
         <h1>FITNESS</h1>
         <h3>Reset Your Body. Delete the Calories.</h3>
