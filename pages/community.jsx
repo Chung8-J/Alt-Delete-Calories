@@ -27,33 +27,33 @@ export default function CommunityPage() {
   };
 
   const timeAgo = (utcDateStr) => {
-  // Convert to ISO format
-  const isoStr = utcDateStr.replace(' ', 'T');
+    // Convert to ISO format
+    const isoStr = utcDateStr.replace(' ', 'T');
 
-  // Parse as UTC, then convert to local time
-  const utcDate = new Date(isoStr);
+    // Parse as UTC, then convert to local time
+    const utcDate = new Date(isoStr);
 
-  // Create local date from UTC parts
-  const localDate = new Date(utcDate.getTime() + (8 * 60 * 60 * 1000)); // +8 hours for Malaysia
+    // Create local date from UTC parts
+    const localDate = new Date(utcDate.getTime() + (8 * 60 * 60 * 1000)); // +8 hours for Malaysia
 
-  const secondsAgo = Math.floor((new Date() - localDate) / 1000);
+    const secondsAgo = Math.floor((new Date() - localDate) / 1000);
 
-  const units = [
-    ['year', 31536000],
-    ['month', 2592000],
-    ['day', 86400],
-    ['hour', 3600],
-    ['minute', 60],
-    ['second', 1],
-  ];
+    const units = [
+      ['year', 31536000],
+      ['month', 2592000],
+      ['day', 86400],
+      ['hour', 3600],
+      ['minute', 60],
+      ['second', 1],
+    ];
 
-  for (let [name, sec] of units) {
-    const c = Math.floor(secondsAgo / sec);
-    if (c > 0) return `${c} ${name}${c !== 1 ? 's' : ''} ago`;
-  }
+    for (let [name, sec] of units) {
+      const c = Math.floor(secondsAgo / sec);
+      if (c > 0) return `${c} ${name}${c !== 1 ? 's' : ''} ago`;
+    }
 
-  return 'just now';
-};
+    return 'just now';
+  };
 
 
 
@@ -108,7 +108,7 @@ export default function CommunityPage() {
           post_id: postId,
           member_ic: currentUser.member_ic,
           content: newComment,
-          role: currentUser.role 
+          role: currentUser.role
         }),
       });
 
@@ -125,9 +125,9 @@ export default function CommunityPage() {
     }, [postId]);
 
     return (
-      
+
       <div style={{ marginTop: '12px' }}>
-        <strong>💬 Comments</strong>
+        <strong>Comments:</strong>
         <div style={{ marginTop: '6px' }}>
           {comments.map((c) => (
             <div key={c.comment_id} style={{ marginBottom: '8px' }}>
@@ -146,7 +146,7 @@ export default function CommunityPage() {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
+              placeholder="   Write a comment..."
               style={{
                 width: '100%',
                 height: '30px',
@@ -156,11 +156,27 @@ export default function CommunityPage() {
                 resize: 'none',
                 outline: 'none',
                 fontFamily: 'inherit',
+                paddingTop: '6px'
               }}
             />
-            <button onClick={submitComment} style={{ marginTop: '3px' }}>
+            <button
+              onClick={submitComment}
+              style={{
+                marginTop: '10px',
+                backgroundColor: '#50DA00',
+                color: 'black',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontWeight: 'bolder',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                transition: 'background-color 0.3s ease'
+              }}
+            >
               Submit Comment
             </button>
+
           </>
         )}
       </div>
@@ -168,67 +184,84 @@ export default function CommunityPage() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '20px', marginTop: '130px' }}>
       <Layout>
-      <h2>📢 Community Posts</h2>
+        <h2 style={{ marginBottom: 20, marginLeft: 10, fontSize: 32 }}>Community Posts</h2>
+        <button
+          onClick={() => setShowCreate(!showCreate)}
+          style={{
+            position: 'fixed',
+            bottom: '50px',
+            right: '50px',
+            padding: '15px 23px',
+            backgroundColor: '#50DA00',
+            color: 'black',
+            border: 'none',
+            fontSize: ' 17px',
+            fontWeight: ' bolder',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+            zIndex: 999
+          }}
+        >
+          {showCreate ? 'Hide Create Post' : 'Create New Post'}
+        </button>
 
-      <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
 
-      <button onClick={() => setShowCreate(!showCreate)} style={{ marginBottom: '20px' }}>
-        {showCreate ? 'Hide Create Post' : '➕ Create New Post'}
-      </button>
+        {showCreate && <CreatePost onPostCreated={handlePostCreated} />}
 
-      {showCreate && <CreatePost onPostCreated={handlePostCreated} />}
+        {posts.length === 0 && <p>No posts yet.</p>}
 
-      {posts.length === 0 && <p>No posts yet.</p>}
+        {posts.map((post) => (
+          <div key={post.postid} style={{
+            border: post.poster_role === 'coach' ? '2px solid red' : '3px solid rgba(147, 5, 241, 0.45)',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '20px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+            background: 'linear-gradient(to right, rgba(18, 44, 111, 0.7), rgba(130, 21, 202, 0.7), rgba(18, 44, 111, 0.7))',
+            color: 'white' // Optional: Ensures text is visible on dark background
+          }}>
+            <p style={{ marginBottom: '6px' }}>
+              <strong>{post.poster_name}</strong> • {timeAgo(post.created_at)}
+              {post.poster_role === 'coach' && (
+                <span style={{ color: 'red', marginLeft: '10px' }}>🎓 Coach Post</span>
+              )}
+            </p>
 
-      {posts.map((post) => (
-        <div key={post.postid} style={{
-          border: post.poster_role === 'coach' ? '2px solid red' : '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '20px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-        }}>
-          <p style={{ marginBottom: '6px' }}>
-            <strong>{post.poster_name}</strong> • {timeAgo(post.created_at)}
-            {post.poster_role === 'coach' && (
-              <span style={{ color: 'red', marginLeft: '10px' }}>🎓 Coach Post</span>
-            )}
-          </p>
-
-          <img
-            src={SUPABASE_IMAGE_BASE + post.image}
-            alt="Post"
-            style={{
-              width: '100%',
-              maxHeight: '400px',
-              objectFit: 'contain',
-              borderRadius: '4px'
-            }}
-          />
-          <p style={{ marginTop: '10px' }}>{post.description}</p>
-
-          <CommentSection postId={post.postid} currentUser={currentUser} />
-
-          {currentUser?.role === 'admin' && (
-            <button
-              onClick={() => handleDeletePost(post.postid)}
+            <img
+              src={SUPABASE_IMAGE_BASE + post.image}
+              alt="Post"
               style={{
-                backgroundColor: 'red',
-                color: 'white',
-                padding: '5px 10px',
-                border: 'none',
-                borderRadius: '5px',
-                marginTop: '10px',
-                cursor: 'pointer'
+                width: '100%',
+                maxHeight: '400px',
+                objectFit: 'contain',
+                borderRadius: '4px'
               }}
-            >
-              🗑️ Delete Post
-            </button>
-          )}
-        </div>
-      ))}
+            />
+            <p style={{ marginTop: '10px' }}>{post.description}</p>
+
+            <CommentSection postId={post.postid} currentUser={currentUser} />
+
+            {currentUser?.role === 'admin' && (
+              <button
+                onClick={() => handleDeletePost(post.postid)}
+                style={{
+                  backgroundColor: 'red',
+                  color: 'white',
+                  padding: '5px 10px',
+                  border: 'none',
+                  borderRadius: '5px',
+                  marginTop: '10px',
+                  cursor: 'pointer'
+                }}
+              >
+                Delete Post
+              </button>
+            )}
+          </div>
+        ))}
       </Layout>
     </div>
   );
