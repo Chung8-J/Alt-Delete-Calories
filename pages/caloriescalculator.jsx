@@ -112,6 +112,7 @@ export default function CaloriesCalculator() {
     }
 
     setCalculatedFoods(results);
+    setFoodCalculated(true);
   };
 
 
@@ -129,15 +130,11 @@ export default function CaloriesCalculator() {
 
   return (
     
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: '20px' }}>
         <Layout></Layout>
-          <h1>Calories Calculator</h1>
 
-          <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>Back</a><br /><br />
-
-      <div className="calculator-page" style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <a href={currentUser?.role === 'admin' ? '/adminhome' : '/userhome'}>← Back</a>
-
+      <div className="calculator-page" style={{  textAlign: 'left', marginTop: '120px', width:'100%' }}>      
+        <h1 style={{fontSize:'40px',marginBottom: '20px',marginLeft: '60px',marginTop: '20px'}}>Calories Calculator</h1>
         <div className="calculator-buttons">
           <button onClick={() => setSection('tdee')}>TDEE Calculator</button>
           <button onClick={() => setSection('food')}>Food Calculator</button>
@@ -145,7 +142,7 @@ export default function CaloriesCalculator() {
 
         {section === 'tdee' && (
           <div className="calculator-container calculator-section">
-            <h2>TDEE Calculator</h2>
+            <h2 style={{textAlign:'center',marginBottom:'30px'}}>TDEE Calculator</h2>
 
             {!showTdeeResultOnly ? (
               <>
@@ -189,8 +186,8 @@ export default function CaloriesCalculator() {
                 </div>
               </>
             ) : (
-              <div style={{ textAlign: 'center', marginTop: '25px', fontSize: 19 }}>
-                <p><strong>Result:</strong> <br />{tdeeResult} kcal/day</p>
+              <div style={{ textAlign: 'center', marginTop: '25px', fontSize: '19px' }}>
+                <p><strong>Result:</strong> <br /><br />{tdeeResult} kcal/day</p>
                 <button
                   onClick={() => {
                     setShowTdeeResultOnly(false);
@@ -209,7 +206,7 @@ export default function CaloriesCalculator() {
 
         {section === 'food' && (
           <div className="calculator-container calculator-section">
-            <h2>Food Calories Calculator</h2>
+            <h2 style={{textAlign:'center',marginBottom:'30px'}}>Food Calories Calculator</h2>
 
             {!foodCalculated && (
               <>
@@ -271,8 +268,8 @@ export default function CaloriesCalculator() {
 
 
                 <div className="calculator-buttons">
-                  <button onClick={handleAddRow}>Add Food</button>
-                  <button onClick={calculateFoodCalories}>Calculate Calories</button>
+                  <button onClick={handleAddRow} className="tdee-btn" style={{color:'black'}}>Add Food</button>
+                  <button onClick={calculateFoodCalories} className="tdee-btn" style={{color:'black'}}>Calculate Calories</button>
                 </div>
               </>
             )}
@@ -281,24 +278,27 @@ export default function CaloriesCalculator() {
 
             {foodCalculated && (
               <div className="results food-result">
-                <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'black' }}>Food Calories Result</h4>
+                <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'black', fontSize:'20px' }}>Food Calories Result</h4>
 
                 <ul style={{ listStyle: 'none', padding: 0, color: 'black' }}>
                   {calculatedFoods.map((f, i) => (
-                    <li key={i} style={{ textAlign: 'center', marginBottom: '5px' }}>
+                    <li key={i} style={{ textAlign: 'center', marginBottom: '10px' }}>
                       {f.food_name}: <strong>{f.grams}g</strong> = <strong>{f.totalCalories} kcal</strong>
                     </li>
                   ))}
                 </ul>
 
-                <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold', fontSize: '18px', color: 'black' }}>
-                  Total Calories: <span style={{ color: '#4CAF50' }}>{totalCalories}</span> kcal
+                <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold', fontSize: '20px', color: 'black' }}>
+                  Total Calories: <span style={{ color: '#4CAF50', fontSize:'30px' }}>{totalCalories}</span> kcal
                 </p>
 
                 {/* 🔙 Back Button */}
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
                   <button
-                    onClick={() => setFoodCalculated(false)}
+                    onClick={() =>{setFoodCalculated(false);
+                                  setFoodRows([{ food_code: '', grams: '' }]);
+                                  setCalculatedFoods([]);
+                    }}
                     style={{
                       padding: '8px 18px',
                       backgroundColor: '#50DA00',

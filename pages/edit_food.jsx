@@ -99,11 +99,10 @@ export default function EditFood() {
   const SUPABASE_IMAGE_BASE = 'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/food/public/';
 
 return (
-  <div className="max-w-3xl mx-auto p-6">
+  <div className="edit_food" style={{margin:'180px auto', width:'86%'}}>
     <Layout>
-      <h1 className="text-2xl font-bold mb-4">Edit Food</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
-
+      <h1 className="text-2xl font-bold mb-4" style={{marginBottom:'50px',fontSize:'40px'}}>Edit Food</h1>
+      <form onSubmit={handleSubmit} className="edit-food-form" style={{fontSize:'20px'}}>
          <strong>Food Name: </strong>
             <input
                 type="text"
@@ -112,6 +111,13 @@ return (
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
                 placeholder="Food Name"
+                style={{
+                  verticalAlign:'middle',
+                  padding: '8px 10px',
+                  border:'1px solid ',
+                  borderRadius:'5px',
+                  fontSize:'18px'
+                }}
             /> <br /><br />
 
         <strong>Food Description: </strong>
@@ -121,6 +127,13 @@ return (
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
                 placeholder="Description"
+                style={{
+                  verticalAlign:'middle',
+                  padding: '8px 10px',
+                  border:'1px solid ',
+                  borderRadius:'5px',
+                  fontSize:'18px'
+                }}
             /><br /><br />
             <strong>Carb per 100g: </strong>
                 <input
@@ -131,6 +144,13 @@ return (
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     placeholder="Carbohydrates per 100g"
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
                 /><br /><br />
             <strong>Protein per 100g: </strong>
                 <input
@@ -141,6 +161,13 @@ return (
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     placeholder="Protein per 100g"
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
                 /><br /><br />
             <strong>Fat per 100g: </strong>
                 <input
@@ -151,6 +178,13 @@ return (
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     placeholder="Fat per 100g"
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
                 /><br /><br />
             <strong>Calories: </strong>
                 <input
@@ -160,6 +194,13 @@ return (
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     placeholder="Calories"
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
                 /><br /><br />
 
 
@@ -177,13 +218,13 @@ return (
             <img
               src={uploadPreview}
               alt="Preview"
-              style={{ maxWidth: '300px', height: '100%', marginTop: '10px' }}
+              style={{ maxWidth: '200px', height: '100%', marginTop: '0px' }}
             />
           ) : food.food_pic ? (
             <img
               src={SUPABASE_IMAGE_BASE + food.food_pic}
               alt="Current"
-              style={{ maxWidth: '300px', height: '100%', marginTop: '10px' }}
+              style={{ maxWidth: '200px', height: '100%', marginTop: '0px' }}
             />
           ) : null}
         </div>
@@ -191,12 +232,27 @@ return (
    <br /><br />
 
     {/* Dropdown for food_genre enum */}
-    <strong>Category: </strong>
+    <strong style={{
+                      verticalAlign:'middle',
+                      padding: '0px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'20px',
+                      border:'none'
+                    }}>
+    Category: </strong>
     <select
         name="food_genre"
         value={food.food_genre || ''}
         onChange={handleChange}
         className="w-full border p-2 rounded"
+        style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
     >
         <option value="">-- Select Genre --</option>
         <option value="Carbohydrate">Carbohydrate</option>
@@ -210,7 +266,17 @@ return (
 
     <button
         type="submit"
-        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="update-btn"
+        style={{
+                      verticalAlign:'middle',
+                      padding: '10px 15px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px',
+                      fontWeight:'bold',
+                      width:'100%',
+                      backgroundColor:'#00ff37' 
+                    }}
     >
         Update Food
     </button>

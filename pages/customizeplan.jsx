@@ -996,9 +996,11 @@ export default function CustomizePlan() {
           )}
         </div>
 
-
+        
       </div>
+      <Footer />
     </Layout>
+    
   );
 }
 

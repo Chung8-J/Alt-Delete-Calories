@@ -5,6 +5,7 @@ import CreatePost from '@/components/createpost';
 import Layout from '../components/Layout';
 import Footer from '../components/footer';
 
+
 export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
@@ -185,9 +186,9 @@ export default function CommunityPage() {
   };
 
   return (
-    <div style={{ padding: '20px', marginTop: '130px' }}>
+    <div style={{ padding: '20px', width:'89.5%',margin: '160px auto' }}>
       <Layout>
-        <h2 style={{ marginBottom: 20, marginLeft: 10, fontSize: 32 }}>Community Posts</h2>
+        <h2 style={{ marginBottom: 20, marginLeft: 0, fontSize: 40 }}>Community Posts</h2>
         <button
           onClick={() => setShowCreate(!showCreate)}
           style={{
@@ -216,7 +217,7 @@ export default function CommunityPage() {
 
         {posts.map((post) => (
           <div key={post.postid} style={{
-            border: post.poster_role === 'coach' ? '2px solid red' : '3px solid rgba(147, 5, 241, 0.45)',
+            border: post.poster_role === 'coach' ? '5px solid #22c55e' : '5px solid rgba(147, 5, 241, 0.45)',
             borderRadius: '8px',
             padding: '12px',
             marginBottom: '20px',
@@ -224,10 +225,10 @@ export default function CommunityPage() {
             background: 'linear-gradient(to right, rgba(18, 44, 111, 0.7), rgba(130, 21, 202, 0.7), rgba(18, 44, 111, 0.7))',
             color: 'white' // Optional: Ensures text is visible on dark background
           }}>
-            <p style={{ marginBottom: '6px' }}>
+            <p style={{ marginBottom: '6px',fontSize:'20px' }}>
               <strong>{post.poster_name}</strong> • {timeAgo(post.created_at)}
               {post.poster_role === 'coach' && (
-                <span style={{ color: 'red', marginLeft: '10px' }}>🎓 Coach Post</span>
+                <span style={{ color: 'red', marginLeft: '10px',fontWeight:'bold' }}>🎓 Coach Post</span>
               )}
             </p>
 
@@ -241,7 +242,7 @@ export default function CommunityPage() {
                 borderRadius: '4px'
               }}
             />
-            <p style={{ marginTop: '10px' }}>{post.description}</p>
+            <p style={{ marginTop: '10px',marginBottom:'10px',fontSize:'25px' }}>{post.description}</p><hr />
 
             <CommentSection postId={post.postid} currentUser={currentUser} />
 

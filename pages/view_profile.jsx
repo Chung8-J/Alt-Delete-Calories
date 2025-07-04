@@ -12,7 +12,7 @@ export default function ViewProfile() {
   useEffect(() => {
     const stored = localStorage.getItem('user');
     if (!stored) {
-      router.push('/login');
+      router.push('/Login');
       return;
     }
 

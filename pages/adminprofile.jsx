@@ -15,12 +15,13 @@ export default function AdminProfile() {
   const [newPassword, setNewPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
+  const [originalData, setOriginalData] = useState({});
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('user'));
     if (!stored || stored.role !== 'admin' || !stored.member_ic) {
       alert('⚠️ Not authorized!');
-      router.push('/login');
+      router.push('/Login');
       return;
     }
 
@@ -29,6 +30,7 @@ export default function AdminProfile() {
       .then(res => res.json())
       .then(data => {
         setFormData(data);
+        setOriginalData(data); // Save original profile data
         setOriginalIc(data.coach_ic);
         setAvatarPreview(
           data.avatar || (data.coach_gender === 'female' ? '/user_avatar/female_avt.png' : '/user_avatar/male_avt.png')
@@ -97,137 +99,153 @@ export default function AdminProfile() {
   if (!formData.coach_ic) return <p>Loading profile...</p>;
 
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow p-6 rounded mt-10" style={{ padding: '20px' }}>
+    <div className="adminprofile" style={{margin:'180px auto', width:'86%', marginBottom:'20px'}}>
       <Layout>
-        <h1 className="text-2xl font-bold mb-6 text-center">👤 Admin Profile</h1>
-
-        {/* Avatar */}
-        <div className="flex justify-center mb-6">
-          <img
-            src={avatarPreview}
-            alt="avatar"
-            className="w-40 h-40 rounded-full object-cover border-2 border-white"
-            style={{
+        <h1 className="" style={{marginBottom:'50px',fontSize:'40px'}}>Admin Profile</h1>
+        <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+          {/* Avatar on the left */}
+          <div style={{ flex: '0 0 270px', textAlign: 'center' }}>
+            <img
+              src={avatarPreview}
+              alt="avatar"
+              className="rounded-full object-cover border-2 border-white"
+              style={{
                 width: '270px',
                 height: '270px',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                verticalAlign: 'middle',
-                border: '2px solid white'
+                border: '2px solid white',marginRight:'10px'
               }}
-          />
-        </div>
+            />
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" >
-          {[
-            ['IC Number', 'coach_ic'],
-            ['Name', 'coach_name'],
-            ['Date of Birth', 'd_birth'],
-            ['Years of Experience', 'expr_coaching'],
-            ['Email', 'email'],
-            ['Phone Number', 'no_tel']
-          ].map(([label, key]) => (
-            <div key={key}>
-              <label className="block font-semibold mb-1">{label}:</label>
+          {/* Admin info on the right */}
+          <form onSubmit={handleSubmit} style={{ flex: 1 }}>
+            {[
+              ['IC Number', 'coach_ic'],
+              ['Name', 'coach_name'],
+              ['Date of Birth', 'd_birth'],
+              ['Years of Experience', 'expr_coaching'],
+              ['Email', 'email'],
+              ['Phone Number', 'no_tel']
+            ].map(([label, key]) => (
+              <div key={key} style={{ display: 'flex', marginBottom: '15px',  }}>
+                <label style={{ width: '50%', fontWeight: 'bold', fontSize:'20px',textAlign:'left' }}>{label}:</label>
+                {Editing ? (
+                  <input
+                    type={key === 'd_birth' ? 'date' : 'text'}
+                    name={key}
+                    value={formData[key] || ''}
+                    onChange={handleChange}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '6px',
+                      border: '1px solid #ccc'
+                    }}
+                  />
+                ) : (
+                  <span style={{ color: 'white',fontSize:'22px'  }}>{formData[key] || '-'}</span>
+                )}
+              </div>
+            ))}
+
+            {/* Gender */}
+            <div style={{ display: 'flex', marginBottom: '15px' }}>
+              <label style={{ width: '50%', fontWeight: 'bold', fontSize:'20px'}}>Gender:</label>
               {Editing ? (
-                <input
-                  type={key === 'd_birth' ? 'date' : 'text'}
-                  name={key}
-                  value={formData[key] || ''}
+                <select
+                  name="coach_gender"
+                  value={formData.coach_gender || ''}
                   onChange={handleChange}
-                  className="w-full border p-2 rounded"
-                />
+                  style={{
+                    flex: 1,
+                    padding: '8px',
+                    borderRadius: '6px',
+                    border: '1px solid #ccc'
+                  }}
+                >
+                  <option value="">-- Select Gender --</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
               ) : (
-                <p className="text-gray-700">{formData[key] || '-'}</p>
+                <span style={{ color: 'white',fontSize:'22px' }}>{formData.coach_gender || '-'}</span>
               )}
             </div>
-          ))}
 
-          <div>
-            <label className="block font-semibold mb-1">Gender:</label>
-            {Editing ? (
-              <select
-                name="coach_gender"
-                value={formData.coach_gender || ''}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              >
-                <option value="">-- Select Gender --</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            ) : (
-              <p className="text-gray-700">{formData.coach_gender || '-'}</p>
-            )}
-          </div>
-
-          <div className="flex gap-4 mt-6">
-            {Editing ? (
-              <>
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-                  💾 Save
-                </button>
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '30px', flexWrap: 'wrap' }}>
+              {Editing ? (
+                <>
+                  <button type="submit" style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px' }}>
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditing(false);
+                      setFormData(originalData); // Revert to original data
+                    }}
+                    style={{ fontWeight:'bold',fontSize:'20px',backgroundColor: 'rgb(255, 0, 0)',color:'white',padding: '8px 16px',borderRadius: '6px' }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditing(false);
-                    setFormData(admin);
-                  }}
-                  className="border px-4 py-2 rounded"
+                  onClick={() => setEditing(true)}
+                  style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px' }}
                 >
-                  ❌ Cancel
+                  Edit Profile
                 </button>
-              </>
-            ) : (
+              )}
+
               <button
                 type="button"
-                onClick={() => setEditing(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
+                onClick={() => setShowModal(true)}
+                style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.88)', color: 'black', padding: '8px 16px', borderRadius: '6px' }}
               >
-                ✏️ Edit Profile
+                Change Password
               </button>
-            )}
 
-            <button
-              type="button"
-              onClick={() => setShowModal(true)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              🔐 Change Password
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.removeItem('user');
-                router.push('/Login');
-              }}
-              className="text-red-600 ml-auto"
-            >
-              🚪Logout
-            </button>
-            <br /> <br />
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.removeItem('user');
+                  router.push('/Login');
+                }}
+                style={{ fontWeight:'bold',fontSize:'20px',backgroundColor: 'rgb(255, 0, 0)',color:'white', marginLeft: 'auto',padding: '8px 16px',borderRadius: '6px' }}
+              >
+                Logout
+              </button>
+            </div>
+          </form>
           </div>
-        </form>
+
 
         {/* Password Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+              <br />
               <hr />
-              <h2 className="text-lg font-bold mb-2">Change Password</h2>
+              <br />
+              <h2 className="" style={{marginBottom:'20px',fontSize:'30px'}}>Change Password</h2>
               <input
                 type="password"
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder="New Password"
                 className="w-full border p-2 mb-4"
+                style={{ width: '50%', fontWeight: 'bold', fontSize:'16px',textAlign:'left', padding:'15px' }}
               /><br /><br />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setShowModal(false)} className="px-3 py-1 bg-gray-300 rounded">
+                <button onClick={() => setShowModal(false)} style={{ fontWeight:'bold',fontSize:'20px',backgroundColor: 'rgb(255, 0, 0)',color:'white', marginLeft: 'auto',padding: '8px 16px', borderRadius: '6px', marginRight:'8px' }}>
                   Cancel
-                </button>||
-                <button onClick={handlePasswordUpdate} className="px-3 py-1 bg-green-600 text-white rounded">
+                </button>
+                <button onClick={handlePasswordUpdate} style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.88)', color: 'black', padding: '8px 16px', borderRadius: '6px' }}>
                   Update
                 </button>
               </div>

@@ -31,12 +31,13 @@ export default function FeedbackList() {
   };
 
   return (
-    <div style={{ paddingTop: '160px',width:'85%', margin: 'auto' }}>
+    <div style={{ paddingTop: '180px',width:'88%', margin: 'auto' }}>
       <Layout>
         <h2 className="" style={{ fontSize:'40px',marginBottom:'30px'}}>Member Feedback List</h2>
         <button
           onClick={toggleSortOrder}
-          style={{ marginBottom: '15px', background: '#eee', padding: '5px 10px' }}
+          className='update-btn'
+          style={{ fontWeight:'bold', fontSize:'15px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px',marginBottom:'20px' }}
         >
           Sort by Date ({sortOrder === 'asc' ? 'Oldest First' : 'Newest First'})
         </button>
