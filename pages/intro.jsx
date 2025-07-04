@@ -74,14 +74,6 @@ export default function introPage() {
           <a href="#" className="Explore-Btn">Explore Now</a>
         </div>
       </div>
-
-
-      <footer className="footer">
-        <div className="ContactUs">
-          <h2>Do you need help?</h2>
-          <p>We will provide detailed information about our services, types of work, and top projects. We will calculate the cost and prepare a commercial proposal.</p>
-        </div>
-      </footer>
       </nav>
       <Footer />
     </html>

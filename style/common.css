@@ -11,7 +11,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  padding-bottom: 60px; 
+  padding-bottom: 0px; 
   background-color: #011126;
   color: white;
   font-family: 'Inter', sans-serif;
@@ -110,8 +110,9 @@ html, body {
     background: url(/images/Advi-Back.png);
     background-repeat: no-repeat;
     text-align: right;
+    
 
-    margin-top: 150px;
+    margin-top: 60px;
     margin-right: 200px;
     margin-left: 200px;
 
@@ -136,8 +137,9 @@ html, body {
     font-weight: bolder;
     text-align: right;
     position: absolute;
-    right: 10px;
-    
+    right: 40px;
+    font-size: 15px;
+    line-height: 160%;
     
 }
 .advertise-board h2{
@@ -160,7 +162,7 @@ html, body {
     border-width: 2px;
     padding: 16px 50px;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 25px;
     font-weight: bolder;
     font-family: "Inter", sans-serif;
 
@@ -179,13 +181,13 @@ html, body {
     align-items: center;
     color: white;
 
-    margin-top: 150px;
+    margin-top: 0px;
     margin-right: 230px;
     margin-left: 230px;
 
     position: absolute;
     width: auto;
-    height: 400px;
+    height: 650px;
 
     text-align: right;
 
@@ -197,7 +199,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   margin: 100px 230px;
-  gap: 30px;
+  gap: 20px;
 }
 
 .section-image img {
@@ -210,12 +212,12 @@ html, body {
 .section-text {
   flex: 1;
   color: white;
-  text-align: right;
+  text-align: left;
 
 }
 
 .section-text h1 {
-  font-size: 50px;
+  font-size: 30px;
   font-weight: bolder;
 }
 
@@ -237,7 +239,7 @@ html, body {
 .Explore-Btn{
     position: absolute;
     text-decoration: none;
-    bottom: 10px;
+    bottom: 80px;
     right: 30px;
 
    background: linear-gradient(to right, #122C6F, #8215ca,#122C6F );
@@ -259,21 +261,19 @@ html, body {
     align-items: center;
     color: white;
 
-    margin-top: 150px;
-    margin-right: 230px;
-    margin-left: 230px;
+    margin-top:-300px !important;
 
     position: absolute;
     width: auto;
-    height: 400px;
+    height: 650px;
 
-    position: sticky;
+    position: relative;
 
 }
 
 .intro-Community h1{
     font-weight: bolder;
-    font-size: 50px;
+    font-size: 30px !important;
 
 }
 
@@ -295,6 +295,8 @@ html, body {
   width: auto;
   height: 300px;
   border-radius: 10px;
+  vertical-align: middle;
+  margin-right: 10px;
 }
 
 .section-text-left {
@@ -324,8 +326,8 @@ html, body {
 .Explore-Btn-left{
     position: absolute;
     text-decoration: none;
-    bottom: 10px;
-    left: 30px;
+    margin-top: 25px;
+    left: 0px;
 
     background: linear-gradient(to right, #122C6F, #8215ca,#122C6F );
     color: white;
@@ -350,20 +352,20 @@ html, body {
 }
 
 .footer{
-    height: 600px;
+    height: 20px;
     bottom: 0;
-
+    margin-top:0;
     margin-right: 230px;
     margin-left: 230px;
-
+    margin-bottom: 100px;
     color: white;
 }
 
 .ContactUs{
-    height: 200px;
+    height: 50px !important;
     width: auto;
 
-    margin-top: 150px;
+    margin-bottom: 150px;
     background-color: #2D323E;
 
     border-radius: 15px;
