@@ -118,7 +118,7 @@ export default function CaloriesCalculator() {
 
   const totalCalories = calculatedFoods.reduce((sum, f) => sum + f.totalCalories, 0);
 
-  const container = { 
+  const container = {
     maxWidth: '600px',
     margin: 'auto',
     padding: '20px',
@@ -319,6 +319,10 @@ export default function CaloriesCalculator() {
         )}
         <Footer />
       </div>
+
     </div>
+    
+  
+    
   );
 }

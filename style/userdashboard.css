@@ -118,7 +118,6 @@ strong {
     /* equal width */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     padding: 0 20px;
     min-width: 0;
     /* allows shrinking if needed */
@@ -203,7 +202,6 @@ strong {
     min-width: 800px;
 }
 
-.exercise-inprogress{}
 
 .exercise-inprogress button {
     margin-bottom: 10px;

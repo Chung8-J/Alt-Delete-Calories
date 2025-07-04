@@ -342,17 +342,8 @@ if (table === 'member' && action === 'create') {
 
           for (const food of meal.foods) {
             // Look up food_code by food_name
-            const foodRes = await pool.query(
-              'SELECT food_code FROM food WHERE LOWER(food_name) = LOWER($1) LIMIT 1',
-              [food.food_name]
-            );
+          const food_code = food.food_code;
 
-            if (foodRes.rows.length === 0) {
-              console.warn(`⚠️ Skipping unknown food name: ${food.food_name}`);
-              continue; // Skip if food not found
-            }
-
-            const food_code = foodRes.rows[0].food_code;
 
             await pool.query(mealInsert, [
               d_plan_id,

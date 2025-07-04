@@ -229,7 +229,7 @@ return (
           ) : null}
         </div>
 
-   <br /><br />
+          <br /><br />
 
     {/* Dropdown for food_genre enum */}
     <strong style={{
@@ -282,10 +282,10 @@ return (
     </button>
       </form>
 
-      {message && <p className="text-red-500 mt-3">{message}</p>}
-    </Layout>
-    <Footer />
-  </div>
-);
+        {message && <p className="text-red-500 mt-3">{message}</p>}
+      </Layout>
+      <Footer />
+    </div>
+  );
 
 } 

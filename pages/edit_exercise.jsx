@@ -44,13 +44,13 @@ export default function EditExercise() {
   };
 
   const handleVideoChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const previewUrl = URL.createObjectURL(file);
-    setUploadPreview(previewUrl);
-    setSelectedVideo(file); // Use this to upload to Supabase
-  }
-};
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setUploadPreview(previewUrl);
+      setSelectedVideo(file); // Use this to upload to Supabase
+    }
+  };
 
   const imageStyle = {
     maxWidth: '300px',
@@ -85,31 +85,31 @@ export default function EditExercise() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setUploading(true);
-  setMessage('');
+    e.preventDefault();
+    setUploading(true);
+    setMessage('');
 
-  try {
-    let imageName = exercise.example_pic; // keep existing image if not changed
-    let videoName = exercise.example_video; // keep existing video if not changed
+    try {
+      let imageName = exercise.example_pic; // keep existing image if not changed
+      let videoName = exercise.example_video; // keep existing video if not changed
 
-    // 🔼 Upload Image to Supabase
-    if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `public/${fileName}`;
+      // 🔼 Upload Image to Supabase
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const filePath = `public/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('exercise') // ✅ Your bucket name
-        .upload(filePath, imageFile);
+        const { error: uploadError } = await supabase.storage
+          .from('exercise') // ✅ Your bucket name
+          .upload(filePath, imageFile);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      imageName = fileName;
-    }
+        imageName = fileName;
+      }
 
-    // 🎥 Upload Video to Supabase
-    if (selectedVideo) {
+      // 🎥 Upload Video to Supabase
+      if (selectedVideo) {
         const fileExt = selectedVideo.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExt}`;
         const filePath = `videos/${fileName}`; // Can use 'videos/' folder inside same bucket
