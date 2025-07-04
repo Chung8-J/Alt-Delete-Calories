@@ -649,8 +649,9 @@ html, body {
 .dashboard{
     color: white;
     margin:180px;
-    width:70%;
-
+    width:80%;
+    margin-left: 150px;
+    margin-right: 150px;
 }
 
 .fixed-footer {
