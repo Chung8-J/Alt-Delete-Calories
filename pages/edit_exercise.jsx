@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/pages/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import Layout from '../components/Layout';
+import Footer from '../components/footer';
+import '../style/common.css';
 
 export default function EditExercise() {
   const router = useRouter();
@@ -155,12 +157,25 @@ export default function EditExercise() {
   if (!exercise) return <p>No exercise found.</p>;
 
   return (
-    <div className="edit_exercise">
+    <div className="edit_food" style={{margin:'180px auto', width:'86%'}}>
       <Layout>
-        <h1 className="text-2xl font-bold mb-4">Edit Exercise</h1>
+        <h1 className="text-2xl font-bold mb-4" style={{marginBottom:'50px',fontSize:'40px'}}>Edit Exercise</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <strong>Exercise Name: </strong>
+        <form onSubmit={handleSubmit} className="edit-food-form"
+          style=
+            {{
+              background: 'linear-gradient(135deg, #122C6F, #8215ca, #122C6F)',
+              borderRadius: '20px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+              border: '3px solid rgb(103, 255, 15)',
+              marginTop: '20px', 
+              padding:'30px',
+              gap:'10px',
+              lineHeight:'450%'
+            }}
+        >
+
+          <strong style={{fontWeight:'bold',fontSize:'20px',marginBottom:'100px'}}>Exercise Name: </strong>
           <input
             type="text"
             name="exercise_name"
@@ -168,18 +183,32 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Exercise Name"
+            style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
           /><br />
 
-          <strong>Description: </strong>
+          <strong style={{fontWeight:'bold',fontSize:'20px'}}>Description: </strong>
           <textarea
             name="description"
             value={exercise.description}
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Description"
+            style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
           /><br />
 
-          <strong>Calories Per Sec: </strong>
+          <strong style={{fontWeight:'bold',fontSize:'20px'}}>Calories Per Sec: </strong>
           <input
             type="number"
             step="0.01"
@@ -188,11 +217,18 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Calories/sec"
+            style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
           /><br />
 
 
-          <div>
-            <label className="block mb-1 font-semibold"><strong>Media (Image OR Video) </strong></label>
+         <div>
+            <label className="block mb-1 font-semibold" style={{fontWeight:'bold',fontSize:'20px'}}>Media (Image OR Video) </label>
             <input
               type="file"
               accept="image/*,video/*"
@@ -205,6 +241,13 @@ export default function EditExercise() {
                 }
               }}
               ref={fileInputRef}
+              style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
             /><br />
 
             {/* Show preview based on file type */}
@@ -223,7 +266,7 @@ export default function EditExercise() {
             ) : null}
           </div>
 
-          <strong>Targeted Area: </strong>
+          <strong style={{fontWeight:'bold',fontSize:'20px'}}>Targeted Area: </strong>
           <input
             type="text"
             name="targeted_area"
@@ -231,14 +274,28 @@ export default function EditExercise() {
             onChange={handleChange}
             className="w-full border p-2 rounded"
             placeholder="Targeted Area"
+            style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
           /><br />
 
-          <strong>Exercise Genre: </strong>
+          <strong style={{fontWeight:'bold',fontSize:'20px'}}>Exercise Genre: </strong>
           <select
             name="exercise_genre"
             value={exercise.exercise_genre}
             onChange={handleChange}
             className="w-full border p-2 rounded"
+            style={{
+                      verticalAlign:'middle',
+                      padding: '8px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px'
+                    }}
           >
             <option value="">-- Select Genre --</option>
             <option value="Dumbell Exercise">Dumbell Exercise</option>
@@ -253,8 +310,18 @@ export default function EditExercise() {
 
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="update-btn"
             disabled={uploading}
+            style={{
+                      verticalAlign:'middle',
+                      padding: '10px 15px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px',
+                      fontWeight:'bold',
+                      width:'100%',
+                      backgroundColor:'#00ff37' 
+                    }}
           >
             {uploading ? 'Updating...' : 'Update Exercise'}
           </button>
@@ -262,6 +329,7 @@ export default function EditExercise() {
 
         {message && <p className="text-red-500 mt-3">{message}</p>}
       </Layout>
+      <Footer />
     </div>
   );
 }

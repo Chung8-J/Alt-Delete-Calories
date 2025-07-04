@@ -10,7 +10,7 @@ export default function CoachFoodsPage() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || user.role !== 'admin') {
-      router.push('/login');
+      router.push('/Login');
     } else {
       setRole('admin');
     }

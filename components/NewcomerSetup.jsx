@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Layout from './Layout';
+import Footer from './footer';
 
 const bodyParts = [
   "Wrists", "Upper Chest", "Shoulders", "Triceps", "Upper Back", "Spine", "Chest", "Hip Flexors",
@@ -187,35 +187,118 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <Layout>
+    <div style={{
+      margin:'20px auto', 
+      marginBottom:'50px',
+      width:'100%', 
+      marginBottom:'20px', 
+      background: 'linear-gradient(to right, #122C6F, #8215ca,#122C6F )',
+      padding:'50px',
+      borderRadius: '10px'
+    }}
+    > 
         {!plan ? (
           <>
-            <h2>👋 Welcome, Newcomer!</h2>
-            <input type="number" name="height" placeholder="Height (cm)" value={form.height} onChange={handleChange} /><br /><br />
-            <input type="number" name="weight" placeholder="Weight (kg)" value={form.weight} onChange={handleChange} /><br /><br />
-            <input type="number" name="goal_weight" placeholder="Goal Weight (kg)" value={form.goal_weight} onChange={handleChange} /><br /><br />
+            <h2 style={{marginBottom:'-5px'}}>👋 Welcome, Newcomer!</h2>
+            <h3 style={{marginLeft:'0px', marginBottom:'25px'}}>May I ask your..........</h3>
+            <label style={{fontWeight:'bold'}}>Height: </label>
+            <input type="number" 
+            name="height" 
+            placeholder="Height (cm)" 
+            value={form.height} 
+            onChange={handleChange} 
+            style={{
+              verticalAlign:'middle',
+              padding: '6px 10px',
+              border:'1px solid ',
+              borderRadius:'5px',
+              fontSize:'12px',
+              width:'81%'
+            }}/>
+            <br /><br />
 
-            <label>Targeted Area:</label><br />
-            <select name="targeted_area" value={form.targeted_area} onChange={handleChange}>
+            <label style={{fontWeight:'bold'}}>Weight: </label>
+            <input type="number"
+                   name="weight"
+                   placeholder="Weight (kg)" 
+                   value={form.weight} 
+                   onChange={handleChange}
+                   style={{
+                    verticalAlign:'middle',
+                    padding: '6px 10px',
+                    border:'1px solid ',
+                    borderRadius:'5px',
+                    fontSize:'12px',
+                    width:'80%'
+                  }}/>
+                  <br /><br />
+
+            <label style={{fontWeight:'bold'}}>Goal Weight: </label>
+            <input type="number"
+                   name="goal_weight"
+                   placeholder="Goal Weight (kg)"
+                   value={form.goal_weight}
+                   onChange={handleChange} 
+                   style={{
+                    verticalAlign:'middle',
+                    padding: '6px 10px',
+                    border:'1px solid ',
+                    borderRadius:'5px',
+                    fontSize:'12px',
+                    width:'70%'
+                  }}/>
+                   <br /><br />
+
+            <label style={{fontWeight:'bold'}}>Targeted Area: </label>
+            <select name="targeted_area" 
+                    value={form.targeted_area} 
+                    onChange={handleChange}
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '6px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'12px',
+                      width:'66%'
+                    }}>
               <option value="Any">No selected part (any type of exercise)</option>
               {bodyParts.map((part, i) => <option key={i} value={part}>{part}</option>)}
             </select><br /><br />
 
-            <label>Preferred Exercise Genre:</label><br />
-            <select name="exercise_genre" value={form.exercise_genre} onChange={handleChange}>
+            <label style={{fontWeight:'bold'}}>Preferred Exercise Genre: </label><br /><br />
+            <select name="exercise_genre" 
+                    value={form.exercise_genre} 
+                    onChange={handleChange}
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '6px 10px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'12px',
+                      width:'100%'
+                    }}>
               <option value="Any">No selected genre</option>
               {genres.map((g, i) => <option key={i} value={g}>{g}</option>)}
             </select><br /><br />
 
-            <button onClick={handleSave} disabled={loading}>
-              {loading ? 'Generating Plan...' : '💾 Save Info & Generate Plan'}
+            <button onClick={handleSave} disabled={loading} 
+                    style={{
+                      verticalAlign:'middle',
+                      padding: '10px 15px',
+                      border:'1px solid ',
+                      borderRadius:'5px',
+                      fontSize:'18px',
+                      fontWeight:'bold',
+                      width:'100%',
+                      backgroundColor:'#00ff37' 
+                    }}>
+              {loading ? 'Generating Plan...' : 'Save Info & Generate Plan'}
             </button>
           </>
         ) : (
           <>
-            <h3>🎯 Personalized Fitness Plan</h3>
-            <div style={{ background: '#f0f8ff', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+            <h3>Personalized Fitness Plan</h3>
+            <div style={{ background: '#f0f8ff', padding: '20px', borderRadius: '8px', marginBottom: '20px', color:'black' }}>
               {plan.workout?.length > 0 && (
                 <>
                   <h4>🏋️ Workouts</h4>
@@ -234,7 +317,7 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
 
               {plan.meals?.length > 0 && (
                 <>
-                  <h4>🍽️ Meal Plan</h4>
+                  <h4>Meal Plan</h4>
                   {plan.meals.map((meal, idx) => (
                     <div key={idx} style={{ marginBottom: '10px' }}>
                       <strong>{meal.meal}</strong>
@@ -249,15 +332,15 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
               )}
 
               {plan.summary && (
-                <p><strong>📌 Summary:</strong> {plan.summary}</p>
+                <p><strong>Summary:</strong> {plan.summary}</p>
               )}
             </div>
 
             {!planAccepted ? (
               <>
                 <p>Would you like to use this plan or customize it?</p>
-                <button onClick={() => setPlanAccepted(true)}>✅ Use This Plan</button>
-                <button onClick={() => router.push('/customizeplan')}>✏️ Customize Plan</button>
+                <button onClick={() => setPlanAccepted(true)}>Use This Plan</button>
+                <button onClick={() => router.push('/customizeplan')}>Customize Plan</button>
               </>
             ) : (
               <div style={{ marginTop: 20 }}>
@@ -265,12 +348,12 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
                 <input type="text" value={planName} onChange={e => setPlanName(e.target.value)} /><br /><br />
                 <label>Description:</label><br />
                 <textarea rows={3} value={planDesc} onChange={e => setPlanDesc(e.target.value)} style={{ width: '100%' }}></textarea><br /><br />
-                <button onClick={handleFinalPlanSave}>💾 Save Final Plan</button>
+                <button onClick={handleFinalPlanSave}>Save Final Plan</button>
               </div>
             )}
           </>
         )}
-      </Layout>
+      <Footer />
     </div>
   );
 }

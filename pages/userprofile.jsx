@@ -113,9 +113,9 @@ function handleFeedbackSubmit() {
   if (!profile) return <p>Loading profile...</p>;
 
   return (
-    <div style={{ padding: '30px', maxWidth: '600px', margin: 'auto' }}>
+    <div style={{margin:'180px auto', width:'86%', marginBottom:'20px',fontSize:'20px'}}>
       <Layout>
-      <h2>👤 User Profile</h2>
+      <h2 style={{marginBottom:'50px',fontSize:'40px'}}>User Profile</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <tbody>
           {[
@@ -165,27 +165,33 @@ function handleFeedbackSubmit() {
       <div style={{ marginTop: '20px' }}>
         {editing ? (
           <>
-            <button onClick={handleSave} style={{ marginRight: '10px' }}>
-              💾 Save
+            <button onClick={handleSave} className='update-btn' style={{ marginRight: '10px' }}>
+              Save
             </button>
-            <button onClick={() => setEditing(false)}>❌ Cancel</button>
+            <button onClick={() => setEditing(false)} className='update-btn' >Cancel</button>
           </>
         ) : (
-          <button onClick={() => setEditing(true)}>✏️ Edit Profile</button>
+          <button onClick={() => setEditing(true)} 
+                  style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px', marginRight:'10px' }}
+                  className='update-btn'>      
+                  Edit Profile</button> 
         )}
         <button
-          style={{ marginTop: '20px', background: '#eee', padding: '5px 10px' }}
+          style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(255, 255, 255, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px' }}
           onClick={() => setShowFeedbackModal(true)}
+          className='update-btn'
         >
-          📝 Leave Feedback
+          Leave Feedback
         </button>
         
         <button
-          style={{ float: 'right', color: 'red' }}
+          style={{ fontWeight:'bold',fontSize:'20px',backgroundColor: 'rgb(255, 0, 0)',color:'white', marginLeft: 'auto',padding: '15px 24px',borderRadius: '6px',float:'right' }}
           onClick={() => {
             localStorage.removeItem('user');
             router.push('/Login');
           }}
+          className='update-btn'
+          
         >
           Logout
         </button>
@@ -212,8 +218,10 @@ function handleFeedbackSubmit() {
                 />
               </label>
               <div style={{ marginTop: '10px' }}>
-                <button onClick={handleFeedbackSubmit} style={{ marginRight: '10px' }}>✅ Submit</button>
-                <button onClick={() => setShowFeedbackModal(false)}>❌ Cancel</button>
+                <button onClick={handleFeedbackSubmit} style={{ fontWeight:'bold', fontSize:'15px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '6px 10px', borderRadius: '6px', marginRight:'10px' }}
+                  className='update-btn'> Submit</button>
+                <button onClick={() => setShowFeedbackModal(false)} style={{ fontWeight:'bold',fontSize:'15px',backgroundColor: 'rgb(255, 0, 0)',color:'white', marginLeft: 'auto',padding: '6px 10px',borderRadius: '6px' }}>
+                        Cancel</button>
               </div>
             </div>
           </div>
