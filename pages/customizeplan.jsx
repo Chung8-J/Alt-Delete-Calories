@@ -163,6 +163,12 @@ export default function CustomizePlan() {
     if (user) fetchPlans();
   }, [user]);
 
+
+
+
+
+
+  
   const selectPlan = async (planId) => {
     const planList = section === 'exercise' ? exercisePlans : foodPlans;
     const key = section === 'exercise' ? 'p_workoutplan_id' : 'd_plan_id';
@@ -996,7 +1002,6 @@ export default function CustomizePlan() {
           )}
         </div>
 
-        
       </div>
       <Footer />
     </Layout>

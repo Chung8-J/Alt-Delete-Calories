@@ -28,7 +28,7 @@ function generateFitnessPrompt(user, exerciseList, foodList) {
   const dailyDiff = Math.round(calorieDiff / 30);
   const dailyCalories = tdee + dailyDiff;
     
-    return `
+return `
 You are a certified fitness and nutrition AI coach. Create a **personalized daily workout** and **nutrition plan** to help the user safely reach their goal within 30 days.
 
 🧑‍💼 **User Profile**
@@ -46,34 +46,34 @@ You are a certified fitness and nutrition AI coach. Create a **personalized dail
 
 📌 **Planning Guidelines**
 
-1. **Workout Plan**:
-   - Select **4–6 exercises** from the provided JSON list.
-   - Match the user’s **age**, **gender**, **genre preference**, and **targeted body area**.
-   - The Exercise is 
-   - Total workout calories burned should:
-     - Aim to offset the ${Math.abs(dailyDiff)} kcal ${dailyDiff > 0 ? 'surplus' : 'deficit'}
-     - **But not exceed 1000 kcal** to maintain safety and avoid burnout.
-  - ⚠️ Use **either** of the following formats appropriately:
-    - If the exercise is **cardio or continuous**, use duration_second
-    - If the exercise is **strength-based or discrete**, use reps and set, and estimate one reps is 5second
+### 1. 🏋️ Workout Plan:
+- Select **4–6 exercises** from the provided **exercise list only**.
+- Match the user’s **age**, **gender**, **genre**, and **targeted body area**.
+- Total workout calories burned should:
+  - Offset the ${Math.abs(dailyDiff)} kcal ${dailyDiff > 0 ? 'surplus' : 'deficit'}
+  - **Not exceed 1000 kcal** for safety
+- ✅ For each workout item, include:
+  - \`exercise_id\` (number, from the provided list)
+  - \`exercise_name\` (string)
+  - \`estimated_calories\` (number)
+  - Use **either** of the following formats:
+    - If cardio/continuous: include \`duration_seconds\` (number)
+    - If strength-based: include both \`reps\` and \`set\` (numbers)
+- 🚫 Do not include both formats at the same time.
 
+### 2. 🍽️ Nutrition Plan:
+- Provide **3 main meals** and **1–2 snacks**, chosen only from the provided food list.
+- Total calories should be around **${dailyCalories} kcal**, within this range:
+  - **Minimum**: ${gender === 'male' ? 1500 : 1200} kcal
+  - **Acceptable range**: ${Math.max(gender === 'male' ? 1500 : 1200, dailyCalories - 300)} to ${dailyCalories + 200} kcal/day
+- ✅ Ensure:
+  - Meal variety, no duplicate food items in the same day
+  - Balanced macros: proteins, healthy fats, complex carbs
+  - Safe and realistic portion sizes
 
-2. **Nutrition Plan**:
-   - Recommend **3 main meals** and **1–2 snacks** using only the provided food list.
-   - Base the meal plan on a total daily intake of approximately **${dailyCalories} kcal**.
-   - Enforce these safety boundaries:
-     - **Minimum** intake: ≥ 1500 kcal (male), ≥ 1200 kcal (female)
-     - **Acceptable range**: ${Math.max(gender === 'male' ? 1500 : 1200, dailyCalories - 300)} to ${dailyCalories + 200} kcal/day
-   - If the target is below the safe minimum, **increase food portions** to reach a healthy intake.
-   - Ensure:
-     - Meal variety
-     - Balanced macronutrients (protein, carbs, healthy fats)
-     - Realistic portion sizes and practical food combinations
-     - **No repeated food item** within the same day
-
-3. **Safety and Practicality**:
-   - Always prioritize user safety—especially for female users, or those under 18 or over 60.
-   - Assume the user has a **moderate fitness level** unless specified otherwise.
+### 3. 🛡️ Safety and Practicality:
+- Always prioritize safety — especially for users under 18 or over 60.
+- Assume the user has a **moderate fitness level** by default.
 
 📦 **Available Exercises (JSON)**:
 ${JSON.stringify(exerciseList)}
@@ -81,11 +81,23 @@ ${JSON.stringify(exerciseList)}
 🍽️ **Available Foods (JSON)**:
 ${JSON.stringify(foodList)}
 
-📤 **Expected Output Format (JSON)**:
+📤 **Expected Output Format (Strict JSON Only):**
+\`\`\`json
 {
   "workout": [
-    { "exercise_id": "2", "exercise_name": "Squats", "duration_seconds": 300, "reps": "12" ,"set": "2"  , "estimated_calories": "45"},
-    ...
+    {
+      "exercise_id": 2,
+      "exercise_name": "Squats",
+      "duration_seconds": 300,
+      "estimated_calories": 45
+    },
+    {
+      "exercise_id": 5,
+      "exercise_name": "Push-ups",
+      "reps": 12,
+      "set": 3,
+      "estimated_calories": 55
+    }
   ],
   "meals": [
     {
@@ -97,8 +109,16 @@ ${JSON.stringify(foodList)}
     },
     ...
   ],
-  "summary": "To ${goalWeight > currentWeight ? 'gain' : 'lose'} ${Math.abs(goalWeight - currentWeight)}kg in 30 days, aim for a daily ${dailyDiff > 0 ? 'caloric surplus' : 'caloric deficit'} of ${Math.abs(dailyDiff)} kcal. Burn around ${Math.min(Math.abs(dailyDiff), 1000)} kcal through exercise and consume approximately ${dailyCalories} kcal of food per day. Never consume less than the safe minimum to ensure proper energy, nutrition, and sustainability."
+  "summary": "To ${goalWeight > currentWeight ? 'gain' : 'lose'} ${Math.abs(goalWeight - currentWeight)}kg in 30 days, aim for a daily ${dailyDiff > 0 ? 'caloric surplus' : 'caloric deficit'} of ${Math.abs(dailyDiff)} kcal. Burn around ${Math.min(Math.abs(dailyDiff), 1000)} kcal through exercise and consume approximately ${dailyCalories} kcal of food per day. Never go below safe minimum intake to ensure health."
 }
+\`\`\`
+
+⚠️ **DO NOT:**
+- Invent any exercises or foods
+- Use names, IDs, or items not present in the lists
+- Wrap the output in extra Markdown, explanation, or headings
+
+✅ **JUST return pure valid JSON in the above format.**
 `;
 
 

@@ -31,23 +31,27 @@ export default async function handler(req, res) {
   }
 
   // ✅ Add DELETE method support for admins
-  if (req.method === 'DELETE') {
-    const { postid } = req.body;
+if (req.method === 'DELETE') {
+  const { postid } = req.body;
 
-    if (!postid) {
-      return res.status(400).json({ error: 'Missing post ID' });
-    }
-
-    try {
-      // Optionally delete image from Supabase (if you handle cleanup)
-      await pool.query('DELETE FROM post WHERE postid = $1', [postid]);
-      return res.status(200).json({ message: '✅ Post deleted' });
-    } catch (err) {
-      console.error('❌ Error deleting post:', err);
-      return res.status(500).json({ error: 'Failed to delete post' });
-    }
+  if (!postid) {
+    return res.status(400).json({ error: 'Missing post ID' });
   }
 
+  try {
+    // First delete all comments linked to the post
+    await pool.query('DELETE FROM comment WHERE post_id = $1', [postid]);
+
+    // Then delete the post itself
+    await pool.query('DELETE FROM post WHERE postid = $1', [postid]);
+
+    return res.status(200).json({ message: '✅ Post and related comments deleted' });
+  } catch (err) {
+    console.error('❌ Error deleting post:', err);
+    return res.status(500).json({ error: 'Failed to delete post and related comments' });
+  }
+}
+  
   // ❌ Reject unsupported methods
   return res.status(405).json({ error: 'Method Not Allowed' });
 }
