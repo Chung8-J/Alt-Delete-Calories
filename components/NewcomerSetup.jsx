@@ -298,7 +298,16 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
         ) : (
           <>
             <h3>Personalized Fitness Plan</h3>
-            <div style={{ background: '#f0f8ff', padding: '20px', borderRadius: '8px', marginBottom: '20px', color:'black' }}>
+            <div style={{
+                background: 'linear-gradient(to right, rgba(18, 44, 111, 0.7), rgba(130, 21, 202, 0.7), rgba(18, 44, 111, 0.7))',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                borderRadius: '8px',
+                border: '3px solid rgba(147, 5, 241, 0.45)',
+                padding: '20px',
+                marginBottom: '20px',
+                color: 'white'
+              }}>
+
               {plan.workout?.length > 0 && (
                 <>
                   <h4>🏋️ Workouts</h4>
