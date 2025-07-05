@@ -68,13 +68,12 @@ const [summary, setSummary] = useState({ totalCalories: 0, totalDuration: 0 });
   return (
    <div style={{ padding: '30px' }}>
   <Layout>
-    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Workout Calendar</h2>
+    <h2 style={{ textAlign: 'center',marginTop:'140px',fontSize:'40px'}}>Workout Calendar</h2>
 
     <div
       style={{
         maxWidth: '1000px', 
         display: 'flex',
-
         margin: '0 auto',   
         justifyContent: 'space-between',
         gap: '20px',
@@ -85,7 +84,7 @@ const [summary, setSummary] = useState({ totalCalories: 0, totalDuration: 0 });
         padding: '20px',
         color: 'white',
         flexWrap: 'wrap',
-        marginTop:140
+        marginTop:'40px'
       }}
     >
       {/* Day buttons */}

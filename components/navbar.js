@@ -62,7 +62,7 @@ export default function Navbar() {
               <Link href="/userhome" className="hover:text-yellow-400">
                 <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
               </Link>
-              <Link href="/calander" className="hover:text-yellow-400">Calander</Link>
+              <Link href="/calander" className="hover:text-yellow-400">Calendar</Link>
               <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>
               <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>
               <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
