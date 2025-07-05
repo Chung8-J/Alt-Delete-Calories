@@ -20,10 +20,10 @@ export default function IntroPage() {
           feel fresh, fun, and achievable. <br /> It's time to upgrade your health—one click,
           one rep, one calorie at a time.
         </p>
-        <a href="#" className="Advertise-btn">Start Now!</a>
+        <a href="/Login" className="Advertise-btn">Start Now!</a>
       </div>
 
-      <div className="intro-Workout section-row" style={{height:'650px'}}>
+      <div className="intro-Workout section-row" style={{height:'650px',marginTop:'-80px'}}>
         <div className="section-image">
           <img src="/images/Workout and food.jpg" alt="Replacement" className="Advi-Small-img" />
         </div>
@@ -34,7 +34,7 @@ export default function IntroPage() {
             Explore our extensive library of workouts and food items, complete with calorie counts and health insights.
             Whether you're planning a meal or burning off the extra snack, this is your go-to database for making informed fitness decisions.
           </p>
-          <a href="#" className="Explore-Btn">Explore Now</a>
+          <a href="/Login" className="Explore-Btn">Explore Now</a>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ export default function IntroPage() {
             Join a supportive fitness community where you can post photos,
             comment, and cheer each other on. Celebrate progress, swap tips, or just show off that post-workout glow—you're not on this journey alone.
           </p>
-          <a href="#" className="Explore-Btn-left">Explore Now</a>
+          <a href="/Login" className="Explore-Btn-left">Explore Now</a>
         </div>
 
         <div className="section-image">
@@ -65,7 +65,7 @@ export default function IntroPage() {
             Get tailored workout plans that match your goals, 
             schedule, and fitness level. Whether you're a beginner or a pro, our structured routines guide you step-by-step to keep you motivated and progressing.
           </p>
-          <a href="#" className="Explore-Btn" style={{marginRight:'-25px'}}>Explore Now</a>
+          <a href="/Login" className="Explore-Btn" style={{marginRight:'-25px'}}>Explore Now</a>
         </div>
       </div>
 
