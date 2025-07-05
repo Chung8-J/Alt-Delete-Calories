@@ -122,15 +122,22 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
     if (!plan?.workout?.length) return alert('❌ No workout exercises found.');
 
     const matched = plan.workout.map(item => {
-      if (!item.exercise_id || !item.duration_seconds || !item.estimated_calories) return null;
+      const hasDuration = item.duration_seconds && !isNaN(item.duration_seconds);
+      const hasRepsSets = item.reps && item.set && !isNaN(item.reps) && !isNaN(item.set);
+
+      if (!item.exercise_id || !item.estimated_calories || (!hasDuration && !hasRepsSets)) return null;
+
       return {
         exercise_id: parseInt(item.exercise_id),
-        duration_seconds: Math.round(item.duration_seconds),
+        duration_seconds: hasDuration ? Math.round(item.duration_seconds) : null,
+        reps: hasRepsSets ? parseInt(item.reps) : null,
+        set: hasRepsSets ? parseInt(item.set) : null,
         estimated_calories: Math.round(parseFloat(item.estimated_calories)),
-        reps: item.reps ? parseInt(item.reps) : null,
-        set: item.set ? parseInt(item.set) : null
+        mode: hasRepsSets ? 'reps_sets' : 'duration'
       };
     }).filter(Boolean);
+
+
 
     const workoutRes = await fetch('/api/Db_connection', {
       method: 'POST',
@@ -188,130 +195,145 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
 
   return (
     <div style={{
-      margin:'20px auto', 
-      marginBottom:'50px',
-      width:'100%', 
-      marginBottom:'20px', 
+      margin: '20px auto',
+      marginBottom: '150px',
+      width: '100%',
+      marginBottom: '20px',
       background: 'linear-gradient(to right, #122C6F, #8215ca,#122C6F )',
-      padding:'50px',
+      padding: '50px',
       borderRadius: '10px'
     }}
-    > 
-        {!plan ? (
-          <>
-            <h2 style={{marginBottom:'-5px'}}>👋 Welcome, Newcomer!</h2>
-            <h3 style={{marginLeft:'0px', marginBottom:'25px'}}>May I ask your..........</h3>
-            <label style={{fontWeight:'bold'}}>Height: </label>
-            <input type="number" 
-            name="height" 
-            placeholder="Height (cm)" 
-            value={form.height} 
-            onChange={handleChange} 
+    >
+      {!plan ? (
+        <>
+          <h2 style={{ marginBottom: '-5px' }}>👋 Welcome, Newcomer!</h2>
+          <h3 style={{ marginLeft: '0px', marginBottom: '25px' }}>May I ask your..........</h3>
+          <label style={{ fontWeight: 'bold' }}>Height: </label>
+          <input type="number"
+            name="height"
+            placeholder="Height (cm)"
+            value={form.height}
+            onChange={handleChange}
             style={{
-              verticalAlign:'middle',
+              verticalAlign: 'middle',
               padding: '6px 10px',
-              border:'1px solid ',
-              borderRadius:'5px',
-              fontSize:'12px',
-              width:'81%'
-            }}/>
-            <br /><br />
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '12px',
+              width: '81%'
+            }} />
+          <br /><br />
 
-            <label style={{fontWeight:'bold'}}>Weight: </label>
-            <input type="number"
-                   name="weight"
-                   placeholder="Weight (kg)" 
-                   value={form.weight} 
-                   onChange={handleChange}
-                   style={{
-                    verticalAlign:'middle',
-                    padding: '6px 10px',
-                    border:'1px solid ',
-                    borderRadius:'5px',
-                    fontSize:'12px',
-                    width:'80%'
-                  }}/>
-                  <br /><br />
+          <label style={{ fontWeight: 'bold' }}>Weight: </label>
+          <input type="number"
+            name="weight"
+            placeholder="Weight (kg)"
+            value={form.weight}
+            onChange={handleChange}
+            style={{
+              verticalAlign: 'middle',
+              padding: '6px 10px',
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '12px',
+              width: '80%'
+            }} />
+          <br /><br />
 
-            <label style={{fontWeight:'bold'}}>Goal Weight: </label>
-            <input type="number"
-                   name="goal_weight"
-                   placeholder="Goal Weight (kg)"
-                   value={form.goal_weight}
-                   onChange={handleChange} 
-                   style={{
-                    verticalAlign:'middle',
-                    padding: '6px 10px',
-                    border:'1px solid ',
-                    borderRadius:'5px',
-                    fontSize:'12px',
-                    width:'70%'
-                  }}/>
-                   <br /><br />
+          <label style={{ fontWeight: 'bold' }}>Goal Weight: </label>
+          <input type="number"
+            name="goal_weight"
+            placeholder="Goal Weight (kg)"
+            value={form.goal_weight}
+            onChange={handleChange}
+            style={{
+              verticalAlign: 'middle',
+              padding: '6px 10px',
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '12px',
+              width: '70%'
+            }} />
+          <br /><br />
 
-            <label style={{fontWeight:'bold'}}>Targeted Area: </label>
-            <select name="targeted_area" 
-                    value={form.targeted_area} 
-                    onChange={handleChange}
-                    style={{
-                      verticalAlign:'middle',
-                      padding: '6px 10px',
-                      border:'1px solid ',
-                      borderRadius:'5px',
-                      fontSize:'12px',
-                      width:'66%'
-                    }}>
-              <option value="Any">No selected part (any type of exercise)</option>
-              {bodyParts.map((part, i) => <option key={i} value={part}>{part}</option>)}
-            </select><br /><br />
+          <label style={{ fontWeight: 'bold' }}>Targeted Area: </label>
+          <select name="targeted_area"
+            value={form.targeted_area}
+            onChange={handleChange}
+            style={{
+              verticalAlign: 'middle',
+              padding: '6px 10px',
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '12px',
+              width: '66%'
+            }}>
+            <option value="Any">No selected part (any type of exercise)</option>
+            {bodyParts.map((part, i) => <option key={i} value={part}>{part}</option>)}
+          </select><br /><br />
 
-            <label style={{fontWeight:'bold'}}>Preferred Exercise Genre: </label><br /><br />
-            <select name="exercise_genre" 
-                    value={form.exercise_genre} 
-                    onChange={handleChange}
-                    style={{
-                      verticalAlign:'middle',
-                      padding: '6px 10px',
-                      border:'1px solid ',
-                      borderRadius:'5px',
-                      fontSize:'12px',
-                      width:'100%'
-                    }}>
-              <option value="Any">No selected genre</option>
-              {genres.map((g, i) => <option key={i} value={g}>{g}</option>)}
-            </select><br /><br />
+          <label style={{ fontWeight: 'bold' }}>Preferred Exercise Genre: </label><br /><br />
+          <select name="exercise_genre"
+            value={form.exercise_genre}
+            onChange={handleChange}
+            style={{
+              verticalAlign: 'middle',
+              padding: '6px 10px',
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '12px',
+              width: '100%'
+            }}>
+            <option value="Any">No selected genre</option>
+            {genres.map((g, i) => <option key={i} value={g}>{g}</option>)}
+          </select><br /><br />
 
-            <button onClick={handleSave} disabled={loading} 
-                    style={{
-                      verticalAlign:'middle',
-                      padding: '10px 15px',
-                      border:'1px solid ',
-                      borderRadius:'5px',
-                      fontSize:'18px',
-                      fontWeight:'bold',
-                      width:'100%',
-                      backgroundColor:'#00ff37' 
-                    }}>
-              {loading ? 'Generating Plan...' : 'Save Info & Generate Plan'}
-            </button>
-          </>
-        ) : (
-          <>
-            <h3>Personalized Fitness Plan</h3>
+          <button onClick={handleSave} disabled={loading}
+            style={{
+              verticalAlign: 'middle',
+              padding: '10px 15px',
+              border: '1px solid ',
+              borderRadius: '5px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              width: '100%',
+              backgroundColor: '#00ff37'
+            }}>
+            {loading ? 'Generating Plan...' : 'Save Info & Generate Plan'}
+          </button>
+        </>
+      ) : (
+        <>
+          <h3>Personalized Fitness Plan</h3>
+          {/* Wrapper div to center the plan */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            {/* Styled plan box */}
             <div style={{
-                background: 'linear-gradient(to right, rgba(18, 44, 111, 0.7), rgba(130, 21, 202, 0.7), rgba(18, 44, 111, 0.7))',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                borderRadius: '8px',
-                border: '3px solid rgba(147, 5, 241, 0.45)',
-                padding: '20px',
-                marginBottom: '20px',
-                color: 'white'
-              }}>
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              border: '3px solid rgba(147, 5, 241, 0.45)',
+              padding: '20px',
+              color: 'white',
+              boxSizing: 'border-box',
+              width: '100%',
+              maxWidth: '800px',
+              marginTop: '10px',
+              marginBottom: '10px',
+            }}>
+              {/* Your existing workout and meal plan content here */}
+
+
+
 
               {plan.workout?.length > 0 && (
                 <>
-                  <h4>🏋️ Workouts</h4>
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                  <h4 style={{
+                    fontSize: '23px',
+                    marginTop: '5px',
+                    marginBottom: '10px',
+
+                  }}>Workouts</h4>
+                  <ul style={{ listStyle: 'none', padding: 0, marginBottom: 10 }}>
                     {plan.workout.map((ex, idx) => (
                       <li key={idx} style={{ marginBottom: '10px' }}>
                         <strong>{ex.exercise_name}</strong><br />
@@ -326,7 +348,13 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
 
               {plan.meals?.length > 0 && (
                 <>
-                  <h4>Meal Plan</h4>
+                  <h4 style={{
+                    fontSize: '23px',
+                    marginTop: '10px',
+                    marginBottom: '10px',
+                    borderTop: '1px solid white',
+                    paddingTop: '10px'
+                  }}>Meal Plan</h4>
                   {plan.meals.map((meal, idx) => (
                     <div key={idx} style={{ marginBottom: '10px' }}>
                       <strong>{meal.meal}</strong>
@@ -344,24 +372,66 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
                 <p><strong>Summary:</strong> {plan.summary}</p>
               )}
             </div>
+          </div>
+          {!planAccepted ? (
+            <>
+              <p>Would you like to use this plan or customize it?</p>
+              <button onClick={() => setPlanAccepted(true)}>Use This Plan</button>
+              <button onClick={() => router.push('/customizeplan')}>Customize Plan</button>
+            </>
+          ) : (
+            <div style={{ marginTop: 20 }}>
+              <label>Plan Name:</label><br />
+              <input
+                type="text"
+                value={planName}
+                onChange={e => setPlanName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  marginTop: '5px'
+                }}
+              /><br /><br />
 
-            {!planAccepted ? (
-              <>
-                <p>Would you like to use this plan or customize it?</p>
-                <button onClick={() => setPlanAccepted(true)}>Use This Plan</button>
-                <button onClick={() => router.push('/customizeplan')}>Customize Plan</button>
-              </>
-            ) : (
-              <div style={{ marginTop: 20 }}>
-                <label>Plan Name:</label><br />
-                <input type="text" value={planName} onChange={e => setPlanName(e.target.value)} /><br /><br />
-                <label>Description:</label><br />
-                <textarea rows={3} value={planDesc} onChange={e => setPlanDesc(e.target.value)} style={{ width: '100%' }}></textarea><br /><br />
-                <button onClick={handleFinalPlanSave}>Save Final Plan</button>
-              </div>
-            )}
-          </>
-        )}
+              <label>Description:</label><br />
+              <textarea
+                rows={3}
+                value={planDesc}
+                onChange={e => setPlanDesc(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  resize: 'vertical',
+                  marginTop: '5px'
+                }}
+              ></textarea><br /><br />
+
+              <button style={{
+                backgroundColor: '#50DA00',
+                border: 'none',
+                minWidth: '260px',
+                height: 'auto',
+                fontSize: '17px',
+                fontWeight: 'bolder',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                transition: 'box-shadow 0.3s ease',
+                borderRadius: '15px',
+                padding: '11px 14px',
+                justifyContent: 'center',
+                marginTop: '25px',
+                color: 'black',
+                cursor: 'pointer'
+              }} onClick={handleFinalPlanSave}>Save Final Plan</button>
+            </div>
+          )}
+        </>
+      )}
       <Footer />
     </div>
   );
