@@ -304,7 +304,11 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
         </>
       ) : (
         <>
-          <h3>Personalized Fitness Plan</h3>
+          <h3  style={{
+                    fontSize: '33px',
+                    
+
+                  }}>Personalized Fitness Plan</h3>
           {/* Wrapper div to center the plan */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
             {/* Styled plan box */}
@@ -376,8 +380,39 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
           {!planAccepted ? (
             <>
               <p>Would you like to use this plan or customize it?</p>
-              <button onClick={() => setPlanAccepted(true)}>Use This Plan</button>
-              <button onClick={() => router.push('/customizeplan')}>Customize Plan</button>
+              <button style={{
+                backgroundColor: '#50DA00',
+                border: 'none',
+                minWidth: '260px',
+                height: 'auto',
+                fontSize: '17px',
+                fontWeight: 'bolder',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                transition: 'box-shadow 0.3s ease',
+                borderRadius: '15px',
+                padding: '11px 14px',
+                justifyContent: 'center',
+                marginTop: '25px',
+                color: 'black',
+                cursor: 'pointer',
+                marginRight: '25px'
+              }}onClick={() => setPlanAccepted(true)}>Use This Plan</button>
+              <button style={{
+                backgroundColor: '#50DA00',
+                border: 'none',
+                minWidth: '260px',
+                height: 'auto',
+                fontSize: '17px',
+                fontWeight: 'bolder',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                transition: 'box-shadow 0.3s ease',
+                borderRadius: '15px',
+                padding: '11px 14px',
+                justifyContent: 'center',
+                marginTop: '25px',
+                color: 'black',
+                cursor: 'pointer'
+              }}onClick={() => router.push('/customizeplan')}>Customize Plan</button>
             </>
           ) : (
             <div style={{ marginTop: 20 }}>
