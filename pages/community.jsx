@@ -10,15 +10,25 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+const [isReady, setIsReady] = useState(false);  // For hydration
+const [loading, setLoading] = useState(true);   // For data + hydration loading
 
   const SUPABASE_IMAGE_BASE =
     'https://shidmbowdyumxioxpabh.supabase.co/storage/v1/object/public/communitypost/public/';
 
+useEffect(() => {
+  const u = JSON.parse(localStorage.getItem('user'));
+  setCurrentUser(u);
+
+  fetchPosts().then(() => {
+    setIsReady(true);
+    setLoading(false); // Only stop loading after posts and hydration
+  });
+}, []);
+
   useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('user'));
-    setCurrentUser(u);
-    fetchPosts();
-  }, []);
+  window.scrollTo(0, 0); // 👈 This makes sure it starts from the top
+}, []);
 
   const fetchPosts = async () => {
     const res = await fetch('/api/Fetch_post');
@@ -27,6 +37,16 @@ export default function CommunityPage() {
       setPosts(data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
     }
   };
+
+  useEffect(() => {
+  const hasRefreshed = sessionStorage.getItem('hasRefreshed');
+
+  if (!hasRefreshed) {
+    sessionStorage.setItem('hasRefreshed', 'true');
+    location.reload(); // refresh once
+  }
+}, []);
+
 
   const timeAgo = (utcDateStr) => {
     // Convert to ISO format
@@ -125,6 +145,24 @@ export default function CommunityPage() {
     useEffect(() => {
       fetchComments();
     }, [postId]);
+
+      if (loading) {
+        return (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            backgroundColor: '#f0f0f0',
+            fontFamily: 'sans-serif',
+            fontSize: '24px',
+            fontWeight: 'bold'
+          }}>
+            Loading Community Page...
+          </div>
+        );
+      }
+
 
     return (
 
@@ -240,6 +278,7 @@ export default function CommunityPage() {
                 maxHeight: '400px',
                 objectFit: 'contain',
                 borderRadius: '4px'
+
               }}
             />
             <p style={{ marginTop: '10px',marginBottom:'10px',fontSize:'25px' }}>{post.description}</p><hr />

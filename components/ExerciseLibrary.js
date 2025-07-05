@@ -6,6 +6,7 @@ import Footer from '../components/footer';
 import AddLibraryExercise from '../components/Addlibraryexercise'; // adjust path if needed
 
 export default function ExerciseLibrary({ role }) {
+  
   const [exercises, setExercises] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
@@ -26,6 +27,8 @@ export default function ExerciseLibrary({ role }) {
       })
       .catch(err => console.error('Failed to fetch exercises:', err));
   }, []);
+
+  
 
   useEffect(() => {
     const filteredData = exercises

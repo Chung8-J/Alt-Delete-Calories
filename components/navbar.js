@@ -35,8 +35,8 @@ export default function Navbar() {
   const avatarUrl = user.avatar
     ? user.avatar
     : (user.gender == 'female' || user.coach_gender == 'female')
-    ? '/user_avatar/female_avt.png'
-    : '/user_avatar/male_avt.png';
+      ? '/user_avatar/female_avt.png'
+      : '/user_avatar/male_avt.png';
 
   const userIc = user.coach_ic || user.member_ic;
 
@@ -47,7 +47,7 @@ export default function Navbar() {
           {user.role === 'admin' && (
             <>
               <Link href="/adminhome" className="hover:text-yellow-400">
-               <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
+                <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
               </Link>
               <Link href="/coach_foodlib" className="hover:text-yellow-400">Manage Food Library</Link>
               <Link href="/coach_exerciselib" className="hover:text-yellow-400">Manage Exercise Library</Link>
@@ -57,11 +57,12 @@ export default function Navbar() {
               <Link href="/feedback_list" className="hover:text-yellow-400">Feedback List</Link>
             </>
           )}
-          {user.role === 'user' && (  
+          {user.role === 'user' && (
             <>
               <Link href="/userhome" className="hover:text-yellow-400">
                 <img src="/images/logo.png" alt="Alt+Calories Logo" className="Logo" />
               </Link>
+              <Link href="/calander" className="hover:text-yellow-400">Calander</Link>
               <Link href="/member_food" className="hover:text-yellow-400">Food Library</Link>
               <Link href="/member_exercise" className="hover:text-yellow-400">Exercise Library</Link>
               <Link href="/caloriescalculator" className="hover:text-yellow-400">Calories Calculator</Link>
@@ -74,15 +75,15 @@ export default function Navbar() {
         {/* Avatar Dropdown */}
         <div className="usertab" ref={dropdownRef}
           style={{
-                borderRadius: '5px',
-                objectFit: 'cover',
-                verticalAlign: 'middle',
-                border: '2px solid',
-                color: 'green',
-                width:'120px',
-                backgroundColor:'blue'
-              }}
-          >
+            borderRadius: '5px',
+            objectFit: 'cover',
+            verticalAlign: 'middle',
+            border: '2px solid',
+            color: 'green',
+            width: '120px',
+            backgroundColor: 'blue'
+          }}
+        >
           <button
             onClick={() => setShowDropdown(p => !p)}
             className="flex items-center gap-2 focus:outline-none"
@@ -97,14 +98,14 @@ export default function Navbar() {
                 borderRadius: '50%',
                 objectFit: 'cover',
                 verticalAlign: 'middle',
-                marginLeft:'5px'
+                marginLeft: '5px'
               }}
             />
-            <span className="usertab-name" style={{padding:'0.894rem'}}>{user.name || user.member_name}</span>
+            <span className="usertab-name" style={{ padding: '0.894rem' }}>{user.name || user.member_name}</span>
           </button>
 
           {showDropdown && (
-            <div className="dropdown" style={{ minWidth: '160px', float:'right' }}>
+            <div className="dropdown" style={{ minWidth: '160px', float: 'right' }}>
               <ul style={{ listStyleType: 'none', }}>
                 <li>
                   <Link
@@ -112,8 +113,8 @@ export default function Navbar() {
                       user.role === 'admin'
                         ? '/adminprofile'
                         : userIc
-                        ? `/userprofile`
-                        : '#'
+                          ? `/userprofile`
+                          : '#'
                     }
                   >
                     View/Edit Profile

@@ -16,6 +16,9 @@ export default function CaloriesCalculator() {
   const [currentUser, setCurrentUser] = useState(null);
   const [showTdeeResultOnly, setShowTdeeResultOnly] = useState(false);
   const [foodCalculated, setFoodCalculated] = useState(false);
+const [pageReady, setPageReady] = useState(false);
+
+
 
 
   useEffect(() => {
@@ -127,6 +130,15 @@ export default function CaloriesCalculator() {
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     marginTop: '20px'
   };
+
+  useEffect(() => {
+  const timeout = setTimeout(() => setPageReady(true), 100); // small delay lets CSS apply
+  return () => clearTimeout(timeout);
+}, []);
+
+if (!pageReady) {
+  return <div style={{ textAlign: 'center', paddingTop: '100px' }}>Loading...</div>;
+}
 
   return (
     
