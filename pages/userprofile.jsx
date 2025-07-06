@@ -44,35 +44,58 @@ export default function UserProfile() {
     setFormData(prev => ({ ...prev, [name]: value }));
   }
 
-  async function handleSave() {
-    try {
-      const res = await fetch('/api/Db_connection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          table: 'member',
-          action: 'update_profile',
-          data: {
-            role: user.role,
-            member_ic: user.member_ic,
-            updates: formData
-          }
-        })
-      });
+async function handleSave() {
+  const requiredFields = ['member_name', 'email', 'height', 'weight', 'goal_weight', 'age', 'gender'];
 
-      const result = await res.json();
-      if (res.ok) {
-        alert('✅ Profile updated!');
-        setEditing(false);
-        setProfile(formData);
-      } else {
-        console.error('❌ Update failed:', result);
-        alert('❌ Update failed');
-      }
-    } catch (err) {
-      console.error('❌ Error updating profile:', err);
+  for (const field of requiredFields) {
+    if (!formData[field] || formData[field].toString().trim() === '') {
+      alert(`⚠️ Please fill in the "${field.replace('_', ' ')}" field.`);
+      return;
     }
   }
+
+  // Basic format checks
+  if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+    alert('⚠️ Please enter a valid email address.');
+    return;
+  }
+
+  if (isNaN(formData.height) || isNaN(formData.weight) || isNaN(formData.goal_weight) || isNaN(formData.age)) {
+    alert('⚠️ Height, weight, goal weight, and age must be valid numbers.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/Db_connection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        table: 'member',
+        action: 'update_profile',
+        data: {
+          role: user.role,
+          member_ic: user.member_ic,
+          updates: formData
+        }
+      })
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error('❌ API error:', result.error || result);
+      alert(`❌ Failed to update: ${result.error || 'Unknown error'}`);
+      return;
+    }
+
+    alert('✅ Profile updated!');
+    setEditing(false);
+    setProfile(formData);
+  } catch (err) {
+    console.error('❌ Network error while updating profile:', err);
+    alert('❌ Network error: Could not update profile.');
+  }
+}
 
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');

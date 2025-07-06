@@ -40,38 +40,45 @@ export default function AddExercise({ onSave }) {
     setSelectedExercises(updated);
   };
 
-  const handleSubmit = () => {
-    if (!planName.trim()) return alert('❌ Enter plan name');
-    if (!selectedExercises.length) return alert('❌ Add at least one exercise');
+const handleSubmit = () => {
+  if (!planName.trim()) return alert('❌ Enter plan name');
+  if (!selectedExercises.length) return alert('❌ Add at least one exercise');
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user?.member_ic) return alert('❌ No user found in localStorage');
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user?.member_ic) return alert('❌ No user found in localStorage');
 
-    // ✅ Check that every exercise has duration_seconds OR reps + set
-    for (const [i, ex] of selectedExercises.entries()) {
-      const hasSeconds = ex.duration_seconds && parseInt(ex.duration_seconds) > 0;
-      const hasRepsSets = ex.reps && ex.set && parseInt(ex.reps) > 0 && parseInt(ex.set) > 0;
-
-      if (!hasSeconds && !hasRepsSets) {
-        return alert(`❌ Exercise ${i + 1}: Enter either seconds OR reps and sets`);
-      }
+  for (const [i, ex] of selectedExercises.entries()) {
+    if (!ex.exercise_id) {
+      return alert(`❌ Exercise ${i + 1}: Please select an exercise`);
     }
 
-    const finalPlan = {
-      plan_name: planName,
-      description: planDesc,
-      member_ic: user.member_ic,
-      exercises: selectedExercises.map(e => ({
-        ...e,
-        exercise_id: parseInt(e.exercise_id),
-        duration_seconds: e.duration_seconds ? parseInt(e.duration_seconds) : null,
-        reps: e.reps ? parseInt(e.reps) : null,
-        set: e.set ? parseInt(e.set) : null
-      }))
-    };
+    const hasSeconds = ex.duration_seconds && parseInt(ex.duration_seconds) > 0;
+    const hasRepsSets =
+      ex.reps && ex.set &&
+      parseInt(ex.reps) > 0 &&
+      parseInt(ex.set) > 0;
 
-    onSave?.(finalPlan);
+    if (!hasSeconds && !hasRepsSets) {
+      return alert(`❌ Exercise ${i + 1}: Enter either duration (seconds) or reps and sets`);
+    }
+  }
+
+  const finalPlan = {
+    plan_name: planName,
+    description: planDesc,
+    member_ic: user.member_ic,
+    exercises: selectedExercises.map(e => ({
+      ...e,
+      exercise_id: parseInt(e.exercise_id),
+      duration_seconds: e.duration_seconds ? parseInt(e.duration_seconds) : null,
+      reps: e.reps ? parseInt(e.reps) : null,
+      set: e.set ? parseInt(e.set) : null
+    }))
   };
+
+  onSave?.(finalPlan);
+};
+
 
   return (
   <div style={{ padding: 20 }}>
