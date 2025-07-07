@@ -42,6 +42,8 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: `${role === 'admin' ? 'Coach' : 'Member'} not found` });
       }
 
+      
+
       return res.status(200).json(result.rows[0]);
     }
 

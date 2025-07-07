@@ -190,10 +190,10 @@ export default function ExerciseLibrary({ role }) {
       />
     )}
 
-
+    <Footer />
     </Layout>
 
-    <Footer />
+    
   </div>
 );
 

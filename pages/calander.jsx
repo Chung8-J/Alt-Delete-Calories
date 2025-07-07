@@ -68,7 +68,7 @@ const [summary, setSummary] = useState({ totalCalories: 0, totalDuration: 0 });
   return (
    <div style={{ padding: '30px' }}>
   <Layout>
-    <h2 style={{ textAlign: 'center',marginTop:'140px',fontSize:'40px'}}>Workout Calendar</h2>
+    <h2 style={{ textAlign: 'center',marginTop:'140px',fontSize:'40px'}}>Daily Progress Calendar</h2>
 
     <div
       style={{

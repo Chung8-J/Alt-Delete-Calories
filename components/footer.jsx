@@ -1,4 +1,4 @@
-// components/Footer.jsx
+
 
 
 export default function Footer() {

@@ -715,7 +715,8 @@ export default function UserDashboard() {
                         <p>You don’t have any exercise plan yet.</p>
                         <button
                           onClick={() => router.push('/customizeplan')}
-
+                          className='Dashboard-btn'
+                          style={{marginTop:'10px'}}
                         >
                           Customize Plan Now!
                         </button>

@@ -29,6 +29,9 @@ export default function UserProfile() {
       const res = await fetch(`/api/Db_connection?member_ic=${member_ic}&role=${role}`);
       const data = await res.json();
       if (res.ok) {
+        if (data.d_birth) {
+          data.d_birth = new Date(data.d_birth).toISOString().split('T')[0];
+        }
         setProfile(data);
         setFormData(data); // For editing
       } else {
@@ -136,21 +139,44 @@ function handleFeedbackSubmit() {
               <td style={{ padding: '8px' }}>
                 {editing ? (
                   key === 'gender' ? (
-                    <select name="gender" value={formData.gender || ''} onChange={handleChange} style={{ width: '100%' }}>
+                    <select name="gender" value={formData.gender || ''} onChange={handleChange} 
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          borderRadius: '6px',
+                          border: '1px solid #ccc',
+                          width:'100%',
+                          fontSize:'15px'
+                        }}>
                       <option value="">-- Select Gender --</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
                     </select>
                   ) : key === 'd_birth' ? (
-                    <input type="date" name={key} value={formData[key] || ''} onChange={handleChange} style={{ width: '100%' }} />
+                    <input type="date" name={key} value={formData[key] || ''} onChange={handleChange} 
+                           style={{
+                            flex: 1,
+                            padding: '8px',
+                            borderRadius: '6px',
+                            border: '1px solid #ccc',
+                            width:'100%',
+                            fontSize:'15px'
+                          }}/>
                   ) : (
                     <input
                       type="text"
                       name={key}
                       value={formData[key] || ''}
                       onChange={handleChange}
-                      style={{ width: '100%' }}
+                      style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '6px',
+                      border: '1px solid #ccc',
+                      width:'100%',
+                      fontSize:'15px'
+                    }}
                     />
                   )
                 ) : (
@@ -165,17 +191,17 @@ function handleFeedbackSubmit() {
       <div style={{ marginTop: '20px' }}>
         {editing ? (
           <>
-            <button onClick={handleSave} className='update-btn' style={{ marginRight: '10px' }}>
+            <button onClick={handleSave} className='update-btn' style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px',marginRight:'10px' }}>
               Save
             </button>
-            <button onClick={() => setEditing(false)} className='update-btn' >Cancel</button>
+            <button onClick={() => setEditing(false)} className='update-btn' style={{ fontWeight:'bold',fontSize:'20px',backgroundColor: 'rgb(255, 0, 0)',color:'white',padding: '15px 24px',borderRadius: '6px' }}>Cancel</button>
           </>
         ) : (
           <button onClick={() => setEditing(true)} 
                   style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(103, 255, 15, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px', marginRight:'10px' }}
                   className='update-btn'>      
                   Edit Profile</button> 
-        )}
+        )}<br /><br />
         <button
           style={{ fontWeight:'bold', fontSize:'20px',background: 'rgba(255, 255, 255, 0.86)', color: 'black', padding: '15px 24px', borderRadius: '6px' }}
           onClick={() => setShowFeedbackModal(true)}
