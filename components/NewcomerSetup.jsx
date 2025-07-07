@@ -189,8 +189,9 @@ export default function NewcomerSetup({ user, setUser, setIsNewcomer }) {
       }
     }
 
-    alert(`✅ Both plans saved successfully!`);
+    alert(`plans saved successfully!`);
     setIsNewcomer(false);
+    window.location.reload();
   };
 
   return (
