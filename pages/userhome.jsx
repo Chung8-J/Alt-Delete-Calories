@@ -800,9 +800,7 @@ export default function UserDashboard() {
                   ) : (
                     recentComments.map((comment, index) => (
                       <li key={index} style={{ marginBottom: '12px' }}>
-                        💬 <strong>{comment.commenter_name}</strong> said: "{comment.content}"<br />
-                        “{comment.content}”
-                        <br />
+                        💬 <strong>{comment.commenter_name}</strong> Comment under your post: "{comment.content}"<br />
                         <small style={{ color: '#888' }}>
                           {new Date(comment.created_at).toLocaleString()}
                         </small>
