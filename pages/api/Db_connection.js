@@ -209,10 +209,6 @@ export default async function handler(req, res) {
           const setClause = keys.map((key, i) => `${key} = $${i + 1}`).join(', ');
           const query = `UPDATE ${tableName} SET ${setClause} WHERE ${idColumn} = $${keys.length + 1}`;
 
-          console.log('🛠️ Fields to update:', keys);
-          console.log('📦 Values:', [...values, member_ic]);
-          console.log('🧾 Final SQL:', query);
-
           await pool.query(query, [...values, member_ic]);
 
           return res.status(200).json({ message: '✅ Profile updated' });
@@ -255,7 +251,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: `Calories info not found for exercise_id ${exercise_id}` });
           }
 
-          // 🧠 2. Decide duration and estimate calories
+          // 2. Decide duration and estimate calories
           let duration = null;
           let estimatedCalories = null;
 
@@ -280,7 +276,6 @@ export default async function handler(req, res) {
             set ?? null
           ]);
         }
-
 
         return res.status(200).json({ success: true, planId });
       }
@@ -467,7 +462,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ message: 'Product added' });
       }
 
-
+ 
       if (table === 'preset_workout_plan' && action === 'get_user_plans') {
         const { member_ic } = data;
         const plans = await pool.query(
@@ -533,39 +528,31 @@ export default async function handler(req, res) {
             `UPDATE preset_workout_plan SET plan_name = $3, description = $2 WHERE p_workoutplan_id = $1`,
             [plan_id, description, plan_name]
           );
-
           // Delete old exercises
           await pool.query(
             `DELETE FROM preset_workout_exercise WHERE p_workoutplan_id = $1`,
             [plan_id]
           );
-
           for (const ex of exercises) {
             const exercise_id = parseInt(ex.exercise_id);
-
             // Validate exercise_id
             if (isNaN(exercise_id)) {
               return res.status(400).json({ error: `⛔ Invalid exercise_id: ${ex.exercise_id}` });
             }
-
             const reps = ex.reps ? parseInt(ex.reps) : null;
             const set = ex.set ? parseInt(ex.set) : null;
             const duration_seconds = ex.duration_seconds ? parseInt(ex.duration_seconds) : null;
-
             // Fetch calories_per_sec
             const calRes = await pool.query(
               `SELECT calories_per_sec FROM exercise WHERE exercise_id = $1 LIMIT 1`,
               [exercise_id]
             );
             const calPerSec = calRes.rows[0]?.calories_per_sec;
-
             if (!calPerSec) {
               return res.status(400).json({ error: `❌ Calories info not found for exercise_id ${exercise_id}` });
             }
-
             let duration = null;
             let estimatedCalories = null;
-
             if (duration_seconds) {
               duration = duration_seconds;
               estimatedCalories = Math.round(duration * calPerSec);
@@ -577,16 +564,13 @@ export default async function handler(req, res) {
                 error: `❌ Please provide either duration_seconds or reps & set for exercise_id ${exercise_id}`
               });
             }
-
             await pool.query(
               `INSERT INTO preset_workout_exercise (p_workoutplan_id, exercise_id, duration_seconds, estimated_calories, reps, set)
          VALUES ($1, $2, $3, $4, $5, $6)`,
               [plan_id, exercise_id, duration, estimatedCalories, reps, set]
             );
           }
-
           return res.status(200).json({ success: true });
-
         } catch (err) {
           console.error('❌ Update Plan Error:', err);
           return res.status(500).json({ error: 'Server error during update.' });

@@ -109,7 +109,7 @@ export default function AddFood({ initialData, onPlanSaved }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             table: 'diet_plan',
-            action: 'save_diet_plan', // ← ✅ use this
+            action: 'save_diet_plan_custom', // ← ✅ use this
             data: {
             member_ic: user.member_ic,
             plan_name: planName,
