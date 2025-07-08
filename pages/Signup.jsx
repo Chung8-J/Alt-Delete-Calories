@@ -80,7 +80,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className='signup'>
+    <div className='signup' style={{paddingBottom:'40px'}}>
       <h1>Sign Up</h1>
 
       <label htmlFor="ic">IC Number (12 digits):</label><br />

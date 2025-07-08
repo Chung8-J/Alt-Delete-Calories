@@ -406,7 +406,7 @@ export default function UserDashboard() {
     <Layout>
 
       <div className="dashboard-container" style={{
-        display: 'flex', gap: '0', minHeight: exerciseInProgress ? '80vh' : '50vh', marginTop: exerciseInProgress ? '180px' : '10px'
+        display: 'flex', gap: '0', minHeight: exerciseInProgress ? '80vh' : '50vh', marginTop: exerciseInProgress ? '180px' : '180px'
 
       }}>
         {exerciseStarted ? (

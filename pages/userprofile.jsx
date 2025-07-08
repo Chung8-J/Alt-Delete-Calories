@@ -139,7 +139,7 @@ function handleFeedbackSubmit() {
   if (!profile) return <p>Loading profile...</p>;
 
   return (
-    <div style={{margin:'180px auto', width:'86%', marginBottom:'20px',fontSize:'20px'}}>
+    <div style={{margin:'180px auto', width:'86%', marginBottom:'20px',fontSize:'20px',paddingBottom:'40px'}}>
       <Layout>
       <h2 style={{marginBottom:'50px',fontSize:'40px'}}>User Profile</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
